@@ -49,10 +49,11 @@ locals {
   short_environment_identifier = "${var.short_environment_identifier}"
   remote_state_bucket_name     = "${var.remote_state_bucket_name}"
   s3_lb_policy_file            = "../policies/s3_alb_policy.json"
-  environment                  = "${var.environment}"
+  environment                  = "${var.environment_type}"
   tags                         = "${merge(data.terraform_remote_state.vpc.tags, map("sub-project", "${var.mis_app_name}"))}"
 
   ssh_deployer_key = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
+  eng_root_arn     = "${var.eng_root_arn}"
 
   app_hostnames = {
     internal = "${var.mis_app_name}-int"
@@ -95,7 +96,6 @@ locals {
 ####################################################
 module "common" {
   source                       = "../modules/common"
-  spg_app_name                 = "${local.spg_app_name}"
   cidr_block                   = "${local.cidr_block}"
   common_name                  = "${local.common_name}"
   environment                  = "${local.environment}"

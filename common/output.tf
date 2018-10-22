@@ -70,8 +70,8 @@ output "role_arn" {
   value = "${var.role_arn}"
 }
 
-output "spg_app_name" {
-  value = "${var.spg_app_name}"
+output "mis_app_name" {
+  value = "${var.mis_app_name}"
 }
 
 output "environment_identifier" {
@@ -91,19 +91,7 @@ output "s3_lb_policy_file" {
 }
 
 output "environment" {
-  value = "${var.environment}"
-}
-
-output "monitoring_server_external_url" {
-  value = "${data.terraform_remote_state.monitor.monitoring_server_external_url}"
-}
-
-output "monitoring_server_internal_url" {
-  value = "${data.terraform_remote_state.monitor.monitoring_server_internal_url}"
-}
-
-output "monitoring_server_client_sg_id" {
-  value = "${data.terraform_remote_state.monitor.monitoring_server_client_sg_id}"
+  value = "${var.environment_type}"
 }
 
 output "private_subnet_map" {
@@ -152,11 +140,6 @@ output "public_subnet_ids" {
     "${data.terraform_remote_state.vpc.vpc_public-subnet-az2}",
     "${data.terraform_remote_state.vpc.vpc_public-subnet-az3}",
   ]
-}
-
-# Security groups
-output "sg_map_ids" {
-  value = "${local.sg_map_ids}"
 }
 
 # spg hosts

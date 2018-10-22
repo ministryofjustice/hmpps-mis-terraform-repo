@@ -17,7 +17,7 @@ variable "region" {
   description = "The AWS region."
 }
 
-variable "environment" {
+variable "environment_type" {
   description = "environment"
 }
 
@@ -34,3 +34,5 @@ variable "route53_hosted_zone_id" {}
 variable "mis_app_name" {}
 
 variable "cloudwatch_log_retention" {}
+
+variable "eng_root_arn" {}

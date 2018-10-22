@@ -31,3 +31,7 @@ allowed_ip_cidr = [
   "52.74.223.119/32",
   "217.33.148.210/32",
 ]
+
+# This is used for ALB logs to S3 bucket.
+# This is fixed for each region. if region changes, this changes
+lb_account_id = "652711504416"

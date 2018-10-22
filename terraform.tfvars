@@ -6,7 +6,7 @@ terragrunt = {
     config {
       encrypt = true
       bucket  = "${get_env("TG_REMOTE_STATE_BUCKET", "REMOTE_STATE_BUCKET")}"
-      key     = "spg/${path_relative_to_include()}/terraform.tfstate"
+      key     = "${get_env("TG_ENVIRONMENT_TYPE", "ENVIRONMENT")}/${path_relative_to_include()}/terraform.tfstate"
       region  = "${get_env("TG_REGION", "AWS-REGION")}"
 
       dynamodb_table = "${get_env("TG_ENVIRONMENT_IDENTIFIER", "ENVIRONMENT_IDENTIFIER")}-lock-table"
@@ -25,7 +25,7 @@ terragrunt = {
 
       arguments = [
         "-var-file=${get_parent_tfvars_dir()}/env_configs/common.tfvars",
-        "-var-file=${get_parent_tfvars_dir()}/env_configs/${get_env("TG_ENVIRONMENT_TYPE", "ENVIRONMENT")}.tfvars",
+        "-var-file=${get_parent_tfvars_dir()}/env_configs/${get_env("TG_PROJECT_NAME", "integration")}-${get_env("TG_ENVIRONMENT_TYPE", "ENVIRONMENT")}.tfvars",
       ]
     }
   }
