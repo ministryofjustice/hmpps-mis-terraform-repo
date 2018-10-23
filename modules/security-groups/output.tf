@@ -1,21 +1,13 @@
 # SECURITY GROUPS
 
-output "security_groups_sg_internal_lb_id" {
-  value = "${local.internal_lb_sg_id}"
+output "security_groups_sg_mis_app_in" {
+  value = "${local.sg_mis_app_in}"
 }
 
-output "security_groups_sg_internal_instance_id" {
-  value = "${local.internal_inst_sg_id}"
+output "security_groups_sg_mis_common" {
+  value = "${local.sg_mis_common}"
 }
 
-output "security_groups_sg_rds_id" {
-  value = "${local.db_sg_id}"
-}
-
-output "security_groups_sg_external_lb_id" {
-  value = "${local.external_lb_sg_id}"
-}
-
-output "security_groups_sg_external_instance_id" {
-  value = "${local.external_inst_sg_id}"
+output "security_groups_sg_mis_db_in" {
+  value = "${local.sg_mis_db_in}"
 }

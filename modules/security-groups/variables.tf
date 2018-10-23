@@ -1,13 +1,7 @@
 variable "environment_identifier" {}
 variable "region" {}
 
-variable "spg_app_name" {}
-
-variable "alb_http_port" {}
-
-variable "alb_https_port" {}
-
-variable "alb_backend_port" {}
+variable "app_name" {}
 
 variable "vpc_id" {}
 
