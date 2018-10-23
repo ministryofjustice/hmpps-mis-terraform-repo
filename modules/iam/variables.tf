@@ -1,12 +1,8 @@
 variable "environment_identifier" {}
 
-variable "spg_app_name" {}
+variable "app_name" {}
 
 variable "ec2_policy_file" {}
-
-variable "ecs_policy_file" {}
-
-variable "ecs_role_policy_file" {}
 
 variable "ec2_role_policy_file" {}
 
