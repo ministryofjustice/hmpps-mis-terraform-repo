@@ -29,6 +29,19 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
+#-------------------------------------------------------------
+### Getting the sg details
+#-------------------------------------------------------------
+data "terraform_remote_state" "security-groups" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "security-groups/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
 ####################################################
 # Locals
 ####################################################
@@ -89,6 +102,12 @@ locals {
     "${data.terraform_remote_state.vpc.vpc_db-subnet-az2}",
     "${data.terraform_remote_state.vpc.vpc_db-subnet-az3}",
   ]
+
+  sg_map_ids = {
+    sg_mis_db_in  = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"
+    sg_mis_common = "${data.terraform_remote_state.security-groups.sg_mis_common}"
+    sg_mis_app_in = "${data.terraform_remote_state.security-groups.sg_mis_app_in}"
+  }
 }
 
 ####################################################

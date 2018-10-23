@@ -142,7 +142,12 @@ output "public_subnet_ids" {
   ]
 }
 
-# spg hosts
+# Security groups
+output "sg_map_ids" {
+  value = "${local.sg_map_ids}"
+}
+
+# mis hosts
 output "app_hostnames" {
   value = "${local.app_hostnames}"
 }
