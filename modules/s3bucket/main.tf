@@ -7,7 +7,7 @@
 ####################################################
 
 locals {
-  common_name = "${var.environment_identifier}-${var.spg_app_name}"
+  common_name = "${var.environment_identifier}-${var.app_name}"
   tags        = "${var.tags}"
 }
 
