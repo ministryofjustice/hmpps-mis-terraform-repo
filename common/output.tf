@@ -102,6 +102,14 @@ output "private_subnet_map" {
   }
 }
 
+output "public_subnet_map" {
+  value = {
+    az1 = "${data.terraform_remote_state.vpc.vpc_public-subnet-az1}"
+    az2 = "${data.terraform_remote_state.vpc.vpc_public-subnet-az2}"
+    az3 = "${data.terraform_remote_state.vpc.vpc_public-subnet-az3}"
+  }
+}
+
 output "public_cidr_block" {
   value = [
     "${data.terraform_remote_state.vpc.vpc_public-subnet-az1-cidr_block}",
@@ -142,7 +150,12 @@ output "public_subnet_ids" {
   ]
 }
 
-# spg hosts
+# Security groups
+output "sg_map_ids" {
+  value = "${local.sg_map_ids}"
+}
+
+# mis hosts
 output "app_hostnames" {
   value = "${local.app_hostnames}"
 }
@@ -150,4 +163,9 @@ output "app_hostnames" {
 # enginnering root account arn
 output "eng_root_arn" {
   value = "${local.eng_root_arn}"
+}
+
+# availability_zone_map
+output "availability_zone_map" {
+  value = "${local.availability_zone_map}"
 }
