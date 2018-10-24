@@ -123,6 +123,7 @@ locals {
   ssh_deployer_key      = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
   availability_zone_map = "${data.terraform_remote_state.common.availability_zone_map}"
   nart_role             = "ndl-bws"
+  sg_outbound_id        = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
 ####################################################
@@ -150,6 +151,7 @@ module "create-ec2-instance" {
   vpc_security_group_ids = [
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
+    "${local.sg_outbound_id}",
   ]
 }
 
@@ -210,6 +212,7 @@ module "create-ec2-instance1" {
   vpc_security_group_ids = [
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
+    "${local.sg_outbound_id}",
   ]
 }
 
