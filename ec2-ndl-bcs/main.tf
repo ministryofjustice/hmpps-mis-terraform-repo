@@ -241,8 +241,8 @@ module "ebs-attach-ec2-instance1" {
 
 resource "aws_route53_record" "instance1" {
   zone_id = "${local.private_zone_id}"
-  name    = "${local.nart_role}-001.${local.internal_domain}"
+  name    = "${local.nart_role}-002.${local.internal_domain}"
   type    = "A"
   ttl     = "300"
-  records = ["${module.create-ec2-instance.private_ip}"]
+  records = ["${module.create-ec2-instance1.private_ip}"]
 }
