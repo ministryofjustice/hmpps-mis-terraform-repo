@@ -39,6 +39,8 @@ eng_role_arn = "arn:aws:iam::895523100917:role/terraform"
 
 eng_root_arn = "arn:aws:iam::895523100917:root"
 
+cross_account_iam_role = "arn:aws:iam::895523100917:role/tf-eu-west-2-hmpps-eng-dev-mis-runtime"
+
 # ROUTE53 ZONE probation.hmpps.dsd.io
 route53_hosted_zone_id = "Z2UWMKJVW764KQ"
 

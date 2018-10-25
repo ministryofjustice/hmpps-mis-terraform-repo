@@ -18,3 +18,7 @@ variable depends_on {
 }
 
 variable "artefact-bucket" {}
+
+variable "runtime_role" {
+  default = ""
+}

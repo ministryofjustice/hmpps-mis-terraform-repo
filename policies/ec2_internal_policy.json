@@ -2,19 +2,10 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "ecsInstanceRole",
+            "Sid": "AssumeRole",
             "Effect": "Allow",
-            "Action": [
-                "ecs:DeregisterContainerInstance",
-                "ecs:DiscoverPollEndpoint",
-                "ecs:Poll",
-                "ecs:RegisterContainerInstance",
-                "ecs:Submit*",
-                "ecs:StartTelemetrySession"
-            ],
-            "Resource": [
-                "*"
-            ]
+            "Action": "sts:AssumeRole",
+            "Resource": "${runtime_role}"
         },
         {
             "Sid": "ec2InstanceRole",
