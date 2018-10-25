@@ -105,9 +105,10 @@ locals {
   ]
 
   sg_map_ids = {
-    sg_mis_db_in  = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"
-    sg_mis_common = "${data.terraform_remote_state.security-groups.sg_mis_common}"
-    sg_mis_app_in = "${data.terraform_remote_state.security-groups.sg_mis_app_in}"
+    sg_mis_db_in    = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"
+    sg_mis_common   = "${data.terraform_remote_state.security-groups.sg_mis_common}"
+    sg_mis_app_in   = "${data.terraform_remote_state.security-groups.sg_mis_app_in}"
+    sg_mis_jumphost = "${data.terraform_remote_state.security-groups.sg_mis_jumphost}"
   }
 }
 

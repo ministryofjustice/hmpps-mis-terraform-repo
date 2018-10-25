@@ -15,21 +15,22 @@ locals {
 
   private_cidr_block = ["${var.private_cidr_block}"]
 
-  db_cidr_block = ["${var.db_cidr_block}"]
-  sg_mis_app_in = "${var.sg_map_ids["sg_mis_app_in"]}"
-  sg_mis_common = "${var.sg_map_ids["sg_mis_common"]}"
-  sg_mis_db_in  = "${var.sg_map_ids["sg_mis_db_in"]}"
+  db_cidr_block   = ["${var.db_cidr_block}"]
+  sg_mis_app_in   = "${var.sg_map_ids["sg_mis_app_in"]}"
+  sg_mis_common   = "${var.sg_map_ids["sg_mis_common"]}"
+  sg_mis_db_in    = "${var.sg_map_ids["sg_mis_db_in"]}"
+  sg_mis_jumphost = "${var.sg_map_ids["sg_mis_jumphost"]}"
 }
 
 #######################################
 # SECURITY GROUPS
 #######################################
 #-------------------------------------------------------------
-### app
+### jumphost
 #-------------------------------------------------------------
 
-resource "aws_security_group_rule" "rdp_in" {
-  security_group_id = "${local.sg_mis_app_in}"
+resource "aws_security_group_rule" "jump_rdp_in" {
+  security_group_id = "${local.sg_mis_jumphost}"
   from_port         = 3389
   to_port           = 3389
   protocol          = "tcp"
@@ -41,9 +42,43 @@ resource "aws_security_group_rule" "rdp_in" {
   ]
 }
 
+resource "aws_security_group_rule" "jump_rdp_egress" {
+  security_group_id        = "${local.sg_mis_jumphost}"
+  from_port                = 3389
+  to_port                  = 3389
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "${local.common_name}-rdp-out"
+  source_security_group_id = "${local.sg_mis_common}"
+}
+
+#-------------------------------------------------------------
+### app
+#-------------------------------------------------------------
+
+resource "aws_security_group_rule" "tomcat_in" {
+  security_group_id        = "${local.sg_mis_app_in}"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  type                     = "ingress"
+  description              = "${local.common_name}-tomcat-in"
+  source_security_group_id = "${local.sg_mis_jumphost}"
+}
+
 #-------------------------------------------------------------
 ### common sg rules
 #-------------------------------------------------------------
+resource "aws_security_group_rule" "rdp_in" {
+  security_group_id        = "${local.sg_mis_common}"
+  from_port                = 3389
+  to_port                  = 3389
+  protocol                 = "tcp"
+  type                     = "ingress"
+  description              = "${local.common_name}-rdp-in"
+  source_security_group_id = "${local.sg_mis_jumphost}"
+}
+
 resource "aws_security_group_rule" "local_ingress" {
   security_group_id = "${local.sg_mis_common}"
   type              = "ingress"
