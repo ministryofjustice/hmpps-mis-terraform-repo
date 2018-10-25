@@ -7,10 +7,6 @@ output "primary_private_ip" {
   value = "${module.create-ec2-instance.private_ip}"
 }
 
-output "primary_public_ip" {
-  value = "${module.create-ec2-instance.public_ip}"
-}
-
 # primary ebs
 output "primary_ebs_id" {
   value = "${module.ebs-ec2-instance.id}"
@@ -36,10 +32,6 @@ output "secondary_instance_id" {
 
 output "secondary_private_ip" {
   value = "${module.create-ec2-instance1.private_ip}"
-}
-
-output "secondary_public_ip" {
-  value = "${module.create-ec2-instance1.public_ip}"
 }
 
 # secondary ebs

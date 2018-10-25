@@ -111,7 +111,6 @@ locals {
   environment                  = "${data.terraform_remote_state.common.environment}"
   tags                         = "${data.terraform_remote_state.common.common_tags}"
   private_subnet_map           = "${data.terraform_remote_state.common.private_subnet_map}"
-  public_subnet_map            = "${data.terraform_remote_state.common.public_subnet_map}"
   s3bucket                     = "${data.terraform_remote_state.s3bucket.s3bucket}"
   app_hostnames                = "${data.terraform_remote_state.common.app_hostnames}"
 
@@ -138,9 +137,9 @@ module "create-ec2-instance" {
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-001"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.instance_type}"
-  subnet_id                   = "${local.public_subnet_map["az1"]}"
+  subnet_id                   = "${local.private_subnet_map["az1"]}"
   iam_instance_profile        = "${local.instance_profile}"
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   monitoring                  = true
   user_data                   = ""
   CreateSnapshot              = false
@@ -199,9 +198,9 @@ module "create-ec2-instance1" {
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-002"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.instance_type}"
-  subnet_id                   = "${local.public_subnet_map["az2"]}"
+  subnet_id                   = "${local.private_subnet_map["az2"]}"
   iam_instance_profile        = "${local.instance_profile}"
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   monitoring                  = true
   user_data                   = ""
   CreateSnapshot              = false
