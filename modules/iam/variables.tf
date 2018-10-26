@@ -22,3 +22,7 @@ variable "artefact-bucket" {}
 variable "runtime_role" {
   default = ""
 }
+
+variable "region" {}
+
+variable "account_id" {}

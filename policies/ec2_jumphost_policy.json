@@ -57,6 +57,16 @@
                 "route53:ListHostedZonesByName"
             ],
             "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Sid": "allowSSMReadOnly",
+            "Action": [
+                "ssm:Describe*",
+                "ssm:Get*",
+                "ssm:List*"
+            ],
+            "Resource": "${ssm_prefix}"
         }
     ]
 }

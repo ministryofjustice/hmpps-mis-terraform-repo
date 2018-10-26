@@ -60,7 +60,7 @@
                 "ssm:Get*",
                 "ssm:List*"
             ],
-            "Resource": "*"
+            "Resource": "${ssm_prefix}"
         },
         {
             "Sid": "allowRoute53Update",
