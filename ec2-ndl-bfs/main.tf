@@ -129,6 +129,15 @@ locals {
 # instance 1
 ####################################################
 
+data "template_file" "instance_userdata" {
+  template = "${file("../userdata/userdata.txt")}"
+
+  vars {
+    host_name       = "${local.nart_role}-001"
+    internal_domain = "${local.internal_domain}"
+  }
+}
+
 #-------------------------------------------------------------
 ### Create instance - NDL-BWS-001 
 #-------------------------------------------------------------
@@ -141,7 +150,7 @@ module "create-ec2-instance" {
   iam_instance_profile        = "${local.instance_profile}"
   associate_public_ip_address = false
   monitoring                  = true
-  user_data                   = ""
+  user_data                   = "${data.template_file.instance_userdata.rendered}"
   CreateSnapshot              = false
   tags                        = "${local.tags}"
   key_name                    = "${local.ssh_deployer_key}"
