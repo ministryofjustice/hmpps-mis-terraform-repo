@@ -71,7 +71,7 @@ data "aws_ami" "amazon_ami" {
 
   filter {
     name   = "name"
-    values = ["Windows_Server-2012-R2_RTM-English-64Bit-Base*"]
+    values = ["HMPPS MIS NART Windows Server master *"]
   }
 
   filter {
