@@ -17,6 +17,7 @@ locals {
   internal_domain = "${var.internal_domain}"
   tags            = "${var.tags}"
   common_name     = "${var.environment_identifier}-mis"
+  admin_user      = "mis_admin_${var.environment}"
 }
 
 #######################################
@@ -90,4 +91,35 @@ module "s3alb_logs_policy" {
   source       = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=pre-shared-vpc//modules//s3bucket//s3bucket_policy"
   s3_bucket_id = "${module.s3_lb_logs_bucket.s3_bucket_name}"
   policyfile   = "${data.template_file.s3alb_logs_policy.rendered}"
+}
+
+###############################################
+# MIS admin account
+###############################################
+resource "random_string" "password" {
+  length  = 20
+  special = true
+}
+
+# Add to SSM
+resource "aws_ssm_parameter" "ssm_password" {
+  name        = "${local.common_name}-admin-password"
+  description = "${local.common_name}-admin-password"
+  type        = "SecureString"
+  value       = "${sha256(bcrypt(random_string.password.result))}"
+
+  tags = "${merge(local.tags, map("Name", "${local.common_name}-admin-password"))}"
+
+  lifecycle {
+    ignore_changes = ["value"]
+  }
+}
+
+# Add to SSM
+resource "aws_ssm_parameter" "ssm_user" {
+  name        = "${local.common_name}-admin-user"
+  description = "${local.common_name}-admin-user"
+  type        = "String"
+  value       = "${local.admin_user}"
+  tags        = "${merge(local.tags, map("Name", "${local.common_name}-admin-user"))}"
 }
