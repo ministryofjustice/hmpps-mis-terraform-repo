@@ -121,7 +121,7 @@ locals {
   instance_profile      = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
   ssh_deployer_key      = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
   availability_zone_map = "${data.terraform_remote_state.common.availability_zone_map}"
-  nart_role             = "ndl-bws"
+  nart_role             = "ndl-bps"
   sg_outbound_id        = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
@@ -245,4 +245,61 @@ resource "aws_route53_record" "instance1" {
   type    = "A"
   ttl     = "300"
   records = ["${module.create-ec2-instance1.private_ip}"]
+}
+
+#-------------------------------------------------------------
+### Create instance - NDL-BWS-003
+#-------------------------------------------------------------
+module "create-ec2-instance2" {
+  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
+  app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-003"
+  ami_id                      = "${data.aws_ami.amazon_ami.id}"
+  instance_type               = "${var.instance_type}"
+  subnet_id                   = "${local.private_subnet_map["az3"]}"
+  iam_instance_profile        = "${local.instance_profile}"
+  associate_public_ip_address = false
+  monitoring                  = true
+  user_data                   = ""
+  CreateSnapshot              = false
+  tags                        = "${local.tags}"
+  key_name                    = "${local.ssh_deployer_key}"
+  root_device_size            = "60"
+
+  vpc_security_group_ids = [
+    "${local.sg_map_ids["sg_mis_app_in"]}",
+    "${local.sg_map_ids["sg_mis_common"]}",
+    "${local.sg_outbound_id}",
+  ]
+}
+
+#-------------------------------------------------------------
+# Create ebs volume
+#-------------------------------------------------------------
+module "ebs-ec2-instance2" {
+  source            = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_volume"
+  availability_zone = "${local.availability_zone_map["az3"]}"
+  volume_size       = "50"
+  encrypted         = true
+  app_name          = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-003"
+  tags              = "${local.tags}"
+  CreateSnapshot    = false
+}
+
+module "ebs-attach-ec2-instance2" {
+  source      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_attachment"
+  device_name = "/dev/sdb"
+  instance_id = "${module.create-ec2-instance2.instance_id}"
+  volume_id   = "${module.ebs-ec2-instance2.id}"
+}
+
+#-------------------------------------------------------------
+# Create route53 entry for instance 2
+#-------------------------------------------------------------
+
+resource "aws_route53_record" "instance2" {
+  zone_id = "${local.private_zone_id}"
+  name    = "${local.nart_role}-003.${local.internal_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance2.private_ip}"]
 }

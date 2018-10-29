@@ -4,8 +4,6 @@ variable "app_name" {}
 
 variable "ec2_policy_file" {}
 
-variable "ec2_role_policy_file" {}
-
 variable "ec2_internal_policy_file" {}
 
 variable "tags" {
@@ -20,3 +18,11 @@ variable depends_on {
 }
 
 variable "artefact-bucket" {}
+
+variable "runtime_role" {
+  default = ""
+}
+
+variable "region" {}
+
+variable "account_id" {}

@@ -47,3 +47,30 @@ output "secondary_ebs_arn" {
 output "secondary_dns" {
   value = "${aws_route53_record.instance1.fqdn}"
 }
+
+####################################################
+# instance 3
+####################################################
+
+# third ec2
+output "third_instance_id" {
+  value = "${module.create-ec2-instance2.instance_id}"
+}
+
+output "third_private_ip" {
+  value = "${module.create-ec2-instance2.private_ip}"
+}
+
+# third ebs
+output "third_ebs_id" {
+  value = "${module.ebs-ec2-instance2.id}"
+}
+
+output "third_ebs_arn" {
+  value = "${module.ebs-ec2-instance2.arn}"
+}
+
+# dns
+output "third_dns" {
+  value = "${aws_route53_record.instance2.fqdn}"
+}

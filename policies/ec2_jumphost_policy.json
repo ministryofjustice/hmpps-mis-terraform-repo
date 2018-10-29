@@ -2,24 +2,6 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "ecsInstanceRole",
-            "Effect": "Allow",
-            "Action": [
-                "ecs:DeregisterContainerInstance",
-                "ecs:DiscoverPollEndpoint",
-                "ecs:Poll",
-                "ecs:RegisterContainerInstance",
-                "ecs:Submit*",
-                "ecs:StartTelemetrySession",
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
             "Sid": "ec2InstanceRole",
             "Effect": "Allow",
             "Action": [
@@ -61,20 +43,8 @@
             ],
             "Resource": [
                 "arn:aws:s3:::${s3-config-bucket}",
-                "arn:aws:s3:::${s3-config-bucket}/*",
-                "arn:aws:s3:::${s3-artefact-bucket}",
-                "arn:aws:s3:::${s3-artefact-bucket}/*"
+                "arn:aws:s3:::${s3-config-bucket}/*"
             ]
-        },
-        {
-            "Effect": "Allow",
-            "Sid": "allowSSMReadOnly",
-            "Action": [
-                "ssm:Describe*",
-                "ssm:Get*",
-                "ssm:List*"
-            ],
-            "Resource": "*"
         },
         {
             "Sid": "allowRoute53Update",
@@ -87,6 +57,16 @@
                 "route53:ListHostedZonesByName"
             ],
             "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Sid": "allowSSMReadOnly",
+            "Action": [
+                "ssm:Describe*",
+                "ssm:Get*",
+                "ssm:List*"
+            ],
+            "Resource": "${ssm_prefix}"
         }
     ]
 }

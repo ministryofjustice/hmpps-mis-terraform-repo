@@ -68,6 +68,7 @@ locals {
   ssh_deployer_key      = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
   eng_root_arn          = "${var.eng_root_arn}"
   availability_zone_map = "${data.terraform_remote_state.vpc.availability_zone_map}"
+  password_length       = "12"
 
   app_hostnames = {
     internal = "${var.mis_app_name}-int"
@@ -105,9 +106,10 @@ locals {
   ]
 
   sg_map_ids = {
-    sg_mis_db_in  = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"
-    sg_mis_common = "${data.terraform_remote_state.security-groups.sg_mis_common}"
-    sg_mis_app_in = "${data.terraform_remote_state.security-groups.sg_mis_app_in}"
+    sg_mis_db_in    = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"
+    sg_mis_common   = "${data.terraform_remote_state.security-groups.sg_mis_common}"
+    sg_mis_app_in   = "${data.terraform_remote_state.security-groups.sg_mis_app_in}"
+    sg_mis_jumphost = "${data.terraform_remote_state.security-groups.sg_mis_jumphost}"
   }
 }
 
@@ -128,4 +130,5 @@ module "common" {
   tags                         = "${local.tags}"
   vpc_id                       = "${local.vpc_id}"
   region                       = "${local.region}"
+  password_length              = "${local.password_length}"
 }

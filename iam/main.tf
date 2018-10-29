@@ -48,6 +48,8 @@ locals {
   tags                   = "${data.terraform_remote_state.common.common_tags}"
   s3-config-bucket       = "${data.terraform_remote_state.common.common_s3-config-bucket}"
   artefact-bucket        = "${data.terraform_remote_state.s3buckets.s3bucket}"
+  runtime_role           = "${var.cross_account_iam_role}"
+  account_id             = "${data.terraform_remote_state.common.common_account_id}"
 }
 
 ####################################################
@@ -58,9 +60,27 @@ module "iam" {
   app_name                 = "${local.app_name}"
   environment_identifier   = "${local.environment_identifier}"
   tags                     = "${local.tags}"
-  ec2_role_policy_file     = "${file("../policies/ec2_role_policy.json")}"
   ec2_policy_file          = "ec2_policy.json"
   ec2_internal_policy_file = "${file("../policies/ec2_internal_policy.json")}"
   s3-config-bucket         = "${local.s3-config-bucket}"
   artefact-bucket          = "${local.artefact-bucket}"
+  runtime_role             = "${local.runtime_role}"
+  region                   = "${local.region}"
+  account_id               = "${local.account_id}"
+}
+
+####################################################
+# IAM - Application Specific
+####################################################
+module "jumphost" {
+  source                   = "../modules/iam"
+  app_name                 = "${local.app_name}-jumphost"
+  environment_identifier   = "${local.environment_identifier}"
+  tags                     = "${local.tags}"
+  ec2_policy_file          = "ec2_policy.json"
+  ec2_internal_policy_file = "${file("../policies/ec2_jumphost_policy.json")}"
+  s3-config-bucket         = "${local.s3-config-bucket}"
+  artefact-bucket          = "${local.artefact-bucket}"
+  region                   = "${local.region}"
+  account_id               = "${local.account_id}"
 }

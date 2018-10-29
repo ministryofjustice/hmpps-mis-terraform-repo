@@ -121,7 +121,7 @@ locals {
   instance_profile      = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
   ssh_deployer_key      = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
   availability_zone_map = "${data.terraform_remote_state.common.availability_zone_map}"
-  nart_role             = "ndl-bws"
+  nart_role             = "ndl-bcs"
   sg_outbound_id        = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
@@ -145,7 +145,7 @@ module "create-ec2-instance" {
   CreateSnapshot              = false
   tags                        = "${local.tags}"
   key_name                    = "${local.ssh_deployer_key}"
-  root_device_size            = "60"
+  root_device_size            = "40"
 
   vpc_security_group_ids = [
     "${local.sg_map_ids["sg_mis_app_in"]}",
@@ -160,7 +160,7 @@ module "create-ec2-instance" {
 module "ebs-ec2-instance" {
   source            = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_volume"
   availability_zone = "${local.availability_zone_map["az1"]}"
-  volume_size       = "50"
+  volume_size       = "280"
   encrypted         = true
   app_name          = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-001"
   tags              = "${local.tags}"
@@ -206,7 +206,7 @@ module "create-ec2-instance1" {
   CreateSnapshot              = false
   tags                        = "${local.tags}"
   key_name                    = "${local.ssh_deployer_key}"
-  root_device_size            = "60"
+  root_device_size            = "40"
 
   vpc_security_group_ids = [
     "${local.sg_map_ids["sg_mis_app_in"]}",
@@ -221,7 +221,7 @@ module "create-ec2-instance1" {
 module "ebs-ec2-instance1" {
   source            = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_volume"
   availability_zone = "${local.availability_zone_map["az2"]}"
-  volume_size       = "50"
+  volume_size       = "280"
   encrypted         = true
   app_name          = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-002"
   tags              = "${local.tags}"

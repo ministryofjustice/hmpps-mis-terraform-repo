@@ -36,3 +36,5 @@ variable "mis_app_name" {}
 variable "cloudwatch_log_retention" {}
 
 variable "eng_root_arn" {}
+
+variable "password_length" {}
