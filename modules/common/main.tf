@@ -106,7 +106,7 @@ resource "aws_ssm_parameter" "ssm_password" {
   name        = "${local.common_name}-admin-password"
   description = "${local.common_name}-admin-password"
   type        = "SecureString"
-  value       = "${substr(sha256(bcrypt(random_string.password.result)),0,var.password_length)}P$"
+  value       = "${substr(sha256(bcrypt(random_string.password.result)),0,var.password_length)}${random_string.special.result}"
 
   tags = "${merge(local.tags, map("Name", "${local.common_name}-admin-password"))}"
 
@@ -122,4 +122,13 @@ resource "aws_ssm_parameter" "ssm_user" {
   type        = "String"
   value       = "${local.admin_user}"
   tags        = "${merge(local.tags, map("Name", "${local.common_name}-admin-user"))}"
+}
+
+# random strings for Password policy
+resource "random_string" "special" {
+  length           = 4
+  special          = true
+  min_upper        = 2
+  min_special      = 2
+  override_special = "!@$%&*()-_=+[]{}<>:?"
 }

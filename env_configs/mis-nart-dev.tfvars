@@ -53,4 +53,5 @@ allowed_cidr_block = [
   "35.176.14.16/32",    #Engineering Jenkins non prod AZ 1
   "35.177.83.160/32",   #Engineering Jenkins non prod AZ 2
   "18.130.108.149/32",  #Engineering Jenkins non prod AZ 3
+  "194.75.210.218/32",  #MIS Tolomy
 ]
