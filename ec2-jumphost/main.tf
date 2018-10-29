@@ -125,9 +125,30 @@ locals {
   sg_outbound_id        = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
+#-------------------------------------------------------------
+## Getting the admin username and password
+#-------------------------------------------------------------
+data "aws_ssm_parameter" "user" {
+  name = "${local.environment_identifier}-${local.app_name}-admin-user"
+}
+
+data "aws_ssm_parameter" "password" {
+  name = "${local.environment_identifier}-${local.app_name}-admin-password"
+}
+
 ####################################################
 # instance 1
 ####################################################
+data "template_file" "instance_userdata" {
+  template = "${file("../userdata/jumphost/userdata.txt")}"
+
+  vars {
+    host_name       = "${local.nart_role}-001"
+    internal_domain = "${local.internal_domain}"
+    user            = "${data.aws_ssm_parameter.user.value}"
+    password        = "${data.aws_ssm_parameter.password.value}"
+  }
+}
 
 #-------------------------------------------------------------
 ### Create instance 
@@ -141,7 +162,7 @@ module "create-ec2-instance" {
   iam_instance_profile        = "${local.instance_profile}"
   associate_public_ip_address = true
   monitoring                  = true
-  user_data                   = ""
+  user_data                   = "${data.template_file.instance_userdata.rendered}"
   CreateSnapshot              = false
   tags                        = "${local.tags}"
   key_name                    = "${local.ssh_deployer_key}"

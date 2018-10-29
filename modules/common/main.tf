@@ -106,7 +106,7 @@ resource "aws_ssm_parameter" "ssm_password" {
   name        = "${local.common_name}-admin-password"
   description = "${local.common_name}-admin-password"
   type        = "SecureString"
-  value       = "${substr(sha256(bcrypt(random_string.password.result)),0,var.password_length)}"
+  value       = "${substr(sha256(bcrypt(random_string.password.result)),0,var.password_length)}P$"
 
   tags = "${merge(local.tags, map("Name", "${local.common_name}-admin-password"))}"
 

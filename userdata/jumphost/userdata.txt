@@ -1,0 +1,5 @@
+<powershell>
+net user ${user} "${password}" /add /y
+net localgroup administrators ${user} /add
+</powershell>
+<persist>true</persist>
