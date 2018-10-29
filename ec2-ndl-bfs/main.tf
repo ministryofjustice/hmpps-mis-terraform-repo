@@ -176,26 +176,6 @@ module "create-ec2-instance" {
   ]
 }
 
-# #-------------------------------------------------------------
-# # Create ebs volume
-# #-------------------------------------------------------------
-# module "ebs-ec2-instance" {
-#   source            = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_volume"
-#   availability_zone = "${local.availability_zone_map["az1"]}"
-#   volume_size       = "300"
-#   encrypted         = true
-#   app_name          = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-001"
-#   tags              = "${local.tags}"
-#   CreateSnapshot    = false
-# }
-
-# module "ebs-attach-ec2-instance" {
-#   source      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_attachment"
-#   device_name = "/dev/sdb"
-#   instance_id = "${module.create-ec2-instance.instance_id}"
-#   volume_id   = "${module.ebs-ec2-instance.id}"
-# }
-
 #-------------------------------------------------------------
 # Create route53 entry for instance 1
 #-------------------------------------------------------------
