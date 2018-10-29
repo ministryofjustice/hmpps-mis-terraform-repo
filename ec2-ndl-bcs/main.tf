@@ -125,9 +125,31 @@ locals {
   sg_outbound_id        = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
+#-------------------------------------------------------------
+## Getting the admin username and password
+#-------------------------------------------------------------
+data "aws_ssm_parameter" "user" {
+  name = "${local.environment_identifier}-${local.app_name}-admin-user"
+}
+
+data "aws_ssm_parameter" "password" {
+  name = "${local.environment_identifier}-${local.app_name}-admin-password"
+}
+
 ####################################################
 # instance 1
 ####################################################
+
+data "template_file" "instance_userdata" {
+  template = "${file("../userdata/userdata.txt")}"
+
+  vars {
+    host_name       = "${local.nart_role}-001"
+    internal_domain = "${local.internal_domain}"
+    user            = "${data.aws_ssm_parameter.user.value}"
+    password        = "${data.aws_ssm_parameter.password.value}"
+  }
+}
 
 #-------------------------------------------------------------
 ### Create instance - NDL-BWS-001 
@@ -141,37 +163,17 @@ module "create-ec2-instance" {
   iam_instance_profile        = "${local.instance_profile}"
   associate_public_ip_address = false
   monitoring                  = true
-  user_data                   = ""
+  user_data                   = "${data.template_file.instance_userdata.rendered}"
   CreateSnapshot              = false
   tags                        = "${local.tags}"
   key_name                    = "${local.ssh_deployer_key}"
-  root_device_size            = "40"
+  root_device_size            = "60"
 
   vpc_security_group_ids = [
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
     "${local.sg_outbound_id}",
   ]
-}
-
-#-------------------------------------------------------------
-# Create ebs volume
-#-------------------------------------------------------------
-module "ebs-ec2-instance" {
-  source            = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_volume"
-  availability_zone = "${local.availability_zone_map["az1"]}"
-  volume_size       = "280"
-  encrypted         = true
-  app_name          = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-001"
-  tags              = "${local.tags}"
-  CreateSnapshot    = false
-}
-
-module "ebs-attach-ec2-instance" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_attachment"
-  device_name = "/dev/sdb"
-  instance_id = "${module.create-ec2-instance.instance_id}"
-  volume_id   = "${module.ebs-ec2-instance.id}"
 }
 
 #-------------------------------------------------------------
@@ -189,6 +191,16 @@ resource "aws_route53_record" "instance" {
 ####################################################
 # instance 2
 ####################################################
+data "template_file" "instance1_userdata" {
+  template = "${file("../userdata/userdata.txt")}"
+
+  vars {
+    host_name       = "${local.nart_role}-002"
+    internal_domain = "${local.internal_domain}"
+    user            = "${data.aws_ssm_parameter.user.value}"
+    password        = "${data.aws_ssm_parameter.password.value}"
+  }
+}
 
 #-------------------------------------------------------------
 ### Create instance - NDL-BWS-002
@@ -202,37 +214,17 @@ module "create-ec2-instance1" {
   iam_instance_profile        = "${local.instance_profile}"
   associate_public_ip_address = false
   monitoring                  = true
-  user_data                   = ""
+  user_data                   = "${data.template_file.instance1_userdata.rendered}"
   CreateSnapshot              = false
   tags                        = "${local.tags}"
   key_name                    = "${local.ssh_deployer_key}"
-  root_device_size            = "40"
+  root_device_size            = "60"
 
   vpc_security_group_ids = [
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
     "${local.sg_outbound_id}",
   ]
-}
-
-#-------------------------------------------------------------
-# Create ebs volume
-#-------------------------------------------------------------
-module "ebs-ec2-instance1" {
-  source            = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_volume"
-  availability_zone = "${local.availability_zone_map["az2"]}"
-  volume_size       = "280"
-  encrypted         = true
-  app_name          = "${local.environment_identifier}-${local.app_name}-${local.nart_role}-002"
-  tags              = "${local.tags}"
-  CreateSnapshot    = false
-}
-
-module "ebs-attach-ec2-instance1" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ebs//ebs_attachment"
-  device_name = "/dev/sdb"
-  instance_id = "${module.create-ec2-instance1.instance_id}"
-  volume_id   = "${module.ebs-ec2-instance1.id}"
 }
 
 #-------------------------------------------------------------
