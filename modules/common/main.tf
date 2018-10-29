@@ -17,7 +17,7 @@ locals {
   internal_domain = "${var.internal_domain}"
   tags            = "${var.tags}"
   common_name     = "${var.environment_identifier}-mis"
-  admin_user      = "mis_admin_${var.environment}"
+  admin_user      = "mis${var.environment}"
 }
 
 #######################################
@@ -97,7 +97,7 @@ module "s3alb_logs_policy" {
 # MIS admin account
 ###############################################
 resource "random_string" "password" {
-  length  = 20
+  length  = 22
   special = true
 }
 
@@ -106,7 +106,7 @@ resource "aws_ssm_parameter" "ssm_password" {
   name        = "${local.common_name}-admin-password"
   description = "${local.common_name}-admin-password"
   type        = "SecureString"
-  value       = "${sha256(bcrypt(random_string.password.result))}"
+  value       = "${substr(sha256(bcrypt(random_string.password.result)),0,var.password_length)}"
 
   tags = "${merge(local.tags, map("Name", "${local.common_name}-admin-password"))}"
 

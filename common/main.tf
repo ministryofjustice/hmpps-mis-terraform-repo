@@ -68,6 +68,7 @@ locals {
   ssh_deployer_key      = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
   eng_root_arn          = "${var.eng_root_arn}"
   availability_zone_map = "${data.terraform_remote_state.vpc.availability_zone_map}"
+  password_length       = "12"
 
   app_hostnames = {
     internal = "${var.mis_app_name}-int"
@@ -129,4 +130,5 @@ module "common" {
   tags                         = "${local.tags}"
   vpc_id                       = "${local.vpc_id}"
   region                       = "${local.region}"
+  password_length              = "${local.password_length}"
 }

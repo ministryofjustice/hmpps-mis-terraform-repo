@@ -29,3 +29,7 @@ variable "tags" {
 }
 
 variable "common_name" {}
+
+variable "password_length" {
+  default = "18"
+}

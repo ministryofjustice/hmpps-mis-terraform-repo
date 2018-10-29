@@ -35,3 +35,6 @@ allowed_ip_cidr = [
 # This is used for ALB logs to S3 bucket.
 # This is fixed for each region. if region changes, this changes
 lb_account_id = "652711504416"
+
+# Windows admin password length
+password_length = "12"
