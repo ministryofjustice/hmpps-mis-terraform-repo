@@ -47,3 +47,9 @@ ndl-bps-003.mis-nart-dev.internal
 ndl-bws-001.mis-nart-dev.internal
 ndl-bws-002.mis-nart-dev.internal
 ```
+
+#### DIS
+
+```
+ndl-dis-001.mis-nart-dev.internal
+```
