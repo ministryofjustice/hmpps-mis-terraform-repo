@@ -52,6 +52,30 @@ resource "aws_security_group_rule" "jump_rdp_egress" {
   source_security_group_id = "${local.sg_mis_common}"
 }
 
+# SSH
+resource "aws_security_group_rule" "bastion_in" {
+  security_group_id = "${local.sg_mis_jumphost}"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  type              = "ingress"
+  description       = "${local.common_name}-ssh-in"
+
+  cidr_blocks = [
+    "${local.allowed_cidr_block}",
+  ]
+}
+
+resource "aws_security_group_rule" "bastion_egress" {
+  security_group_id        = "${local.sg_mis_jumphost}"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "${local.common_name}-ssh-out"
+  source_security_group_id = "${local.sg_mis_common}"
+}
+
 #-------------------------------------------------------------
 ### app
 #-------------------------------------------------------------
@@ -73,6 +97,16 @@ resource "aws_security_group_rule" "rdp_in" {
   security_group_id        = "${local.sg_mis_common}"
   from_port                = 3389
   to_port                  = 3389
+  protocol                 = "tcp"
+  type                     = "ingress"
+  description              = "${local.common_name}-rdp-in"
+  source_security_group_id = "${local.sg_mis_jumphost}"
+}
+
+resource "aws_security_group_rule" "ssh_in" {
+  security_group_id        = "${local.sg_mis_common}"
+  from_port                = 22
+  to_port                  = 22
   protocol                 = "tcp"
   type                     = "ingress"
   description              = "${local.common_name}-rdp-in"
