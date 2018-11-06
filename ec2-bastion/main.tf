@@ -153,6 +153,7 @@ data "template_file" "instance_userdata" {
     private_domain       = "${local.internal_domain}"
     account_id           = "${local.account_id}"
     internal_domain      = "${local.internal_domain}"
+    environment          = "${local.environment}"
   }
 }
 

@@ -36,7 +36,7 @@ cat << EOF > ~/requirements.yml
   src: singleplatform-eng.users
 EOF
 
-wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/bastion -O users.yml
+wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${environment}.yml -O users.yml
 
 cat << EOF > ~/bootstrap.yml
 ---
