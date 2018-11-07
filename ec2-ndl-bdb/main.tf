@@ -110,15 +110,15 @@ locals {
   sg_outbound_id               = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
-module "kms_key_db" {
+module "kms_key_db_bdb" {
   source   = "../modules/keys/encryption_key"
-  key_name = "${local.environment}-db"
-  tags     = "${merge(local.tags, map("Name", "${local.environment}-db"))}"
+  key_name = "${local.environment}-db-bdb"
+  tags     = "${merge(local.tags, map("Name", "${local.environment}-db-bdb"))}"
 }
 
-module "ndl_ddb" {
+module "ndl_bdb" {
   source      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//oracle-database"
-  server_name = "ndl-ddb-poc"
+  server_name = "ndl-bdb-poc"
 
   ami_id               = "${local.ami_id}"
   instance_type        = "${var.instance_type}"
@@ -139,7 +139,7 @@ module "ndl_ddb" {
   short_environment_identifier = "${local.short_environment_identifier}"
   environment_type             = "${var.environment_type}"
   region                       = "${local.region}"
-  kms_key_id                   = "${module.kms_key_db.kms_arn}"
+  kms_key_id                   = "${module.kms_key_db_bdb.kms_arn}"
   public_zone_id               = "${local.public_zone_id}"
   private_zone_id              = "${local.private_zone_id}"
   private_domain               = "${local.internal_domain}"
