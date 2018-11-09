@@ -20,6 +20,21 @@ admin user password - https://eu-west-2.console.aws.amazon.com/systems-manager/p
 jumphost.dev.mis.probation.hmpps.dsd.io
 ```
 
+#### LDAP
+
+```
+ldap-primary.mis-nart-dev.internal
+ldap-replica.mis-nart-dev.internal - Not deployed for POC
+```
+
+#### LDAP Credentials
+
+```
+username - admin
+password - SSM entry - tf-eu-west-2-hmpps-mis-nart-dev-mis-ldap-manager-password
+directory manager password - SSM entry - tf-eu-west-2-hmpps-mis-nart-dev-mis-ldap-manager-password
+```
+
 #### BCS
 
 ```
