@@ -213,6 +213,6 @@ tar cvf /tmp/backups/ipa-backup-$(hostname)-$(date +%Y-%m-%d).tar \
     /var/lib/ipa/backup \
     /etc/ipa
 
-aws s3 sync /tmp/backups s3://tf-eu-west-2-hmpps-mis-nart-dev-mis-s3bucket/backups/
+aws s3 sync /tmp/backups s3://${common_name}-s3bucket/backups/
 
 rm -rf /tmp/backups/* /root/ca
