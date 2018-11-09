@@ -31,7 +31,7 @@ ldap-replica.mis-nart-dev.internal - Not deployed for POC
 
 ```
 username - admin
-password - SSM entry - tf-eu-west-2-hmpps-mis-nart-dev-mis-ldap-manager-password
+password - SSM entry - tf-eu-west-2-hmpps-mis-nart-dev-mis-ldap-admin-password
 directory manager password - SSM entry - tf-eu-west-2-hmpps-mis-nart-dev-mis-ldap-manager-password
 ```
 
