@@ -195,7 +195,7 @@ data "template_file" "instance1_userdata" {
   template = "${file("../userdata/userdata.txt")}"
 
   vars {
-    host_name       = "${local.nart_role}-001"
+    host_name       = "${local.nart_role}-002"
     internal_domain = "${local.internal_domain}"
     user            = "${data.aws_ssm_parameter.user.value}"
     password        = "${data.aws_ssm_parameter.password.value}"
@@ -246,7 +246,7 @@ data "template_file" "instance2_userdata" {
   template = "${file("../userdata/userdata.txt")}"
 
   vars {
-    host_name       = "${local.nart_role}-001"
+    host_name       = "${local.nart_role}-003"
     internal_domain = "${local.internal_domain}"
     user            = "${data.aws_ssm_parameter.user.value}"
     password        = "${data.aws_ssm_parameter.password.value}"
