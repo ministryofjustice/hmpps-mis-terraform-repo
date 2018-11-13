@@ -66,6 +66,26 @@ resource "aws_security_group_rule" "bastion_in" {
   ]
 }
 
+resource "aws_security_group_rule" "jump_http" {
+  security_group_id        = "${local.sg_mis_jumphost}"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "${local.common_name}-http-out"
+  source_security_group_id = "${local.sg_mis_common}"
+}
+
+resource "aws_security_group_rule" "jump_http_alt" {
+  security_group_id        = "${local.sg_mis_jumphost}"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "${local.common_name}-http-alt-out"
+  source_security_group_id = "${local.sg_mis_common}"
+}
+
 resource "aws_security_group_rule" "bastion_egress" {
   security_group_id        = "${local.sg_mis_jumphost}"
   from_port                = 22
@@ -80,13 +100,23 @@ resource "aws_security_group_rule" "bastion_egress" {
 ### app
 #-------------------------------------------------------------
 
-resource "aws_security_group_rule" "tomcat_in" {
+resource "aws_security_group_rule" "http_alt_in" {
   security_group_id        = "${local.sg_mis_app_in}"
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
   type                     = "ingress"
-  description              = "${local.common_name}-tomcat-in"
+  description              = "${local.common_name}-http-alt-in"
+  source_security_group_id = "${local.sg_mis_jumphost}"
+}
+
+resource "aws_security_group_rule" "http_in" {
+  security_group_id        = "${local.sg_mis_app_in}"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  type                     = "ingress"
+  description              = "${local.common_name}-http-in"
   source_security_group_id = "${local.sg_mis_jumphost}"
 }
 
