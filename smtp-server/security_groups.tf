@@ -4,6 +4,8 @@ resource "aws_security_group_rule" "smtp_out_relay" {
   security_group_id = "${data.terraform_remote_state.common.sg_map_ids["sg_mis_common"]}"
   to_port = 25
   type = "egress"
+
+  source_security_group_id = "${aws_security_group.mis_smtp_host.id}"
 }
 
 resource "aws_security_group_rule" "smtp_out_deprecated" {
@@ -13,6 +15,7 @@ resource "aws_security_group_rule" "smtp_out_deprecated" {
   to_port = 465
   type = "egress"
 
+  source_security_group_id = "${aws_security_group.mis_smtp_host.id}"
 }
 
 resource "aws_security_group_rule" "smtp_out_submission" {
@@ -21,6 +24,8 @@ resource "aws_security_group_rule" "smtp_out_submission" {
   security_group_id = "${data.terraform_remote_state.common.sg_map_ids["sg_mis_common"]}"
   to_port = 587
   type = "egress"
+
+  source_security_group_id = "${aws_security_group.mis_smtp_host.id}"
 }
 
 ####Smtp host security group
@@ -70,6 +75,8 @@ resource "aws_security_group_rule" "smtp_host_world_out" {
   security_group_id = "${aws_security_group.mis_smtp_host.id}"
   to_port = 0
   type = "egress"
+
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group" "mis_smtp_host" {
