@@ -69,6 +69,15 @@ resource "aws_security_group_rule" "smtp_host_ssh" {
   source_security_group_id = "${data.terraform_remote_state.common.sg_map_ids["sg_mis_jumphost"]}"
 }
 
+resource "aws_security_group_rule" "bastion_to_smtp" {
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  security_group_id = "${data.terraform_remote_state.common.sg_map_ids["sg_mis_jumphost"]}"
+  type = "egress"
+  source_security_group_id = "${aws_security_group.mis_smtp_host.id}"
+}
+
 resource "aws_security_group_rule" "smtp_host_world_out" {
   from_port = 0
   protocol = "-1"
