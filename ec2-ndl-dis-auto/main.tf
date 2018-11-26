@@ -141,7 +141,7 @@ data "aws_ssm_parameter" "password" {
 ####################################################
 
 data "template_file" "instance_userdata" {
-  template = "${file("../userdata/userdata.txt")}"
+  template = "${file("../userdata/userdata-auto.txt")}"
 
   vars {
     host_name       = "${local.nart_role}-001"

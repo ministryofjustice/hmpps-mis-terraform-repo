@@ -1,0 +1,8 @@
+<powershell>
+$misCreds = New-Credential -UserName "${user}" -Password "${password}"
+Install-User -Credential $misCreds
+
+Add-GroupMember -Name Administrators -Member ${user}
+
+</powershell>
+<persist>true</persist>

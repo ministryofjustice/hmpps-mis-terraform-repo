@@ -69,10 +69,17 @@ ndl-bws-002.mis-nart-dev.internal
 ndl-dis-001.mis-nart-dev.internal
 ```
 
-#### DIS Automation
+Automation
+===========
 
-DIS host 
+####  DIS host 
 
 ```
 ndl-dis-auto-001.mis-nart-dev.internal
+```
+
+####  DB host
+
+```
+ndl-ddb-poc-auto.mis-nart-dev.internal
 ```
