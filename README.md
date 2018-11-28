@@ -68,3 +68,19 @@ ndl-bws-002.mis-nart-dev.internal
 ```
 ndl-dis-001.mis-nart-dev.internal
 ```
+
+Automation
+===========
+
+####  DIS host 
+
+```
+ndl-dis-auto-001.mis-nart-dev.internal
+```
+
+####  BCS host 
+
+```
+ndl-bcs-auto-001.mis-nart-dev.internal
+ndl-bcs-auto-002.mis-nart-dev.internal
+```
