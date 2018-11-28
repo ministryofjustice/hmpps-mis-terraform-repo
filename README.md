@@ -78,8 +78,9 @@ Automation
 ndl-dis-auto-001.mis-nart-dev.internal
 ```
 
-####  DB host
+####  BCS host 
 
 ```
-ndl-ddb-poc-auto.mis-nart-dev.internal
+ndl-bcs-auto-001.mis-nart-dev.internal
+ndl-bcs-auto-002.mis-nart-dev.internal
 ```
