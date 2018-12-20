@@ -32,7 +32,8 @@ locals {
   vpc_id                 = "${data.terraform_remote_state.common.vpc_id}"
   cidr_block             = "${data.terraform_remote_state.common.vpc_cidr_block}"
   allowed_cidr_block     = ["${var.allowed_cidr_block}"]
-  common_name            = "${data.terraform_remote_state.common.environment_identifier}"
+  bastion_cidr           = ["${data.terraform_remote_state.common.bastion_cidr}"]
+  common_name            = "${data.terraform_remote_state.common.common_name}"
   region                 = "${data.terraform_remote_state.common.region}"
   app_name               = "${data.terraform_remote_state.common.mis_app_name}"
   environment_identifier = "${data.terraform_remote_state.common.environment_identifier}"
@@ -51,6 +52,7 @@ module "security_groups" {
   source                 = "../modules/security-groups"
   app_name               = "${local.app_name}"
   allowed_cidr_block     = ["${local.allowed_cidr_block}"]
+  bastion_cidr           = ["${local.bastion_cidr}"]
   common_name            = "${local.common_name}"
   environment_identifier = "${local.environment_identifier}"
   region                 = "${local.region}"

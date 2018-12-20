@@ -89,7 +89,7 @@ locals {
   app_name                     = "${data.terraform_remote_state.common.mis_app_name}"
   environment_identifier       = "${data.terraform_remote_state.common.environment_identifier}"
   short_environment_identifier = "${data.terraform_remote_state.common.short_environment_identifier}"
-  common_name                  = "${data.terraform_remote_state.common.environment_identifier}-${data.terraform_remote_state.common.mis_app_name}"
+  common_name                  = "${data.terraform_remote_state.common.common_name}"
   tags                         = "${data.terraform_remote_state.common.common_tags}"
   vpc_id                       = "${data.terraform_remote_state.common.vpc_id}"
   internal_domain              = "${data.terraform_remote_state.common.internal_domain}"

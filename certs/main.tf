@@ -31,7 +31,7 @@ data "terraform_remote_state" "common" {
 
 locals {
   internal_domain        = "${data.terraform_remote_state.common.internal_domain}"
-  common_name            = "${data.terraform_remote_state.common.environment_identifier}-${data.terraform_remote_state.common.mis_app_name}"
+  common_name            = "${data.terraform_remote_state.common.common_name}"
   tags                   = "${data.terraform_remote_state.common.common_tags}"
   region                 = "${var.region}"
   environment_identifier = "${data.terraform_remote_state.common.environment_identifier}"

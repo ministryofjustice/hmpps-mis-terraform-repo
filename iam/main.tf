@@ -44,7 +44,7 @@ data "terraform_remote_state" "s3buckets" {
 locals {
   region                 = "${var.region}"
   app_name               = "${data.terraform_remote_state.common.mis_app_name}"
-  environment_identifier = "${data.terraform_remote_state.common.environment_identifier}"
+  environment_identifier = "${data.terraform_remote_state.common.common_name}"
   tags                   = "${data.terraform_remote_state.common.common_tags}"
   s3-config-bucket       = "${data.terraform_remote_state.common.common_s3-config-bucket}"
   artefact-bucket        = "${data.terraform_remote_state.s3buckets.s3bucket}"

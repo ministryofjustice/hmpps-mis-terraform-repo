@@ -50,11 +50,12 @@ locals {
   vpc_id                       = "${data.terraform_remote_state.vpc.vpc_id}"
   cidr_block                   = "${data.terraform_remote_state.vpc.vpc_cidr_block}"
   allowed_cidr_block           = ["${data.terraform_remote_state.vpc.vpc_cidr_block}"]
+  bastion_cidr                 = "${data.terraform_remote_state.vpc.bastion_vpc_public_cidr}"
   internal_domain              = "${data.terraform_remote_state.vpc.private_zone_name}"
   private_zone_id              = "${data.terraform_remote_state.vpc.private_zone_id}"
   external_domain              = "${data.terraform_remote_state.vpc.public_zone_name}"
   public_zone_id               = "${data.terraform_remote_state.vpc.public_zone_id}"
-  common_name                  = "${var.environment_identifier}-${var.mis_app_name}"
+  common_name                  = "${var.environment_identifier}-app"
   lb_account_id                = "${var.lb_account_id}"
   region                       = "${var.region}"
   role_arn                     = "${var.role_arn}"
@@ -106,10 +107,12 @@ locals {
   ]
 
   sg_map_ids = {
-    sg_mis_db_in    = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"
-    sg_mis_common   = "${data.terraform_remote_state.security-groups.sg_mis_common}"
-    sg_mis_app_in   = "${data.terraform_remote_state.security-groups.sg_mis_app_in}"
-    sg_mis_jumphost = "${data.terraform_remote_state.security-groups.sg_mis_jumphost}"
+    sg_mis_db_in  = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"
+    sg_mis_common = "${data.terraform_remote_state.security-groups.sg_mis_common}"
+    sg_mis_app_in = "${data.terraform_remote_state.security-groups.sg_mis_app_in}"
+    sg_mis_app_lb = "${data.terraform_remote_state.security-groups.sg_mis_app_lb}"
+    sg_ldap_lb    = "${data.terraform_remote_state.security-groups.sg_ldap_lb}"
+    sg_ldap_inst  = "${data.terraform_remote_state.security-groups.sg_ldap_inst}"
   }
 }
 

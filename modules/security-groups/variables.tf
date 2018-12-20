@@ -9,6 +9,10 @@ variable "allowed_cidr_block" {
   type = "list"
 }
 
+variable "bastion_cidr" {
+  type = "list"
+}
+
 variable "tags" {
   type = "map"
 }

@@ -158,6 +158,14 @@ output "private_subnet_ids" {
   ]
 }
 
+output "bastion_cidr" {
+  value = [
+    "${local.bastion_cidr["az1"]}",
+    "${local.bastion_cidr["az2"]}",
+    "${local.bastion_cidr["az3"]}",
+  ]
+}
+
 # Security groups
 output "sg_map_ids" {
   value = "${local.sg_map_ids}"
