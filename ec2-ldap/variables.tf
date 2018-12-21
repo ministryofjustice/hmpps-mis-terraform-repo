@@ -20,3 +20,5 @@ variable "ad_password_length" {
 variable "instance_type" {
   default = "t2.medium"
 }
+
+variable "bastion_inventory" {}

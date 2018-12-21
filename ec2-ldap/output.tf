@@ -12,19 +12,16 @@ output "primary-instance-dns" {
   value = "${aws_route53_record.ldap-primary.fqdn}"
 }
 
-# # replica ec2
-# output "replica_instance_id" {
-#   value = "${module.ldap-replica.instance_id}"
-# }
+# replica ec2
+output "replica_instance_id" {
+  value = "${module.ldap-replica.instance_id}"
+}
 
+output "replica_instance_private_ip" {
+  value = "${module.ldap-replica.private_ip}"
+}
 
-# output "replica_instance_private_ip" {
-#   value = "${module.ldap-replica.private_ip}"
-# }
-
-
-# # dns
-# output "replica-instance-dns" {
-#   value = "${aws_route53_record.ldap-replica.fqdn}"
-# }
-
+# dns
+output "replica-instance-dns" {
+  value = "${aws_route53_record.ldap-replica.fqdn}"
+}

@@ -3,6 +3,7 @@ data "template_file" "primary_userdata" {
 
   vars {
     app_name             = "${local.app_name}"
+    bastion_inventory    = "${local.bastion_inventory}"
     env_identifier       = "${local.environment_identifier}"
     short_env_identifier = "${local.short_environment_identifier}"
     route53_sub_domain   = "${local.environment}.${local.app_name}"
@@ -21,12 +22,12 @@ data "template_file" "primary_userdata" {
 #-------------------------------------------------------------
 module "ldap-primary" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
-  app_name                    = "${local.environment_identifier}-${local.app_name}-${local.ldap_primary}-01"
+  app_name                    = "${local.common_name}-${local.ldap_primary}-01"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.instance_type}"
   subnet_id                   = "${local.private_subnet_map["az1"]}"
   iam_instance_profile        = "${local.instance_profile}"
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   monitoring                  = true
   user_data                   = "${data.template_file.primary_userdata.rendered}"
   CreateSnapshot              = false
@@ -37,6 +38,7 @@ module "ldap-primary" {
   vpc_security_group_ids = [
     "${local.sg_outbound_id}",
     "${local.sg_map_ids["sg_mis_common"]}",
+    "${local.sg_map_ids["sg_ldap_inst"]}",
   ]
 }
 
@@ -60,6 +62,7 @@ data "template_file" "replica_userdata" {
 
   vars {
     app_name             = "${local.app_name}"
+    bastion_inventory    = "${local.bastion_inventory}"
     env_identifier       = "${local.environment_identifier}"
     short_env_identifier = "${local.short_environment_identifier}"
     route53_sub_domain   = "${local.environment}.${local.app_name}"
@@ -75,12 +78,12 @@ data "template_file" "replica_userdata" {
 
 module "ldap-replica" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
-  app_name                    = "${local.environment_identifier}-${local.app_name}-${local.ldap_replica}-01"
+  app_name                    = "${local.common_name}-${local.ldap_replica}-01"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.instance_type}"
   subnet_id                   = "${local.private_subnet_map["az2"]}"
   iam_instance_profile        = "${local.instance_profile}"
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   monitoring                  = true
   user_data                   = "${data.template_file.replica_userdata.rendered}"
   CreateSnapshot              = false
@@ -91,6 +94,7 @@ module "ldap-replica" {
   vpc_security_group_ids = [
     "${local.sg_outbound_id}",
     "${local.sg_map_ids["sg_mis_common"]}",
+    "${local.sg_map_ids["sg_ldap_inst"]}",
   ]
 }
 
