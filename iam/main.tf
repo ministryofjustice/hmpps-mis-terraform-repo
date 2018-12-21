@@ -42,14 +42,13 @@ data "terraform_remote_state" "s3buckets" {
 ####################################################
 
 locals {
-  region                 = "${var.region}"
-  app_name               = "${data.terraform_remote_state.common.mis_app_name}"
-  environment_identifier = "${data.terraform_remote_state.common.common_name}"
-  tags                   = "${data.terraform_remote_state.common.common_tags}"
-  s3-config-bucket       = "${data.terraform_remote_state.common.common_s3-config-bucket}"
-  artefact-bucket        = "${data.terraform_remote_state.s3buckets.s3bucket}"
-  runtime_role           = "${var.cross_account_iam_role}"
-  account_id             = "${data.terraform_remote_state.common.common_account_id}"
+  region           = "${var.region}"
+  common_name      = "${data.terraform_remote_state.common.common_name}"
+  tags             = "${data.terraform_remote_state.common.common_tags}"
+  s3-config-bucket = "${data.terraform_remote_state.common.common_s3-config-bucket}"
+  artefact-bucket  = "${data.terraform_remote_state.s3buckets.s3bucket}"
+  runtime_role     = "${var.cross_account_iam_role}"
+  account_id       = "${data.terraform_remote_state.common.common_account_id}"
 }
 
 ####################################################
@@ -57,8 +56,7 @@ locals {
 ####################################################
 module "iam" {
   source                   = "../modules/iam"
-  app_name                 = "${local.app_name}"
-  environment_identifier   = "${local.environment_identifier}"
+  common_name              = "${local.common_name}-infra"
   tags                     = "${local.tags}"
   ec2_policy_file          = "ec2_policy.json"
   ec2_internal_policy_file = "${file("../policies/ec2_internal_policy.json")}"
@@ -74,8 +72,7 @@ module "iam" {
 ####################################################
 module "jumphost" {
   source                   = "../modules/iam"
-  app_name                 = "${local.app_name}-jumphost"
-  environment_identifier   = "${local.environment_identifier}"
+  common_name              = "${local.common_name}-jumphost"
   tags                     = "${local.tags}"
   ec2_policy_file          = "ec2_policy.json"
   ec2_internal_policy_file = "${file("../policies/ec2_jumphost_policy.json")}"
@@ -90,8 +87,7 @@ module "jumphost" {
 ####################################################
 module "ldap" {
   source                   = "../modules/iam"
-  app_name                 = "${local.app_name}-ldap"
-  environment_identifier   = "${local.environment_identifier}"
+  common_name              = "${local.common_name}-ldap"
   tags                     = "${local.tags}"
   ec2_policy_file          = "ec2_policy.json"
   ec2_internal_policy_file = "${file("../policies/ec2_ldap_policy.json")}"

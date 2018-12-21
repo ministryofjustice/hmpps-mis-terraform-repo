@@ -16,7 +16,7 @@ locals {
   cidr_block      = "${var.cidr_block}"
   internal_domain = "${var.internal_domain}"
   tags            = "${var.tags}"
-  common_name     = "${var.environment_identifier}-mis"
+  common_name     = "${var.common_name}"
   admin_user      = "mis${var.environment}"
 }
 

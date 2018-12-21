@@ -29,39 +29,6 @@ locals {
 # SECURITY GROUPS
 #######################################
 
-#-------------------------------------------------------------
-### app
-#-------------------------------------------------------------
-
-#-------------------------------------------------------------
-### common sg rules
-#-------------------------------------------------------------
-resource "aws_security_group_rule" "rdp_in" {
-  security_group_id = "${local.sg_mis_common}"
-  from_port         = 3389
-  to_port           = 3389
-  protocol          = "tcp"
-  type              = "ingress"
-  description       = "${local.common_name}-rdp-in"
-
-  cidr_blocks = [
-    "${local.bastion_cidr}",
-  ]
-}
-
-resource "aws_security_group_rule" "ssh_in" {
-  security_group_id = "${local.sg_mis_common}"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  type              = "ingress"
-  description       = "${local.common_name}-rdp-in"
-
-  cidr_blocks = [
-    "${local.bastion_cidr}",
-  ]
-}
-
 # app lb
 resource "aws_security_group_rule" "lb_https_in" {
   security_group_id = "${local.sg_mis_app_lb}"
@@ -69,49 +36,9 @@ resource "aws_security_group_rule" "lb_https_in" {
   to_port           = 443
   protocol          = "tcp"
   type              = "ingress"
-  description       = "${local.common_name}-lb-httpa-in"
+  description       = "${local.common_name}-lb-https-in"
 
   cidr_blocks = [
     "${local.allowed_cidr_block}",
   ]
-}
-
-# inst
-resource "aws_security_group_rule" "http_alt_in" {
-  security_group_id        = "${local.sg_mis_common}"
-  from_port                = 8080
-  to_port                  = 8080
-  protocol                 = "tcp"
-  type                     = "ingress"
-  description              = "${local.common_name}-http-alt-in"
-  source_security_group_id = "${local.sg_mis_app_lb}"
-}
-
-resource "aws_security_group_rule" "http_in" {
-  security_group_id        = "${local.sg_mis_common}"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  type                     = "ingress"
-  description              = "${local.common_name}-http-in"
-  source_security_group_id = "${local.sg_mis_app_lb}"
-}
-
-# All local open
-resource "aws_security_group_rule" "local_ingress" {
-  security_group_id = "${local.sg_mis_common}"
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = -1
-  self              = true
-}
-
-resource "aws_security_group_rule" "local_egress" {
-  security_group_id = "${local.sg_mis_common}"
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = -1
-  self              = true
 }
