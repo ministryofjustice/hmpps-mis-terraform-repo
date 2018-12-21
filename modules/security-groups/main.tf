@@ -6,7 +6,7 @@
 # Locals
 ####################################################
 locals {
-  common_name        = "${var.environment_identifier}-${var.app_name}"
+  common_name        = "${var.common_name}"
   vpc_id             = "${var.vpc_id}"
   allowed_cidr_block = ["${var.allowed_cidr_block}"]
   bastion_cidr       = ["${var.bastion_cidr}"]
@@ -60,54 +60,6 @@ resource "aws_security_group_rule" "ssh_in" {
   cidr_blocks = [
     "${local.bastion_cidr}",
   ]
-}
-
-# ldap lb
-resource "aws_security_group_rule" "lb_ldap_https" {
-  security_group_id = "${local.sg_ldap_lb}"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  type              = "ingress"
-  description       = "${local.common_name}-lb-ldap-https-in"
-
-  cidr_blocks = [
-    "${local.allowed_cidr_block}",
-  ]
-}
-
-resource "aws_security_group_rule" "lb_ldap_http" {
-  security_group_id = "${local.sg_ldap_lb}"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  type              = "ingress"
-  description       = "${local.common_name}-lb-ldap-http-in"
-
-  cidr_blocks = [
-    "${local.allowed_cidr_block}",
-  ]
-}
-
-# ldap inst
-resource "aws_security_group_rule" "ldap_https_in" {
-  security_group_id        = "${local.sg_mis_common}"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  type                     = "ingress"
-  description              = "${local.common_name}-ldap-https-in"
-  source_security_group_id = "${local.sg_ldap_lb}"
-}
-
-resource "aws_security_group_rule" "ldap_http_in" {
-  security_group_id        = "${local.sg_mis_common}"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  type                     = "ingress"
-  description              = "${local.common_name}-ldap-http-in"
-  source_security_group_id = "${local.sg_ldap_lb}"
 }
 
 # app lb
