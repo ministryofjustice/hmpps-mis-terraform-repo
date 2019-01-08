@@ -105,4 +105,6 @@ locals {
   ldap_primary                 = "ldap-primary"
   ldap_replica                 = "ldap-replica"
   bastion_inventory            = "${var.bastion_inventory}"
+  s3bucket                     = "${data.terraform_remote_state.common.common_s3-config-bucket}"
+  cloudwatch_log_retention     = "${var.cloudwatch_log_retention}"
 }

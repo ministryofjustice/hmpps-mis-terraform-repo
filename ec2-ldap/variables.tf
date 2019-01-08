@@ -22,3 +22,5 @@ variable "instance_type" {
 }
 
 variable "bastion_inventory" {}
+
+variable "cloudwatch_log_retention" {}

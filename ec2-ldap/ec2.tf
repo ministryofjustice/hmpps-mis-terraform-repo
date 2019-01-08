@@ -1,3 +1,19 @@
+############################################
+# CREATE LOG GROUPS FOR CONTAINER LOGS
+############################################
+
+module "create_loggroup" {
+  source                   = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//cloudwatch//loggroup"
+  log_group_path           = "${local.environment_identifier}"
+  loggroupname             = "ldap"
+  cloudwatch_log_retention = "${local.cloudwatch_log_retention}"
+  tags                     = "${local.tags}"
+}
+
+#-------------------------------------------------------------
+### Create primary 
+#-------------------------------------------------------------
+
 data "template_file" "primary_userdata" {
   template = "${file("./userdata/primary-userdata.sh")}"
 
@@ -14,12 +30,11 @@ data "template_file" "primary_userdata" {
     ldap_role            = "${local.ldap_primary}"
     hostname             = "${local.ldap_primary}.${local.internal_domain}"
     common_name          = "${local.common_name}"
+    s3bucket             = "${local.s3bucket}"
+    log_group_name       = "${module.create_loggroup.loggroup_name}"
   }
 }
 
-#-------------------------------------------------------------
-### Create primary 
-#-------------------------------------------------------------
 module "ldap-primary" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
   app_name                    = "${local.common_name}-${local.ldap_primary}-01"
@@ -73,6 +88,8 @@ data "template_file" "replica_userdata" {
     ldap_role            = "${local.ldap_replica}"
     hostname             = "${local.ldap_replica}.${local.internal_domain}"
     common_name          = "${local.common_name}"
+    s3bucket             = "${local.s3bucket}"
+    log_group_name       = "${module.create_loggroup.loggroup_name}"
   }
 }
 
