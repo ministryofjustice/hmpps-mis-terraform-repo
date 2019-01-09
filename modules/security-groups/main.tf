@@ -23,6 +23,7 @@ locals {
   sg_mis_app_lb = "${var.sg_map_ids["sg_mis_app_lb"]}"
   sg_ldap_lb    = "${var.sg_map_ids["sg_ldap_lb"]}"
   sg_ldap_inst  = "${var.sg_map_ids["sg_ldap_inst"]}"
+  sg_ldap_proxy = "${var.sg_map_ids["sg_ldap_proxy"]}"
 }
 
 #######################################

@@ -23,3 +23,7 @@ output "security_groups_sg_ldap_lb" {
 output "security_groups_sg_ldap_inst" {
   value = "${local.sg_ldap_inst}"
 }
+
+output "security_groups_sg_ldap_proxy" {
+  value = "${var.sg_map_ids["sg_ldap_proxy"]}"
+}

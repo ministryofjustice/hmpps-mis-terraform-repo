@@ -79,6 +79,19 @@ data "aws_ami" "amazon_ami" {
   owners = ["${data.terraform_remote_state.common.common_account_id}", "895523100917"] # AWS
 }
 
+#-------------------------------------------------------------
+### Getting the security groups details
+#-------------------------------------------------------------
+data "terraform_remote_state" "self_certs" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "${var.environment_type}/certs/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
 ####################################################
 # Locals
 ####################################################

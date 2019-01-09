@@ -25,3 +25,33 @@ output "replica_instance_private_ip" {
 output "replica-instance-dns" {
   value = "${aws_route53_record.ldap-replica.fqdn}"
 }
+
+# LB
+output "lb_id" {
+  value = "${module.create_app_elb.environment_elb_id}"
+}
+
+output "lb_arn" {
+  value = "${module.create_app_elb.environment_elb_arn}"
+}
+
+output "lb_dns_name" {
+  value = "${module.create_app_elb.environment_elb_dns_name}"
+}
+
+output "lb_dns_alias" {
+  value = "${aws_route53_record.dns_entry.fqdn}"
+}
+
+output "lb_zone_id" {
+  value = "${module.create_app_elb.environment_elb_zone_id}"
+}
+
+# LOG GROUPS
+output "loggroup_proxy_arn" {
+  value = "${module.create_loggroup_proxy.loggroup_arn}"
+}
+
+output "loggroup_proxy_name" {
+  value = "${module.create_loggroup_proxy.loggroup_name}"
+}

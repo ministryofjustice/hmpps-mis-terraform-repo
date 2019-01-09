@@ -113,6 +113,7 @@ locals {
     sg_mis_app_lb = "${data.terraform_remote_state.security-groups.sg_mis_app_lb}"
     sg_ldap_lb    = "${data.terraform_remote_state.security-groups.sg_ldap_lb}"
     sg_ldap_inst  = "${data.terraform_remote_state.security-groups.sg_ldap_inst}"
+    sg_ldap_proxy = "${data.terraform_remote_state.security-groups.sg_ldap_proxy}"
   }
 }
 
