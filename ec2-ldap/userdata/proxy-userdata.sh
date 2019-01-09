@@ -169,7 +169,7 @@ echo '{
     "selinux-enabled": true,
     "log-driver": "journald",
     "storage-opts": [
-      "dm.directlvm_device=${ebs_device}",
+      "dm.directlvm_device=${ebs_device_name}",
       "dm.thinp_percent=95",
       "dm.thinp_metapercent=1",
       "dm.thinp_autoextend_threshold=80",
