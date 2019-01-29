@@ -14,7 +14,6 @@ data "aws_acm_certificate" "cert" {
 locals {
   certificate_arn      = "${data.aws_acm_certificate.cert.arn}"
   lb_name              = "${local.short_environment_identifier}-proxy"
-  public_subnet_ids    = ["${data.terraform_remote_state.common.public_subnet_ids}"]
   lb_security_groups   = ["${data.terraform_remote_state.security-groups.security_groups_sg_ldap_lb}"]
   access_logs_bucket   = "${data.terraform_remote_state.common.common_s3_lb_logs_bucket}"
   public_zone_id       = "${data.terraform_remote_state.common.public_zone_id}"
@@ -113,7 +112,46 @@ data "template_file" "user_data" {
     external_domain      = "${local.external_domain}"
     internal_domain      = "${local.internal_domain}"
     route53_sub_domain   = "proxy.${local.environment}"
-    bastion_inventory    = "${local.environment}"
+    bastion_inventory    = "${local.bastion_inventory}"
     account_id           = "${local.account_id}"
   }
+}
+
+############################################
+# CREATE LAUNCH CONFIG FOR EC2 RUNNING SERVICES
+############################################
+
+module "launch_cfg" {
+  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//launch_configuration//blockdevice"
+  launch_configuration_name   = "${local.common_name}-proxy"
+  image_id                    = "${data.aws_ami.amazon_ami.id}"
+  instance_type               = "${local.proxy_instance_type}"
+  volume_size                 = "30"
+  instance_profile            = "${local.instance_profile}"
+  key_name                    = "${local.ssh_deployer_key}"
+  ebs_device_name             = "${local.ebs_device_name}"
+  ebs_volume_type             = "standard"
+  ebs_volume_size             = "10"
+  ebs_encrypted               = "true"
+  associate_public_ip_address = false
+
+  security_groups = [
+    "${local.sg_outbound_id}",
+    "${local.sg_map_ids["sg_mis_common"]}",
+    "${local.sg_map_ids["sg_ldap_proxy"]}",
+  ]
+
+  user_data = "${data.template_file.user_data.rendered}"
+}
+
+module "auto_scale" {
+  source               = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//autoscaling//group//asg_classic_lb"
+  asg_name             = "${local.lb_name}"
+  subnet_ids           = ["${local.private_subnet_ids}"]
+  asg_min              = "2"
+  asg_max              = "2"
+  asg_desired          = "2"
+  launch_configuration = "${module.launch_cfg.launch_name}"
+  load_balancers       = ["${module.create_app_elb.environment_elb_name}"]
+  tags                 = "${local.tags}"
 }

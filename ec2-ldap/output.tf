@@ -55,3 +55,25 @@ output "loggroup_proxy_arn" {
 output "loggroup_proxy_name" {
   value = "${module.create_loggroup_proxy.loggroup_name}"
 }
+
+# Launch config
+output "launch_id" {
+  value = "${module.launch_cfg.launch_id}"
+}
+
+output "launch_name" {
+  value = "${module.launch_cfg.launch_name}"
+}
+
+# ASG
+output "autoscale_id" {
+  value = "${module.auto_scale.autoscale_id}"
+}
+
+output "autoscale_arn" {
+  value = "${module.auto_scale.autoscale_arn}"
+}
+
+output "autoscale_name" {
+  value = "${module.auto_scale.autoscale_name}"
+}

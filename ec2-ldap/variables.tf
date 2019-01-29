@@ -66,3 +66,8 @@ variable "health_check" {
 
 ############### END OF LB SECTION #####################
 
+# PROXY
+
+variable "proxy_instance_type" {
+  default = "t2.medium"
+}

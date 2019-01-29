@@ -120,4 +120,7 @@ locals {
   bastion_inventory            = "${var.bastion_inventory}"
   s3bucket                     = "${data.terraform_remote_state.common.common_s3-config-bucket}"
   cloudwatch_log_retention     = "${var.cloudwatch_log_retention}"
+  proxy_instance_type          = "${var.proxy_instance_type}"
+  public_subnet_ids            = ["${data.terraform_remote_state.common.public_subnet_ids}"]
+  private_subnet_ids           = ["${data.terraform_remote_state.common.private_subnet_ids}"]
 }
