@@ -35,7 +35,7 @@ locals {
 
 # elb
 module "create_app_elb" {
-  source          = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//loadbalancer//elb//create_elb_with_https"
+  source          = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=issue-118//modules//loadbalancer//elb//create_elb_with_https"
   name            = "${local.lb_name}-ext"
   subnets         = ["${local.public_subnet_ids}"]
   security_groups = ["${local.lb_security_groups}"]
@@ -56,6 +56,8 @@ module "create_app_elb" {
   lb_protocol                 = "http"
   lb_protocol_https           = "https"
   health_check                = ["${var.health_check}"]
+  https_instance_port         = "443"
+  https_instance_protocol     = "https"
   tags                        = "${local.tags}"
 }
 
@@ -114,6 +116,7 @@ data "template_file" "user_data" {
     route53_sub_domain   = "proxy.${local.environment}"
     bastion_inventory    = "${local.bastion_inventory}"
     account_id           = "${local.account_id}"
+    application_endpoint = "${local.application_endpoint}"
   }
 }
 
@@ -148,9 +151,9 @@ module "auto_scale" {
   source               = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//autoscaling//group//asg_classic_lb"
   asg_name             = "${local.lb_name}"
   subnet_ids           = ["${local.private_subnet_ids}"]
-  asg_min              = "2"
-  asg_max              = "2"
-  asg_desired          = "2"
+  asg_min              = "1"
+  asg_max              = "1"
+  asg_desired          = "1"
   launch_configuration = "${module.launch_cfg.launch_name}"
   load_balancers       = ["${module.create_app_elb.environment_elb_name}"]
   tags                 = "${local.tags}"

@@ -38,7 +38,7 @@ data "template_file" "primary_userdata" {
 module "ldap-primary" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
   app_name                    = "${local.common_name}-${local.ldap_primary}-01"
-  ami_id                      = "${data.aws_ami.amazon_ami.id}"
+  ami_id                      = "ami-0b462cd3239b8f6f7"                                                                          #"${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.instance_type}"
   subnet_id                   = "${local.private_subnet_map["az1"]}"
   iam_instance_profile        = "${local.instance_profile}"
@@ -96,7 +96,7 @@ data "template_file" "replica_userdata" {
 module "ldap-replica" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
   app_name                    = "${local.common_name}-${local.ldap_replica}-01"
-  ami_id                      = "${data.aws_ami.amazon_ami.id}"
+  ami_id                      = "ami-0b462cd3239b8f6f7"                                                                          #"${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.instance_type}"
   subnet_id                   = "${local.private_subnet_map["az2"]}"
   iam_instance_profile        = "${local.instance_profile}"

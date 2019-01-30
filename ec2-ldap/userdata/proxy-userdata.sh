@@ -138,79 +138,53 @@ chmod 400 ${keys_dir}/server.key
 
 chmod 600 ${keys_dir}/*crt
 
-# Docker setup
+# httpd setup
 
-echo '### DOCKER SETUP'
+yum install -y httpd mod_ssl
 
-yum remove  -y docker \
-    docker-client \
-    docker-client-latest \
-    docker-common \
-    docker-latest \
-    docker-latest-logrotate \
-    docker-logrotate \
-    docker-selinux \
-    docker-engine-selinux \
-    docker-engine
+# SSL VHOST
+echo '<VirtualHost *:80>
+   ServerName ${application_endpoint}.${external_domain}
+   Redirect / https://${application_endpoint}.${external_domain}
+</VirtualHost>
 
-yum install -y yum-utils \
-  device-mapper-persistent-data \
-  lvm2
+Listen 443 https
 
-yum-config-manager \
-    --add-repo \
-    https://download.docker.com/linux/centos/docker-ce.repo
+SSLPassPhraseDialog exec:/usr/libexec/httpd-ssl-pass-dialog
+SSLSessionCache         shmcb:/run/httpd/sslcache(512000)
+SSLSessionCacheTimeout  300
+SSLRandomSeed startup file:/dev/urandom  256
+SSLRandomSeed connect builtin
+SSLCryptoDevice builtin
 
-yum install docker-ce docker-distribution -y
+<VirtualHost _default_:443>
+ErrorLog logs/ssl_error_log
+TransferLog logs/ssl_access_log
+LogLevel warn
+SSLEngine on
+SSLProtocol all -SSLv2 -SSLv3
+SSLCipherSuite HIGH:3DES:!aNULL:!MD5:!SEED:!IDEA
+SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+SSLProxyEngine on
+ProxyPass / https://ldap-primary.${internal_domain}/
+ProxyPassReverse / https://ldap-primary.${internal_domain}/
+ProxyPassReverseCookieDomain ldap-primary.${internal_domain} ${application_endpoint}.${external_domain}
+RequestHeader edit Referer ^https://${application_endpoint}.${external_domain}/  https://ldap-primary.${internal_domain}/
 
-mkdir -p /etc/docker
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+BrowserMatch "MSIE [2-5]" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+</VirtualHost>' > /etc/httpd/conf.d/ssl.conf
 
-echo '{
-    "selinux-enabled": true,
-    "log-driver": "journald",
-    "storage-opts": [
-      "dm.directlvm_device=${ebs_device_name}",
-      "dm.thinp_percent=95",
-      "dm.thinp_metapercent=1",
-      "dm.thinp_autoextend_threshold=80",
-      "dm.thinp_autoextend_percent=20",
-      "dm.directlvm_device_force=false"
-    ],
-    "storage-driver": "devicemapper"
-}' > /etc/docker/daemon.json
+echo '#' > /etc/httpd/conf.d/welcome.conf
 
-systemctl enable docker
+systemctl enable httpd
 
-systemctl restart docker
-
-# Add ${image_url} container
-
-echo '[Unit]
-Description=${container_name} proxy container
-After=docker.service
-Requires=docker.service
-
-[Service]
-EnvironmentFile=-/etc/sysconfig/proxy
-TimeoutStartSec=0
-Restart=always
-ExecStartPre=-/usr/bin/docker stop ${container_name}
-ExecStartPre=-/usr/bin/docker rm ${container_name}
-ExecStartPre=-/usr/bin/docker pull ${image_url}:${image_version}
-ExecStart=/usr/bin/docker run --name ${container_name} \
-  -p 80:80 \
-  -p 443:443 \
-  -v ${keys_dir}:${keys_dir}:z \
-  -e "TZ=Europe/London" \
-  -e "S3_CONFIG_BUCKET=${s3_bucket_config}" ${image_url}:${image_version}
-ExecStop=-/usr/bin/docker rm -f ${container_name}
-
-[Install]
-WantedBy=multi-user.target' > /etc/systemd/system/proxy.service
-
-touch /etc/sysconfig/proxy
-
-systemctl daemon-reload
-
-systemctl enable proxy.service
-systemctl start proxy.service
+systemctl restart httpd
