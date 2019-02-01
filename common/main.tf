@@ -55,7 +55,7 @@ locals {
   private_zone_id              = "${data.terraform_remote_state.vpc.private_zone_id}"
   external_domain              = "${data.terraform_remote_state.vpc.public_zone_name}"
   public_zone_id               = "${data.terraform_remote_state.vpc.public_zone_id}"
-  common_name                  = "${var.environment_identifier}-app"
+  common_name                  = "${var.environment_identifier}-${var.mis_app_name}"
   lb_account_id                = "${var.lb_account_id}"
   region                       = "${var.region}"
   role_arn                     = "${var.role_arn}"
@@ -66,10 +66,9 @@ locals {
   environment                  = "${var.environment_type}"
   tags                         = "${merge(data.terraform_remote_state.vpc.tags, map("sub-project", "${var.mis_app_name}"))}"
 
-  ssh_deployer_key      = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
-  eng_root_arn          = "${var.eng_root_arn}"
-  availability_zone_map = "${data.terraform_remote_state.vpc.availability_zone_map}"
-  password_length       = "12"
+  ssh_deployer_key = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
+  eng_root_arn     = "${var.eng_root_arn}"
+  password_length  = "12"
 
   app_hostnames = {
     internal = "${var.mis_app_name}-int"

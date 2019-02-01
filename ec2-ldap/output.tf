@@ -12,19 +12,19 @@ output "primary-instance-dns" {
   value = "${aws_route53_record.ldap-primary.fqdn}"
 }
 
-# replica ec2
-output "replica_instance_id" {
-  value = "${module.ldap-replica.instance_id}"
-}
+# # replica ec2
+# output "replica_instance_id" {
+#   value = "${module.ldap-replica.instance_id}"
+# }
 
-output "replica_instance_private_ip" {
-  value = "${module.ldap-replica.private_ip}"
-}
+# output "replica_instance_private_ip" {
+#   value = "${module.ldap-replica.private_ip}"
+# }
 
-# dns
-output "replica-instance-dns" {
-  value = "${aws_route53_record.ldap-replica.fqdn}"
-}
+# # dns
+# output "replica-instance-dns" {
+#   value = "${aws_route53_record.ldap-replica.fqdn}"
+# }
 
 # LB
 output "lb_id" {
@@ -48,12 +48,12 @@ output "lb_zone_id" {
 }
 
 # LOG GROUPS
-output "loggroup_proxy_arn" {
-  value = "${module.create_loggroup_proxy.loggroup_arn}"
+output "loggroup_arn" {
+  value = "${module.create_loggroup.loggroup_arn}"
 }
 
-output "loggroup_proxy_name" {
-  value = "${module.create_loggroup_proxy.loggroup_name}"
+output "loggroup_name" {
+  value = "${module.create_loggroup.loggroup_name}"
 }
 
 # Launch config

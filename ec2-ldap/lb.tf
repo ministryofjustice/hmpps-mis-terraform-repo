@@ -13,7 +13,7 @@ data "aws_acm_certificate" "cert" {
 
 locals {
   certificate_arn      = "${data.aws_acm_certificate.cert.arn}"
-  lb_name              = "${local.short_environment_identifier}-proxy"
+  lb_name              = "${local.short_environment_identifier}-ldap"
   lb_security_groups   = ["${data.terraform_remote_state.security-groups.security_groups_sg_ldap_lb}"]
   access_logs_bucket   = "${data.terraform_remote_state.common.common_s3_lb_logs_bucket}"
   public_zone_id       = "${data.terraform_remote_state.common.public_zone_id}"
@@ -36,7 +36,7 @@ locals {
 # elb
 module "create_app_elb" {
   source          = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=issue-118//modules//loadbalancer//elb//create_elb_with_https"
-  name            = "${local.lb_name}-ext"
+  name            = "${local.lb_name}-mis"
   subnets         = ["${local.public_subnet_ids}"]
   security_groups = ["${local.lb_security_groups}"]
   internal        = "${var.internal}"
@@ -78,18 +78,6 @@ resource "aws_route53_record" "dns_entry" {
 }
 
 ############################################
-# CREATE LOG GROUPS FOR CONTAINER LOGS
-############################################
-
-module "create_loggroup_proxy" {
-  source                   = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//cloudwatch//loggroup"
-  log_group_path           = "${local.environment_identifier}"
-  loggroupname             = "ldap-${local.application_endpoint}-proxy"
-  cloudwatch_log_retention = "${var.cloudwatch_log_retention}"
-  tags                     = "${local.tags}"
-}
-
-############################################
 # CREATE USER DATA FOR EC2 RUNNING SERVICES
 ############################################
 
@@ -99,11 +87,10 @@ data "template_file" "user_data" {
   vars {
     keys_dir             = "${local.keys_dir}"
     ebs_device_name      = "${local.ebs_device_name}"
-    app_name             = "proxy"
+    app_name             = "ldap"
     env_identifier       = "${local.environment_identifier}"
     short_env_identifier = "${local.short_environment_identifier}"
-    log_group_name       = "${module.create_loggroup_proxy.loggroup_name}"
-    container_name       = "proxy"
+    log_group_name       = "${module.create_loggroup.loggroup_name}"
     image_url            = "httpd"
     image_version        = "latest"
     self_signed_ca_cert  = "${local.self_signed_ssm["ca_cert"]}"
@@ -126,7 +113,7 @@ data "template_file" "user_data" {
 
 module "launch_cfg" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//launch_configuration//blockdevice"
-  launch_configuration_name   = "${local.common_name}-proxy"
+  launch_configuration_name   = "${local.common_name}-mis"
   image_id                    = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${local.proxy_instance_type}"
   volume_size                 = "30"

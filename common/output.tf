@@ -180,8 +180,3 @@ output "app_hostnames" {
 output "eng_root_arn" {
   value = "${local.eng_root_arn}"
 }
-
-# availability_zone_map
-output "availability_zone_map" {
-  value = "${local.availability_zone_map}"
-}

@@ -58,8 +58,6 @@ mkdir -p /tmp/awslogs-install
 cd /tmp/awslogs-install
 curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 
-mkdir -p /var/log/${container_name}
-
 # Inject the CloudWatch Logs configuration file contents
 cat > awslogs.conf <<- EOF
 [general]
@@ -145,7 +143,7 @@ yum install -y httpd mod_ssl
 # SSL VHOST
 echo '<VirtualHost *:80>
    ServerName ${application_endpoint}.${external_domain}
-   Redirect / https://${application_endpoint}.${external_domain}
+   Redirect / https://${application_endpoint}.${external_domain}/ipa/ui/
 </VirtualHost>
 
 Listen 443 https

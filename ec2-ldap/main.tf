@@ -111,7 +111,6 @@ locals {
   sg_map_ids                   = "${data.terraform_remote_state.common.sg_map_ids}"
   instance_profile             = "${data.terraform_remote_state.iam.iam_policy_int_ldap_instance_profile_name}"
   ssh_deployer_key             = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
-  availability_zone_map        = "${data.terraform_remote_state.common.availability_zone_map}"
   nart_role                    = "ldap"
   sg_outbound_id               = "${data.terraform_remote_state.common.common_sg_outbound_id}"
   private_subnet_map           = "${data.terraform_remote_state.common.private_subnet_map}"

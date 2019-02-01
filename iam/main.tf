@@ -68,21 +68,6 @@ module "iam" {
 }
 
 ####################################################
-# IAM - Application Specific
-####################################################
-module "jumphost" {
-  source                   = "../modules/iam"
-  common_name              = "${local.common_name}-jumphost"
-  tags                     = "${local.tags}"
-  ec2_policy_file          = "ec2_policy.json"
-  ec2_internal_policy_file = "${file("../policies/ec2_jumphost_policy.json")}"
-  s3-config-bucket         = "${local.s3-config-bucket}"
-  artefact-bucket          = "${local.artefact-bucket}"
-  region                   = "${local.region}"
-  account_id               = "${local.account_id}"
-}
-
-####################################################
 # IAM - Application Specific LDAP
 ####################################################
 module "ldap" {
