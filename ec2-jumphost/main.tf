@@ -110,19 +110,18 @@ locals {
   app_name                     = "${data.terraform_remote_state.common.mis_app_name}"
   environment                  = "${data.terraform_remote_state.common.environment}"
   tags                         = "${data.terraform_remote_state.common.common_tags}"
-  public_subnet_map            = "${data.terraform_remote_state.common.public_subnet_map}"
+  private_subnet_map           = "${data.terraform_remote_state.common.private_subnet_map}"
   s3bucket                     = "${data.terraform_remote_state.s3bucket.s3bucket}"
   app_hostnames                = "${data.terraform_remote_state.common.app_hostnames}"
 
-  public_cidr_block     = ["${data.terraform_remote_state.common.db_cidr_block}"]
-  private_cidr_block    = ["${data.terraform_remote_state.common.private_cidr_block}"]
-  db_cidr_block         = ["${data.terraform_remote_state.common.db_cidr_block}"]
-  sg_map_ids            = "${data.terraform_remote_state.common.sg_map_ids}"
-  instance_profile      = "${data.terraform_remote_state.iam.iam_policy_int_jumphost_instance_profile_name}"
-  ssh_deployer_key      = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
-  availability_zone_map = "${data.terraform_remote_state.common.availability_zone_map}"
-  nart_role             = "jumphost"
-  sg_outbound_id        = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+  public_cidr_block  = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  private_cidr_block = ["${data.terraform_remote_state.common.private_cidr_block}"]
+  db_cidr_block      = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  sg_map_ids         = "${data.terraform_remote_state.security-groups.sg_map_ids}"
+  instance_profile   = "${data.terraform_remote_state.iam.iam_policy_int_jumphost_instance_profile_name}"
+  ssh_deployer_key   = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
+  nart_role          = "jumphost"
+  sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
 #-------------------------------------------------------------
@@ -158,9 +157,9 @@ module "create-ec2-instance" {
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.instance_type}"
-  subnet_id                   = "${local.public_subnet_map["az1"]}"
+  subnet_id                   = "${local.private_subnet_map["az1"]}"
   iam_instance_profile        = "${local.instance_profile}"
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   monitoring                  = true
   user_data                   = "${data.template_file.instance_userdata.rendered}"
   CreateSnapshot              = false
@@ -169,7 +168,7 @@ module "create-ec2-instance" {
   root_device_size            = "40"
 
   vpc_security_group_ids = [
-    "${local.sg_map_ids["sg_mis_jumphost"]}",
+    "${local.sg_map_ids["sg_jumphost"]}",
     "${local.sg_outbound_id}",
   ]
 }
@@ -183,5 +182,5 @@ resource "aws_route53_record" "instance" {
   name    = "${local.nart_role}.${local.external_domain}"
   type    = "A"
   ttl     = "300"
-  records = ["${module.create-ec2-instance.public_ip}"]
+  records = ["${module.create-ec2-instance.private_ip}"]
 }
