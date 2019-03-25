@@ -175,8 +175,3 @@ output "sg_map_ids" {
 output "app_hostnames" {
   value = "${local.app_hostnames}"
 }
-
-# enginnering root account arn
-output "eng_root_arn" {
-  value = "${local.eng_root_arn}"
-}

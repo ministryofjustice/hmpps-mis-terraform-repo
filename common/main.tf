@@ -67,8 +67,7 @@ locals {
   tags                         = "${merge(data.terraform_remote_state.vpc.tags, map("sub-project", "${var.mis_app_name}"))}"
 
   ssh_deployer_key = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
-  eng_root_arn     = "${var.eng_root_arn}"
-  password_length  = "12"
+  password_length  = "${var.password_length}"
 
   app_hostnames = {
     internal = "${var.mis_app_name}-int"
@@ -113,6 +112,7 @@ locals {
     sg_ldap_lb    = "${data.terraform_remote_state.security-groups.sg_ldap_lb}"
     sg_ldap_inst  = "${data.terraform_remote_state.security-groups.sg_ldap_inst}"
     sg_ldap_proxy = "${data.terraform_remote_state.security-groups.sg_ldap_proxy}"
+    sg_jumphost   = "${data.terraform_remote_state.security-groups.sg_jumphost}"
   }
 }
 
