@@ -8,6 +8,6 @@ variable "environment_type" {
   description = "environment"
 }
 
-variable "allowed_cidr_block" {
+variable "user_access_cidr_blocks" {
   type = "list"
 }

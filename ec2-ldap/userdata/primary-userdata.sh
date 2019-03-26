@@ -36,7 +36,7 @@ cat << EOF > ~/requirements.yml
   src: singleplatform-eng.users
 EOF
 
-wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${environment}.yml -O users.yml
+wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
 
 cat << EOF > ~/bootstrap.yml
 ---
@@ -55,32 +55,99 @@ EOF
 ansible-galaxy install -f -r ~/requirements.yml
 ansible-playbook ~/bootstrap.yml -e monitoring_host="monitoring.${private_domain}"
 
-# IPA Server
+# enable ipv6
+sed -i '/net.ipv6.conf.all.disable_ipv6/d' /etc/sysctl.conf
+
+# sysctl for ipv6
+sysctl net.ipv6.conf.all.disable_ipv6=0
+sysctl net.ipv6.conf.lo.disable_ipv6=0
+sysctl net.ipv6.conf.eth0.disable_ipv6=1
+
+echo "net.ipv6.conf.eth0.disable_ipv6=1
+sysctl net.ipv6.conf.all.disable_ipv6=0
+sysctl net.ipv6.conf.lo.disable_ipv6=0" > /etc/sysctl.d/ipa-sysctl.conf
+
+# DNS
+# Edit hosts file
+echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+$(hostname -i | cut -d ' ' -f2) ${hostname}
+" > /etc/hosts
 
 hostnamectl set-hostname ${hostname}
+
+# Install awslogs and the jq JSON parser
+current_dir=$(pwd)
+region=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+
+mkdir -p /tmp/awslogs-install
+cd /tmp/awslogs-install
+curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+
+# Inject the CloudWatch Logs configuration file contents
+cat > awslogs.conf <<- EOF
+[general]
+state_file = /var/awslogs/state/agent-state
+
+[/var/log/messages]
+datetime_format = %b %d %H:%M:%S
+file = /var/log/messages
+buffer_duration = 5000
+log_stream_name = {instance_id}/messages
+initial_position = start_of_file
+log_group_name = ${log_group_name}
+
+[/var/log/audit/audit.log]
+datetime_format = %b %d %H:%M:%S
+file = /var/log/audit/audit.log
+buffer_duration = 5000
+log_stream_name = {instance_id}/audit
+initial_position = start_of_file
+log_group_name = ${log_group_name}
+
+[/var/log/secure]
+datetime_format = %b %d %H:%M:%S
+file = /var/log/secure
+buffer_duration = 5000
+log_stream_name = {instance_id}/secure
+initial_position = start_of_file
+log_group_name = ${log_group_name}
+
+[/var/log/cloud-init.log]
+datetime_format = %b %d %H:%M:%S
+file = /var/log/cloud-init.log
+buffer_duration = 5000
+log_stream_name = {instance_id}/cloud-init.log
+initial_position = start_of_file
+log_group_name = ${log_group_name}
+
+EOF
+
+python ./awslogs-agent-setup.py --region $region --non-interactive --configfile=awslogs.conf
+
+systemctl daemon-reload
+systemctl enable awslogs
+systemctl start awslogs
+# end script
+
+cd $current_dir
+
+rm -rf /tmp/awslogs-install
+
+# cloudwatch complete
+
+# IPA Server
 
 yum install ipa-server -y 
 
 # certs
 mkdir -p /root/ipa-certs
-aws --region eu-west-2 ssm get-parameter --with-decryption --name ${common_name}-self-signed-ca-key | jq -r '.Parameter.Value' > /root/ipa-certs/ca.key
-aws --region eu-west-2 ssm get-parameter --with-decryption --name  ${common_name}-self-signed-ca-crt | jq -r '.Parameter.Value' > /root/ipa-certs/ca.crt
+aws --region eu-west-2 ssm get-parameter --with-decryption --name ${common_name}-ldap-self-signed-ca-key | jq -r '.Parameter.Value' > /root/ipa-certs/ca.key
+aws --region eu-west-2 ssm get-parameter --with-decryption --name  ${common_name}-ldap-self-signed-ca-crt | jq -r '.Parameter.Value' > /root/ipa-certs/ca.crt
 
 chmod 600 /root/ipa-certs
 chmod 400 /root/ipa-certs/ca.key
-
-# sysctl for ipv6
-sysctl net.ipv6.conf.all.disable_ipv6=0
-sysctl net.ipv6.conf.lo.disable_ipv6=0
-
-# Edit hosts file
-echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-
-$(hostname -i | cut -d ' ' -f2) $(hostname)
-" > /etc/hosts
-
-echo "net.ipv6.conf.eth0.disable_ipv6=1" > /etc/sysctl.d/ipa-sysctl.conf
 
 export ds_password=$(aws --region eu-west-2 ssm get-parameter --with-decryption --name ${common_name}-ldap-manager-password | jq -r '.Parameter.Value')
 export admin_password=$(aws --region eu-west-2 ssm get-parameter --with-decryption --name ${common_name}-ldap-admin-password | jq -r '.Parameter.Value')
@@ -213,6 +280,6 @@ tar cvf /tmp/backups/ipa-backup-$(hostname)-$(date +%Y-%m-%d).tar \
     /var/lib/ipa/backup \
     /etc/ipa
 
-aws s3 sync /tmp/backups s3://${common_name}-s3bucket/backups/
+aws s3 sync /tmp/backups s3://${s3bucket}/backups/
 
 rm -rf /tmp/backups/* /root/ca

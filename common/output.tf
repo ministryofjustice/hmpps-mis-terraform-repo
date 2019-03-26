@@ -158,22 +158,15 @@ output "private_subnet_ids" {
   ]
 }
 
-# Security groups
-output "sg_map_ids" {
-  value = "${local.sg_map_ids}"
+output "bastion_cidr" {
+  value = [
+    "${local.bastion_cidr["az1"]}",
+    "${local.bastion_cidr["az2"]}",
+    "${local.bastion_cidr["az3"]}",
+  ]
 }
 
 # mis hosts
 output "app_hostnames" {
   value = "${local.app_hostnames}"
-}
-
-# enginnering root account arn
-output "eng_root_arn" {
-  value = "${local.eng_root_arn}"
-}
-
-# availability_zone_map
-output "availability_zone_map" {
-  value = "${local.availability_zone_map}"
 }

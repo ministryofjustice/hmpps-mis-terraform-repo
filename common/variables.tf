@@ -1,9 +1,4 @@
 # Common variables
-variable "eng-remote_state_bucket_name" {
-  description = "Terraform remote state bucket name"
-}
-
-variable "eng_role_arn" {}
 
 variable "environment_identifier" {
   description = "resource label or name"
@@ -31,10 +26,12 @@ variable "role_arn" {}
 
 variable "route53_hosted_zone_id" {}
 
-variable "mis_app_name" {}
+variable "mis_app_name" {
+  default = "mis"
+}
 
 variable "cloudwatch_log_retention" {}
 
-variable "eng_root_arn" {}
-
-variable "password_length" {}
+variable "password_length" {
+  default = 12
+}

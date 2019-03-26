@@ -114,15 +114,14 @@ locals {
   s3bucket                     = "${data.terraform_remote_state.s3bucket.s3bucket}"
   app_hostnames                = "${data.terraform_remote_state.common.app_hostnames}"
 
-  public_cidr_block     = ["${data.terraform_remote_state.common.db_cidr_block}"]
-  private_cidr_block    = ["${data.terraform_remote_state.common.private_cidr_block}"]
-  db_cidr_block         = ["${data.terraform_remote_state.common.db_cidr_block}"]
-  sg_map_ids            = "${data.terraform_remote_state.common.sg_map_ids}"
-  instance_profile      = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
-  ssh_deployer_key      = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
-  availability_zone_map = "${data.terraform_remote_state.common.availability_zone_map}"
-  nart_role             = "ndl-bfs"
-  sg_outbound_id        = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+  public_cidr_block  = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  private_cidr_block = ["${data.terraform_remote_state.common.private_cidr_block}"]
+  db_cidr_block      = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  sg_map_ids         = "${data.terraform_remote_state.common.sg_map_ids}"
+  instance_profile   = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
+  ssh_deployer_key   = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
+  nart_role          = "ndl-bfs"
+  sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
 #-------------------------------------------------------------

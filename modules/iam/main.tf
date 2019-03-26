@@ -6,7 +6,7 @@
 # Locals
 ####################################################
 locals {
-  common_name      = "${var.environment_identifier}-${var.app_name}"
+  common_name      = "${var.common_name}"
   tags             = "${var.tags}"
   s3-config-bucket = "${var.s3-config-bucket}"
   artefact-bucket  = "${var.artefact-bucket}"
@@ -30,13 +30,13 @@ data "template_file" "iam_policy_app_int" {
     s3-artefact-bucket = "${local.artefact-bucket}"
     app_role_arn       = "${module.create-iam-app-role-int.iamrole_arn}"
     runtime_role       = "${var.runtime_role}"
-    ssm_prefix         = "arn:aws:ssm:${local.region}:${local.account_id}:parameter/${var.environment_identifier}*"
+    ssm_prefix         = "arn:aws:ssm:${local.region}:${local.account_id}:parameter/${local.common_name}*"
   }
 }
 
 module "create-iam-app-role-int" {
   source     = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=pre-shared-vpc//modules//iam//role"
-  rolename   = "${local.common_name}-int-ec2"
+  rolename   = "${local.common_name}-ec2"
   policyfile = "${var.ec2_policy_file}"
 }
 

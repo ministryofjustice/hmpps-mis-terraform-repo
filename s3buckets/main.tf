@@ -29,18 +29,16 @@ data "terraform_remote_state" "common" {
 ####################################################
 
 locals {
-  region                 = "${var.region}"
-  app_name               = "${data.terraform_remote_state.common.mis_app_name}"
-  environment_identifier = "${data.terraform_remote_state.common.environment_identifier}"
-  tags                   = "${data.terraform_remote_state.common.common_tags}"
+  region      = "${var.region}"
+  common_name = "${data.terraform_remote_state.common.common_name}"
+  tags        = "${data.terraform_remote_state.common.common_tags}"
 }
 
 ####################################################
 # S3 bucket - Application Specific
 ####################################################
 module "s3bucket" {
-  source                 = "../modules/s3bucket"
-  app_name               = "${local.app_name}"
-  environment_identifier = "${local.environment_identifier}"
-  tags                   = "${local.tags}"
+  source      = "../modules/s3bucket"
+  common_name = "${local.common_name}"
+  tags        = "${local.tags}"
 }
