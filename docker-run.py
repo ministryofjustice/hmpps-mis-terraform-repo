@@ -35,7 +35,6 @@ if args.token:
         cmd=cmd,
         environment=env_target,
         action=action_type,
-        token='hmpps-token',
         component=component_target,
         git_repo=repo)
 else:

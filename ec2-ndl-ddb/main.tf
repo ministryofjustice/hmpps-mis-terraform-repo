@@ -104,7 +104,7 @@ locals {
   environment                  = "${data.terraform_remote_state.common.environment}"
   tags                         = "${data.terraform_remote_state.common.common_tags}"
   db_subnet_ids                = ["${data.terraform_remote_state.common.db_subnet_ids}"]
-  sg_map_ids                   = "${data.terraform_remote_state.common.sg_map_ids}"
+  sg_map_ids                   = "${data.terraform_remote_state.security-groups.sg_map_ids}"
   instance_profile             = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
   ssh_deployer_key             = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
   sg_outbound_id               = "${data.terraform_remote_state.common.common_sg_outbound_id}"
