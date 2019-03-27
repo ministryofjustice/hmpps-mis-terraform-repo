@@ -6,6 +6,7 @@ project.mis       = 'hmpps-mis-terraform-repo'
 
 def environments = [
   'mis-nart-dev',
+  'delius-mis-test',
 ]
 
 def prepare_env() {
@@ -34,7 +35,7 @@ def plan_submodule(config_dir, env_name, git_project_dir, submodule_name) {
                 terragrunt plan -detailed-exitcode --out ${env_name}.plan" \
             || exitcode="\$?"; \
             echo "\$exitcode" > plan_ret; \
-            if [ "\$exitcode" == '1' ]; then exit 1; else exit 0; fi    
+            if [ "\$exitcode" == '1' ]; then exit 1; else exit 0; fi
         set -e
         """
         return readFile("${git_project_dir}/plan_ret").trim()
@@ -177,7 +178,7 @@ pipeline {
               do_terraform(project.config, environment_name, project.mis, 'ec2-jumphost')
             }
           }
-        }        
+        }
 
         // stage('Delius | MIS ec2-ndl-ddb') {
         //   steps {
@@ -194,7 +195,7 @@ pipeline {
         //     }
         //   }
         // }
-        
+
         stage('Delius | MIS ec2-ndl-dis') {
           steps {
             script {
