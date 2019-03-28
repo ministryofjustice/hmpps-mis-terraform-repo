@@ -42,3 +42,14 @@ module "s3bucket" {
   common_name = "${local.common_name}"
   tags        = "${local.tags}"
 }
+
+# #-------------------------------------------
+# ### S3 bucket for backups
+# #--------------------------------------------
+
+module "s3bucket-backups" {
+  source         = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//s3bucket//s3bucket_without_policy"
+  s3_bucket_name = "${local.common_name}-backups"
+  tags           = "${local.tags}"
+  versioning     = false
+}
