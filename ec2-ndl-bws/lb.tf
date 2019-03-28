@@ -56,12 +56,16 @@ resource "aws_route53_record" "dns_entry" {
 # Elb attachment
 ###############################################
 locals {
-  instances = ["${module.create-ec2-instance.instance_id}", "${module.create-ec2-instance1.instance_id}"]
+  instances = [
+    "${module.create-ec2-instance.instance_id}",
+    "${module.create-ec2-instance1.instance_id}",
+  ]
 }
+
 # elb
-module "create_app_elb" {
-  source                            = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//loadbalancer//elb//elb_attachment"
-  number_of_instances               = "${length("${local.instances}")}"
-  elb                               = "${module.create_app_elb.environment_elb_name}"
-  instances                         = "${local.instances}"
+module "create_app_elb_attachment" {
+  source              = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//loadbalancer//elb//elb_attachment"
+  number_of_instances = "${length("${local.instances}")}"
+  elb                 = "${module.create_app_elb.environment_elb_name}"
+  instances           = "${local.instances}"
 }
