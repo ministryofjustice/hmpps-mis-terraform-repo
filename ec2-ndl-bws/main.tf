@@ -25,6 +25,15 @@ data "terraform_remote_state" "common" {
 }
 
 #-------------------------------------------------------------
+### Getting ACM Cert
+#-------------------------------------------------------------
+data "aws_acm_certificate" "cert" {
+  domain      = "*.${data.terraform_remote_state.common.external_domain}"
+  types       = ["AMAZON_ISSUED"]
+  most_recent = true
+}
+
+#-------------------------------------------------------------
 ### Getting the s3 details
 #-------------------------------------------------------------
 data "terraform_remote_state" "s3bucket" {
@@ -107,14 +116,17 @@ locals {
   environment_identifier       = "${data.terraform_remote_state.common.environment_identifier}"
   short_environment_identifier = "${data.terraform_remote_state.common.short_environment_identifier}"
   region                       = "${var.region}"
+  certificate_arn              = "${data.aws_acm_certificate.cert.arn}"
   app_name                     = "${data.terraform_remote_state.common.mis_app_name}"
   environment                  = "${data.terraform_remote_state.common.environment}"
   tags                         = "${data.terraform_remote_state.common.common_tags}"
   private_subnet_map           = "${data.terraform_remote_state.common.private_subnet_map}"
   s3bucket                     = "${data.terraform_remote_state.s3bucket.s3bucket}"
+  logs_bucket                  = "${data.terraform_remote_state.common.common_s3_lb_logs_bucket}"
   app_hostnames                = "${data.terraform_remote_state.common.app_hostnames}"
 
   public_cidr_block  = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  public_subnet_ids  = ["${data.terraform_remote_state.common.public_subnet_ids}"]
   private_cidr_block = ["${data.terraform_remote_state.common.private_cidr_block}"]
   db_cidr_block      = ["${data.terraform_remote_state.common.db_cidr_block}"]
   sg_map_ids         = "${data.terraform_remote_state.security-groups.sg_map_ids}"
