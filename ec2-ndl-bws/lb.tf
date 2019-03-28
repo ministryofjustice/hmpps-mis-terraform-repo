@@ -51,3 +51,17 @@ resource "aws_route53_record" "dns_entry" {
     evaluate_target_health = false
   }
 }
+
+###############################################
+# Elb attachment
+###############################################
+locals {
+  instances = ["${module.create-ec2-instance.instance_id}", "${module.create-ec2-instance1.instance_id}"]
+}
+# elb
+module "create_app_elb" {
+  source                            = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//loadbalancer//elb//elb_attachment"
+  number_of_instances               = "${length("${local.instances}")}"
+  elb                               = "${module.create_app_elb.environment_elb_name}"
+  instances                         = "${local.instances}"
+}
