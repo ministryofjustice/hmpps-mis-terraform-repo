@@ -6,9 +6,9 @@
 #### Credentials:
 
 ```
-admin user - https://eu-west-2.console.aws.amazon.com/systems-manager/parameters/tf-eu-west-2-hmpps-delius-mis-test-mis-admin-password?region=eu-west-2
+admin user - https://eu-west-2.console.aws.amazon.com/systems-manager/parameters/tf-eu-west-2-hmpps-delius-mis-test-mis-admin-user?region=eu-west-2
 
-admin user password - https://eu-west-2.console.aws.amazon.com/systems-manager/parameters/tf-eu-west-2-hmpps-delius-mis-test-mis-admin-user?region=eu-west-2
+admin user password - https://eu-west-2.console.aws.amazon.com/systems-manager/parameters/tf-eu-west-2-hmpps-delius-mis-test-mis-admin-password?region=eu-west-2
 ```
 
 # Instances
@@ -41,6 +41,7 @@ ndl-bps-003.delius-mis-test.internal
 ```
 
 #### BWS
+BWS Endpoint [https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io](https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io)
 
 ```
 ndl-bws-001.delius-mis-test.internal
