@@ -58,3 +58,13 @@ resource "aws_security_group_rule" "rdp_in_jumphost" {
     "${local.bastion_cidr}",
   ]
 }
+
+resource "aws_security_group_rule" "rdp_egress_jumphost" {
+  security_group_id        = "${local.sg_jumphost}"
+  from_port                = 3389
+  to_port                  = 3389
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "${local.common_name}-rdp-out"
+  source_security_group_id = "${local.sg_mis_common}"
+}
