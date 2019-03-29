@@ -42,6 +42,33 @@ def plan_submodule(config_dir, env_name, git_project_dir, submodule_name) {
     }
 }
 
+def plan_submodule_deployment_type(config_dir, env_name, git_project_dir, submodule_name) {
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+        sh """
+        #!/usr/env/bin bash
+        echo "TF PLAN for ${env_name} | ${submodule_name} - component from git project ${git_project_dir}"
+        set +e
+        cp -R -n "${config_dir}" "${git_project_dir}/env_configs"
+        cd "${git_project_dir}"
+        docker run --rm \
+            -v `pwd`:/home/tools/data \
+            -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
+            bash -c "\
+                source env_configs/${env_name}/${env_name}.properties; \
+                cd ${MIS_DEPLOYMENT_TYPE}/${submodule_name}; \
+                if [ -d .terraform ]; then rm -rf .terraform; fi; sleep 5; \
+                terragrunt init; \
+                terragrunt plan -detailed-exitcode --out ${env_name}.plan" \
+            || exitcode="\$?"; \
+            echo "\$exitcode" > plan_ret; \
+            if [ "\$exitcode" == '1' ]; then exit 1; else exit 0; fi
+        set -e
+        """
+        return readFile("${git_project_dir}/plan_ret").trim()
+    }
+}
+
+
 def apply_submodule(config_dir, env_name, git_project_dir, submodule_name) {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
         sh """
@@ -56,6 +83,26 @@ def apply_submodule(config_dir, env_name, git_project_dir, submodule_name) {
         bash -c "\
             source env_configs/${env_name}/${env_name}.properties; \
             cd ${submodule_name}; \
+            terragrunt apply ${env_name}.plan"
+        set -e
+        """
+    }
+}
+
+def apply_submodule_deployment_type(config_dir, env_name, git_project_dir, submodule_name) {
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+        sh """
+        #!/usr/env/bin bash
+        echo "TF APPLY for ${env_name} | ${submodule_name} - component from git project ${git_project_dir}"
+        set +e
+        cp -R -n "${config_dir}" "${git_project_dir}/env_configs"
+        cd "${git_project_dir}"
+        docker run --rm \
+        -v `pwd`:/home/tools/data \
+        -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
+        bash -c "\
+            source env_configs/${env_name}/${env_name}.properties; \
+            cd ${MIS_DEPLOYMENT_TYPE}/${submodule_name}; \
             terragrunt apply ${env_name}.plan"
         set -e
         """
@@ -88,6 +135,18 @@ def do_terraform(config_dir, env_name, git_project, component) {
         confirm()
         if (env.Continue == "true") {
             apply_submodule(config_dir, env_name, git_project, component)
+        }
+    }
+    else {
+        env.Continue = true
+    }
+}
+
+def do_terraform_deployment_type(config_dir, env_name, git_project, component) {
+    if (plan_submodule_deployment_type(config_dir, env_name, git_project, component) == "2") {
+        confirm()
+        if (env.Continue == "true") {
+            apply_submodule_deployment_type(config_dir, env_name, git_project, component)
         }
     }
     else {
@@ -199,7 +258,7 @@ pipeline {
         stage('Delius | MIS ec2-ndl-dis') {
           steps {
             script {
-              do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis')
+              do_terraform_deployment_type(project.config, environment_name, project.mis, 'ec2-ndl-dis')
             }
           }
         }
@@ -207,7 +266,7 @@ pipeline {
         stage('Delius | MIS ec2-ndl-dis-auto') {
           steps {
             script {
-              do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis-auto')
+              do_terraform_deployment_type(project.config, environment_name, project.mis, 'ec2-ndl-dis-auto')
             }
           }
         }
@@ -215,7 +274,7 @@ pipeline {
         stage('Delius | MIS ec2-ndl-bcs') {
           steps {
             script {
-              do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs')
+              do_terraform_deployment_type(project.config, environment_name, project.mis, 'ec2-ndl-bcs')
             }
           }
         }
@@ -223,7 +282,7 @@ pipeline {
         stage('Delius | MIS ec2-ndl-bcs-auto') {
           steps {
             script {
-              do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs-auto')
+              do_terraform_deployment_type(project.config, environment_name, project.mis, 'ec2-ndl-bcs-auto')
             }
           }
         }
@@ -231,7 +290,7 @@ pipeline {
         stage('Delius | MIS ec2-ndl-bfs') {
           steps {
             script {
-              do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs')
+              do_terraform_deployment_type(project.config, environment_name, project.mis, 'ec2-ndl-bfs')
             }
           }
         }
@@ -239,7 +298,7 @@ pipeline {
         stage('Delius | MIS ec2-ndl-bps') {
           steps {
             script {
-              do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps')
+              do_terraform_deployment_type(project.config, environment_name, project.mis, 'ec2-ndl-bps')
             }
           }
         }
@@ -247,7 +306,7 @@ pipeline {
         stage('Delius | MIS ec2-ndl-bws') {
           steps {
             script {
-              do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws')
+              do_terraform_deployment_type(project.config, environment_name, project.mis, 'ec2-ndl-bws')
             }
           }
         }
