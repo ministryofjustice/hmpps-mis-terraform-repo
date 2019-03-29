@@ -55,7 +55,7 @@ def plan_submodule_deployment_type(config_dir, env_name, git_project_dir, submod
             -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
             bash -c "\
                 source env_configs/${env_name}/${env_name}.properties; \
-                cd $MIS_DEPLOYMENT_TYPE/${submodule_name}; \
+                cd minimal-setup/${submodule_name}; \
                 if [ -d .terraform ]; then rm -rf .terraform; fi; sleep 5; \
                 terragrunt init; \
                 terragrunt plan -detailed-exitcode --out ${env_name}.plan" \
@@ -102,7 +102,7 @@ def apply_submodule_deployment_type(config_dir, env_name, git_project_dir, submo
         -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
         bash -c "\
             source env_configs/${env_name}/${env_name}.properties; \
-            cd $MIS_DEPLOYMENT_TYPE/${submodule_name}; \
+            cd minimal-setup/${submodule_name}; \
             terragrunt apply ${env_name}.plan"
         set -e
         """
