@@ -192,68 +192,68 @@ pipeline {
             }
         }
 
-        stage('Delius | MIS Common') {
-          steps {
-            script {
-              do_terraform(project.config, environment_name, project.mis, 'common')
-            }
-          }
-        }
-
-        stage('Delius | MIS Certs') {
-          steps {
-            script {
-              do_terraform(project.config, environment_name, project.mis, 'certs')
-            }
-          }
-        }
-
-        stage('Delius | MIS s3buckets') {
-          steps {
-            script {
-              do_terraform(project.config, environment_name, project.mis, 's3buckets')
-            }
-          }
-        }
-
-        stage('Delius | MIS iam') {
-          steps {
-            script {
-              do_terraform(project.config, environment_name, project.mis, 'iam')
-            }
-          }
-        }
-        stage('Delius | MIS security-groups') {
-          steps {
-            script {
-              do_terraform(project.config, environment_name, project.mis, 'security-groups')
-            }
-          }
-        }
-
-        stage('Delius | MIS Jumphost') {
-          steps {
-            script {
-              do_terraform(project.config, environment_name, project.mis, 'ec2-jumphost')
-            }
-          }
-        }
-
-        // stage('Delius | MIS ec2-ndl-ddb') {
-        //   steps {
-        //     script {
-        //       do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-ddb')
-        //     }
-        //   }
-        // }
-
-        // stage('Delius | MIS ec2-ndl-bdb') {
-        //   steps {
-        //     script {
-        //       do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bdb')
-        //     }
-        //   }
-        // }
+//        stage('Delius | MIS Common') {
+//          steps {
+//            script {
+//              do_terraform(project.config, environment_name, project.mis, 'common')
+//            }
+//          }
+//        }
+//
+//        stage('Delius | MIS Certs') {
+//          steps {
+//            script {
+//              do_terraform(project.config, environment_name, project.mis, 'certs')
+//            }
+//          }
+//        }
+//
+//        stage('Delius | MIS s3buckets') {
+//          steps {
+//            script {
+//              do_terraform(project.config, environment_name, project.mis, 's3buckets')
+//            }
+//          }
+//        }
+//
+//        stage('Delius | MIS iam') {
+//          steps {
+//            script {
+//              do_terraform(project.config, environment_name, project.mis, 'iam')
+//            }
+//          }
+//        }
+//        stage('Delius | MIS security-groups') {
+//          steps {
+//            script {
+//              do_terraform(project.config, environment_name, project.mis, 'security-groups')
+//            }
+//          }
+//        }
+//
+//        stage('Delius | MIS Jumphost') {
+//          steps {
+//            script {
+//              do_terraform(project.config, environment_name, project.mis, 'ec2-jumphost')
+//            }
+//          }
+//        }
+//
+//        // stage('Delius | MIS ec2-ndl-ddb') {
+//        //   steps {
+//        //     script {
+//        //       do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-ddb')
+//        //     }
+//        //   }
+//        // }
+//
+//        // stage('Delius | MIS ec2-ndl-bdb') {
+//        //   steps {
+//        //     script {
+//        //       do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bdb')
+//        //     }
+//        //   }
+//        // }
 
         stage('Delius | MIS ec2-ndl-dis') {
           steps {
