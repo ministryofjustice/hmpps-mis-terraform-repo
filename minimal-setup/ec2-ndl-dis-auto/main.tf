@@ -140,7 +140,7 @@ data "aws_ssm_parameter" "password" {
 ####################################################
 
 data "template_file" "instance_userdata" {
-  template = "${file("../userdata/userdata-auto.txt")}"
+  template = "${file("../../userdata/userdata-auto.txt")}"
 
   vars {
     host_name       = "${local.nart_role}-001"
@@ -151,7 +151,7 @@ data "template_file" "instance_userdata" {
 }
 
 #-------------------------------------------------------------
-### Create instance - NDL-DIS-001 
+### Create instance - NDL-DIS-001
 #-------------------------------------------------------------
 module "create-ec2-instance" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
@@ -182,6 +182,14 @@ module "create-ec2-instance" {
 resource "aws_route53_record" "instance" {
   zone_id = "${local.private_zone_id}"
   name    = "${local.nart_role}-001.${local.internal_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance.private_ip}"]
+}
+
+resource "aws_route53_record" "instance_ext" {
+  zone_id = "${local.public_zone_id}"
+  name    = "${local.nart_role}-001.${local.external_domain}"
   type    = "A"
   ttl     = "300"
   records = ["${module.create-ec2-instance.private_ip}"]

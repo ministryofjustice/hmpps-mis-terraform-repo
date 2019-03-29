@@ -5,7 +5,7 @@ set -e
 #Usage
 # Scripts takes 2 arguments: environment_type and action
 # environment_type: target environment example dev prod
-# ACTION_TYPE: task to complete example plan apply test clean 
+# ACTION_TYPE: task to complete example plan apply test clean
 # AWS_TOKEN: token to use when running locally eg hmpps-token
 
 # Error handler function
@@ -29,7 +29,7 @@ REPO=${4}
 if [ -z "${TG_ENVIRONMENT_TYPE}" ]
 then
     echo "environment_type argument not supplied, please provide an argument!"
-    exit 1 
+    exit 1
 fi
 
 echo "Output -> environment_type set to: ${TG_ENVIRONMENT_TYPE}"
@@ -64,7 +64,14 @@ then
     echo "Output ---> set environment stage complete"
     # set runCmd
     ACTION_TYPE="docker-${ACTION_TYPE}"
-    cd ${workDirContainer}
+    case ${workDirContainer} in
+      ec2-ndl*)
+        cd ${MIS_DEPLOYMENT_TYPE}/${workDirContainer}
+        ;;
+      *)
+        cd ${workDirContainer}
+        ;;
+    esac
     echo "Output -> Container workDir: $(pwd)"
 fi
 
