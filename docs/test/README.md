@@ -80,7 +80,7 @@ ndl-dis-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-dis-001.mis-test.mis-test.delius.probation.hmpps.dsd.io
+ndl-dis-001.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## Automation
 
@@ -97,7 +97,7 @@ ndl-dis-auto-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-dis-auto-001.mis-test.mis-test.delius.probation.hmpps.dsd.io
+ndl-dis-auto-001.mis-test.delius.probation.hmpps.dsd.io
 ```
 ##  BCS host
 #### Internal DNS  
@@ -110,5 +110,5 @@ ndl-bcs-auto-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-bcs-auto-001.mis-test.mis-test.delius.probation.hmpps.dsd.io
+ndl-bcs-auto-001.mis-test.delius.probation.hmpps.dsd.io
 ```
