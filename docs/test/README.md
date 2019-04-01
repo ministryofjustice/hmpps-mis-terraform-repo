@@ -25,7 +25,7 @@ ndl-bcs-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-bcs-001.delius.probation.hmpps.dsd.io
+ndl-bcs-001.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## BFS
 
@@ -38,7 +38,7 @@ ndl-bfs-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-bfs-001.delius.probation.hmpps.dsd.io
+ndl-bfs-001.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## BPS
 #### Internal DNS  
@@ -52,7 +52,7 @@ ndl-bps-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-bps-001.delius.probation.hmpps.dsd.io
+ndl-bps-001.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## BWS
 BWS Endpoint [https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io](https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io)
@@ -67,7 +67,7 @@ ndl-bws-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-bws-001.delius.probation.hmpps.dsd.io
+ndl-bws-001.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## DIS
 #### Internal DNS  
@@ -80,7 +80,7 @@ ndl-dis-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-dis-001.delius.probation.hmpps.dsd.io
+ndl-dis-001.mis-test.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## Automation
 
@@ -97,7 +97,7 @@ ndl-dis-auto-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-dis-auto-001.delius.probation.hmpps.dsd.io
+ndl-dis-auto-001.mis-test.mis-test.delius.probation.hmpps.dsd.io
 ```
 ##  BCS host
 #### Internal DNS  
@@ -110,5 +110,5 @@ ndl-bcs-auto-001.delius-mis-test.internal
 #### External DNS  
 
 ```
-ndl-bcs-auto-001.delius.probation.hmpps.dsd.io
+ndl-bcs-auto-001.mis-test.mis-test.delius.probation.hmpps.dsd.io
 ```
