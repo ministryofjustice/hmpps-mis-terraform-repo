@@ -66,22 +66,30 @@ then
     ACTION_TYPE="docker-${ACTION_TYPE}"
     case ${workDirContainer} in
       ec2-ndl*)
-        cd ${MIS_DEPLOYMENT_TYPE}/${workDirContainer}
+        export workDir=${MIS_DEPLOYMENT_TYPE}/${workDirContainer}
+        cd ${workDir}
         ;;
       *)
-        cd ${workDirContainer}
+        export workDir=${workDirContainer}
+        cd ${workDir}
         ;;
     esac
-    echo "Output -> Container workDir: $(pwd)"
+    export PLAN_RET_FILE=${HOME}/data/${workDirContainer}_plan_ret
+    echo "Output -> Container workDir: ${workDir}"
 fi
 
 case ${ACTION_TYPE} in
   docker-plan)
     echo "Running docker plan action"
-    rm -rf .terraform *.plan
+    rm -rf .terraform *.plan ${PLAN_RET_FILE}
     terragrunt init
     exit_on_error $? !!
-    terragrunt plan -detailed-exitcode --out ${TG_ENVIRONMENT_TYPE}.plan
+    terragrunt plan -detailed-exitcode --out ${TG_ENVIRONMENT_TYPE}.plan || export tf_exit_code="$?"
+    if [ -z ${tf_exit_code} ]
+    then
+      export tf_exit_code="0"
+    fi
+    echo "export exitcode=${tf_exit_code}" > ${PLAN_RET_FILE}
     exit_on_error $? !!
     ;;
   docker-apply)
