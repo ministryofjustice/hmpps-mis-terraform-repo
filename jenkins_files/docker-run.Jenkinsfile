@@ -120,7 +120,7 @@ pipeline {
                 slackSend(message: "Build started on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL.replace(':8080','')}|Open>)")
 
                 dir( project.mis ) {
-                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'issue-53-docker-run-py', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
                 }
 
                 prepare_env()
