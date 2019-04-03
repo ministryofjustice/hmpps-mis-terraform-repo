@@ -52,3 +52,7 @@ variable "bws-health_check" {
   type        = "list"
   default     = []
 }
+
+variable "number_of_instances" {
+  default = 2
+}

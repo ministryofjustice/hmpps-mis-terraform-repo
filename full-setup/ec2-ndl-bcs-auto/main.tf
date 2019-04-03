@@ -192,7 +192,7 @@ resource "aws_route53_record" "instance_ext" {
   name    = "${local.nart_role}-001.${local.external_domain}"
   type    = "A"
   ttl     = "300"
-  records = ["${module.create-ec2-instance1.private_ip}"]
+  records = ["${module.create-ec2-instance.private_ip}"]
 }
 
 ####################################################
