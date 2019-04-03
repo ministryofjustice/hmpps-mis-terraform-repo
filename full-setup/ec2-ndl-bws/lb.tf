@@ -64,8 +64,9 @@ locals {
 
 # elb
 module "create_app_elb_attachment" {
-  source              = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//loadbalancer//elb//elb_attachment"
-  number_of_instances = "${length("${local.instances}")}"
+  source = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//loadbalancer//elb//elb_attachment"
+
+  number_of_instances = "${var.number_of_instances}"
   elb                 = "${module.create_app_elb.environment_elb_name}"
   instances           = "${local.instances}"
 }

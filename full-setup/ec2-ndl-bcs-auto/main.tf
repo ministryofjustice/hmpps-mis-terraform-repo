@@ -140,7 +140,7 @@ data "aws_ssm_parameter" "password" {
 ####################################################
 
 data "template_file" "instance_userdata" {
-  template = "${file("../userdata/userdata-auto.txt")}"
+  template = "${file("../../userdata/userdata-auto.txt")}"
 
   vars {
     host_name       = "${local.nart_role}-001"
@@ -187,11 +187,19 @@ resource "aws_route53_record" "instance" {
   records = ["${module.create-ec2-instance.private_ip}"]
 }
 
+resource "aws_route53_record" "instance_ext" {
+  zone_id = "${local.public_zone_id}"
+  name    = "${local.nart_role}-001.${local.external_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance.private_ip}"]
+}
+
 ####################################################
 # instance 2
 ####################################################
 data "template_file" "instance1_userdata" {
-  template = "${file("../userdata/userdata-auto.txt")}"
+  template = "${file("../../userdata/userdata-auto.txt")}"
 
   vars {
     host_name       = "${local.nart_role}-002"
@@ -233,6 +241,14 @@ module "create-ec2-instance1" {
 resource "aws_route53_record" "instance1" {
   zone_id = "${local.private_zone_id}"
   name    = "${local.nart_role}-002.${local.internal_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance1.private_ip}"]
+}
+
+resource "aws_route53_record" "instance1_ext" {
+  zone_id = "${local.public_zone_id}"
+  name    = "${local.nart_role}-002.${local.external_domain}"
   type    = "A"
   ttl     = "300"
   records = ["${module.create-ec2-instance1.private_ip}"]

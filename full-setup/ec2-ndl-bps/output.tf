@@ -12,6 +12,10 @@ output "primary_dns" {
   value = "${aws_route53_record.instance.fqdn}"
 }
 
+output "primary_dns_ext" {
+  value = "${aws_route53_record.instance_ext.fqdn}"
+}
+
 ####################################################
 # instance 2
 ####################################################
@@ -30,6 +34,10 @@ output "secondary_dns" {
   value = "${aws_route53_record.instance1.fqdn}"
 }
 
+output "third_dns_ext" {
+  value = "${aws_route53_record.instance3_ext.fqdn}"
+}
+
 ####################################################
 # instance 3
 ####################################################
@@ -46,4 +54,8 @@ output "third_private_ip" {
 # dns
 output "third_dns" {
   value = "${aws_route53_record.instance2.fqdn}"
+}
+
+output "secondary_dns_ext" {
+  value = "${aws_route53_record.instance1_ext.fqdn}"
 }

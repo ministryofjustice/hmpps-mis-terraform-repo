@@ -12,6 +12,10 @@ output "primary_dns" {
   value = "${aws_route53_record.instance.fqdn}"
 }
 
+output "primary_dns_ext" {
+  value = "${aws_route53_record.instance_ext.fqdn}"
+}
+
 ####################################################
 # instance 2
 ####################################################
@@ -28,6 +32,10 @@ output "secondary_private_ip" {
 # dns
 output "secondary_dns" {
   value = "${aws_route53_record.instance1.fqdn}"
+}
+
+output "secondary_dns_ext" {
+  value = "${aws_route53_record.instance1_ext.fqdn}"
 }
 
 # ELB

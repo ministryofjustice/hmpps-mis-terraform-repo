@@ -140,7 +140,7 @@ data "aws_ssm_parameter" "password" {
 ####################################################
 
 data "template_file" "instance_userdata" {
-  template = "${file("../userdata/userdata.txt")}"
+  template = "${file("../../userdata/userdata.txt")}"
 
   vars {
     host_name       = "${local.nart_role}-001"
@@ -187,11 +187,19 @@ resource "aws_route53_record" "instance" {
   records = ["${module.create-ec2-instance.private_ip}"]
 }
 
+resource "aws_route53_record" "instance_ext" {
+  zone_id = "${local.public_zone_id}"
+  name    = "${local.nart_role}-001.${local.external_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance.private_ip}"]
+}
+
 ####################################################
 # instance 2
 ####################################################
 data "template_file" "instance1_userdata" {
-  template = "${file("../userdata/userdata.txt")}"
+  template = "${file("../../userdata/userdata.txt")}"
 
   vars {
     host_name       = "${local.nart_role}-002"
@@ -238,11 +246,19 @@ resource "aws_route53_record" "instance1" {
   records = ["${module.create-ec2-instance1.private_ip}"]
 }
 
+resource "aws_route53_record" "instance1_ext" {
+  zone_id = "${local.public_zone_id}"
+  name    = "${local.nart_role}-002.${local.external_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance1.private_ip}"]
+}
+
 #-------------------------------------------------------------
 ### Create instance - NDL-BWS-003
 #-------------------------------------------------------------
 data "template_file" "instance2_userdata" {
-  template = "${file("../userdata/userdata.txt")}"
+  template = "${file("../../userdata/userdata.txt")}"
 
   vars {
     host_name       = "${local.nart_role}-003"
@@ -281,6 +297,14 @@ module "create-ec2-instance2" {
 resource "aws_route53_record" "instance2" {
   zone_id = "${local.private_zone_id}"
   name    = "${local.nart_role}-003.${local.internal_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance2.private_ip}"]
+}
+
+resource "aws_route53_record" "instance3_ext" {
+  zone_id = "${local.public_zone_id}"
+  name    = "${local.nart_role}-003.${local.external_domain}"
   type    = "A"
   ttl     = "300"
   records = ["${module.create-ec2-instance2.private_ip}"]
