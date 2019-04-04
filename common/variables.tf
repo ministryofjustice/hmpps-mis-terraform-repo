@@ -35,3 +35,8 @@ variable "cloudwatch_log_retention" {}
 variable "password_length" {
   default = 12
 }
+
+variable "legacy_environment_name" {
+  default     = "100"
+  description = "legacy environment name"
+}
