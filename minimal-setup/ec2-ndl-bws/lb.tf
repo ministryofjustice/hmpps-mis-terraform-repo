@@ -1,5 +1,6 @@
 locals {
-  lb_name = "${local.short_environment_identifier}-${local.nart_role}"
+  lb_name     = "${local.short_environment_identifier}-${local.nart_role}"
+  lb_endpoint = "ndl-nart"
 
   external_lb_security_groups = [
     "${data.terraform_remote_state.security-groups.security_groups_sg_mis_app_lb}",
@@ -42,7 +43,7 @@ module "create_app_elb" {
 
 resource "aws_route53_record" "dns_entry" {
   zone_id = "${local.public_zone_id}"
-  name    = "${local.nart_role}.${local.external_domain}"
+  name    = "${local.lb_endpoint}.${local.external_domain}"
   type    = "A"
 
   alias {
