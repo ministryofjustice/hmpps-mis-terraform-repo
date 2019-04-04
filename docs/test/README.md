@@ -19,40 +19,40 @@ admin user password - https://eu-west-2.console.aws.amazon.com/systems-manager/p
 
 
 ```
-ndl-bcs-001.delius-mis-test.internal
+ndl-bcs-300.delius-mis-test.internal
 ```
 
 #### External DNS  
 
 ```
-ndl-bcs-001.mis-test.delius.probation.hmpps.dsd.io
+ndl-bcs-300.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## BFS
 
 #### Internal DNS  
 
 ```
-ndl-bfs-001.delius-mis-test.internal
+ndl-bfs-300.delius-mis-test.internal
 ```
 
 #### External DNS  
 
 ```
-ndl-bfs-001.mis-test.delius.probation.hmpps.dsd.io
+ndl-bfs-300.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## BPS
 #### Internal DNS  
 
 
 ```
-ndl-bps-001.delius-mis-test.internal
+ndl-bps-300.delius-mis-test.internal
 
 ```
 
 #### External DNS  
 
 ```
-ndl-bps-001.mis-test.delius.probation.hmpps.dsd.io
+ndl-bps-300.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## BWS
 BWS Endpoint [https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io](https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io)
@@ -61,54 +61,26 @@ BWS Endpoint [https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io](https://nd
 
 
 ```
-ndl-bws-001.delius-mis-test.internal
+ndl-bws-300.delius-mis-test.internal
 ```
 
 #### External DNS  
 
 ```
-ndl-bws-001.mis-test.delius.probation.hmpps.dsd.io
+ndl-bws-300.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## DIS
 #### Internal DNS  
 
 
 ```
-ndl-dis-001.delius-mis-test.internal
+ndl-dis-300.delius-mis-test.internal
 ```
 
 #### External DNS  
 
 ```
-ndl-dis-001.mis-test.delius.probation.hmpps.dsd.io
-```
-## Automation
-
-
-
-##  DIS host
-#### Internal DNS  
-
-
-```
-ndl-dis-auto-001.delius-mis-test.internal
+ndl-dis-300.mis-test.delius.probation.hmpps.dsd.io
 ```
 
-#### External DNS  
 
-```
-ndl-dis-auto-001.mis-test.delius.probation.hmpps.dsd.io
-```
-##  BCS host
-#### Internal DNS  
-
-
-```
-ndl-bcs-auto-001.delius-mis-test.internal
-```
-
-#### External DNS  
-
-```
-ndl-bcs-auto-001.mis-test.delius.probation.hmpps.dsd.io
-```

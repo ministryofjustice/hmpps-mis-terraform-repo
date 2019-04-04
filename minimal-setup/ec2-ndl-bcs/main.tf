@@ -120,7 +120,7 @@ locals {
   sg_map_ids         = "${data.terraform_remote_state.security-groups.sg_map_ids}"
   instance_profile   = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
   ssh_deployer_key   = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
-  nart_role          = "ndl-bcs"
+  nart_role          = "ndl-bcs-${data.terraform_remote_state.common.legacy_environment_name}"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
@@ -143,7 +143,7 @@ data "template_file" "instance_userdata" {
   template = "${file("../../userdata/userdata.txt")}"
 
   vars {
-    host_name       = "${local.nart_role}-001"
+    host_name       = "${local.nart_role}"
     internal_domain = "${local.internal_domain}"
     user            = "${data.aws_ssm_parameter.user.value}"
     password        = "${data.aws_ssm_parameter.password.value}"
@@ -182,7 +182,7 @@ module "create-ec2-instance" {
 
 resource "aws_route53_record" "instance" {
   zone_id = "${local.private_zone_id}"
-  name    = "${local.nart_role}-001.${local.internal_domain}"
+  name    = "${local.nart_role}.${local.internal_domain}"
   type    = "A"
   ttl     = "300"
   records = ["${module.create-ec2-instance.private_ip}"]
@@ -190,7 +190,7 @@ resource "aws_route53_record" "instance" {
 
 resource "aws_route53_record" "instance_ext" {
   zone_id = "${local.public_zone_id}"
-  name    = "${local.nart_role}-001.${local.external_domain}"
+  name    = "${local.nart_role}.${local.external_domain}"
   type    = "A"
   ttl     = "300"
   records = ["${module.create-ec2-instance.private_ip}"]
