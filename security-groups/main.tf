@@ -65,6 +65,7 @@ locals {
     sg_ldap_inst  = "${data.terraform_remote_state.security-groups.sg_ldap_inst}"
     sg_ldap_proxy = "${data.terraform_remote_state.security-groups.sg_ldap_proxy}"
     sg_jumphost   = "${data.terraform_remote_state.security-groups.sg_jumphost}"
+    sg_delius_db  = "${data.terraform_remote_state.security-groups.sg_mis_out_to_delius_db_id}"
   }
 }
 
@@ -77,4 +78,5 @@ locals {
   sg_ldap_lb    = "${local.sg_map_ids["sg_ldap_lb"]}"
   sg_mis_db_in  = "${local.sg_map_ids["sg_mis_db_in"]}"
   sg_mis_app_in = "${local.sg_map_ids["sg_mis_app_in"]}"
+  sg_delius_db  = "${local.sg_map_ids["sg_delius_db"]}"
 }

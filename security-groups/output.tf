@@ -30,6 +30,10 @@ output "security_groups_sg_ldap_proxy" {
   value = "${local.sg_ldap_proxy}"
 }
 
+output "security_groups_sg_delius_db" {
+  value = "${local.sg_delius_db}"
+}
+
 # Security groups
 output "sg_map_ids" {
   value = "${local.sg_map_ids}"
