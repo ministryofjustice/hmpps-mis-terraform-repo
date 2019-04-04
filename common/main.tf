@@ -51,7 +51,8 @@ locals {
   remote_state_bucket_name     = "${var.remote_state_bucket_name}"
   s3_lb_policy_file            = "../policies/s3_alb_policy.json"
   environment                  = "${var.environment_type}"
-  tags                         = "${merge(data.terraform_remote_state.vpc.tags, map("sub-project", "${var.mis_app_name}"))}"
+  legacy_environment_name      = "${var.legacy_environment_name}"
+  tags                         = "${merge(data.terraform_remote_state.vpc.tags, map("sub-project", "${var.mis_app_name}"), map("legacy_environment_name", "${var.legacy_environment_name}"))}"
 
   ssh_deployer_key = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
   password_length  = "${var.password_length}"

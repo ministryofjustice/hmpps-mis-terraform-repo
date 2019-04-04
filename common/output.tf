@@ -170,3 +170,7 @@ output "bastion_cidr" {
 output "app_hostnames" {
   value = "${local.app_hostnames}"
 }
+
+output "legacy_environment_name" {
+  value = "${local.legacy_environment_name}"
+}
