@@ -172,6 +172,7 @@ module "create-ec2-instance" {
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
     "${local.sg_outbound_id}",
+    "${local.sg_map_ids["sg_delius_db"]}",
   ]
 }
 
