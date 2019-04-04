@@ -120,7 +120,7 @@ locals {
   sg_map_ids         = "${data.terraform_remote_state.security-groups.sg_map_ids}"
   instance_profile   = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
   ssh_deployer_key   = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
-  nart_role          = "ndl-dis${data.terraform_remote_state.common.legacy_environment_name}"
+  nart_role          = "ndl-dis-${data.terraform_remote_state.common.legacy_environment_name}"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
