@@ -12,6 +12,7 @@ module "mis_db_1" {
     "${data.terraform_remote_state.security-groups.sg_map_ids["sg_mis_app_in"]}",
     "${data.terraform_remote_state.security-groups.sg_map_ids["sg_mis_common"]}",
     "${data.terraform_remote_state.common.common_sg_outbound_id}",
+    "${data.terraform_remote_state.vpc_security_groups.sg_mis_out_to_delius_db_id}",
   ]
 
   tags                         = "${var.tags}"
