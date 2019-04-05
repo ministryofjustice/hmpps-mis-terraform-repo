@@ -37,7 +37,7 @@ module "misdsd_db_1" {
     database_characterset         = "${var.ansible_vars_misdsd_db["database_characterset"]}"
     oracle_dbca_template_file     = "${var.ansible_vars_misdsd_db["oracle_dbca_template_file"]}"
     database_type                 = "primary" # required for the DB module. This file is where the property is set.
-    dependencies_bucket_arn       = "${data.terraform_remote_state.s3bucket.s3_bucket_backups_arn}"
+    dependencies_bucket_arn       = "${data.terraform_remote_state.s3bucket.s3bucket_backups_arn}" # TODO replace with dependecies arn add backup as variable below update restore in bootstrap
     database_bootstrap_restore    = "${var.ansible_vars_misdsd_db["database_bootstrap_restore"]}"
     database_backup               = "${var.ansible_vars_misdsd_db["database_backup"]}"
     database_backup_sys_passwd    = "${var.ansible_vars_misdsd_db["database_backup_sys_passwd"]}"
