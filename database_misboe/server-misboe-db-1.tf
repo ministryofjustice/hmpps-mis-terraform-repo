@@ -5,7 +5,7 @@ module "misboe_db_1" {
   ami_id               = "${data.aws_ami.centos_oracle_db.id}"
   db_subnet            = "${data.terraform_remote_state.vpc.vpc_db-subnet-az1}"
   key_name             = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
-  iam_instance_profile = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
+  iam_instance_profile = "${data.terraform_remote_state.iam.iam_policy_int_mis_db_instance_profile_name}"
 
   security_group_ids = [
     "${data.terraform_remote_state.vpc_security_groups.sg_ssh_bastion_in_id}",
@@ -37,7 +37,7 @@ module "misboe_db_1" {
     database_characterset         = "${var.ansible_vars_misboe_db["database_characterset"]}"
     oracle_dbca_template_file     = "${var.ansible_vars_misboe_db["oracle_dbca_template_file"]}"
     database_type                 = "primary" # required for the DB module. This file is where the property is set.
-    dependencies_bucket_arn       = "${data.terraform_remote_state.s3bucket.s3_bucket_backups_arn}"
+    dependencies_bucket_arn       = "${data.terraform_remote_state.s3bucket.s3bucket_backups_arn}" # TODO replace with dependecies arn add backup as variable below update restore in bootstrap
     database_bootstrap_restore    = "${var.ansible_vars_misboe_db["database_bootstrap_restore"]}"
     database_backup               = "${var.ansible_vars_misboe_db["database_backup"]}"
     database_backup_sys_passwd    = "${var.ansible_vars_misboe_db["database_backup_sys_passwd"]}"

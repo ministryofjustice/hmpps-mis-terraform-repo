@@ -5,7 +5,7 @@ module "mis_db_2" {
   ami_id               = "${data.aws_ami.centos_oracle_db.id}"
   db_subnet            = "${data.terraform_remote_state.vpc.vpc_db-subnet-az2}"
   key_name             = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
-  iam_instance_profile = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
+  iam_instance_profile = "${data.terraform_remote_state.iam.iam_policy_int_mis_db_instance_profile_name}"
 
   security_group_ids = [
     "${data.terraform_remote_state.vpc_security_groups.sg_ssh_bastion_in_id}",

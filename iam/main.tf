@@ -42,13 +42,16 @@ data "terraform_remote_state" "s3buckets" {
 ####################################################
 
 locals {
-  region           = "${var.region}"
-  common_name      = "${data.terraform_remote_state.common.common_name}"
-  tags             = "${data.terraform_remote_state.common.common_tags}"
-  s3-config-bucket = "${data.terraform_remote_state.common.common_s3-config-bucket}"
-  artefact-bucket  = "${data.terraform_remote_state.s3buckets.s3bucket}"
-  runtime_role     = "${var.cross_account_iam_role}"
-  account_id       = "${data.terraform_remote_state.common.common_account_id}"
+  region             = "${var.region}"
+  common_name        = "${data.terraform_remote_state.common.common_name}"
+  tags               = "${data.terraform_remote_state.common.common_tags}"
+  s3-config-bucket   = "${data.terraform_remote_state.common.common_s3-config-bucket}"
+  artefact-bucket    = "${data.terraform_remote_state.s3buckets.s3bucket}"
+  backups-bucket     = "${data.terraform_remote_state.s3buckets.s3bucket_backups_name}"
+  delius-deps-bucket = "${substr("${var.dependencies_bucket_arn}", 13, -1)}" # name
+  migration-bucket   = "${substr("${var.migration_bucket_arn}", 13, -1)}" # name
+  runtime_role       = "${var.cross_account_iam_role}"
+  account_id         = "${data.terraform_remote_state.common.common_account_id}"
 }
 
 ####################################################
@@ -93,6 +96,25 @@ module "jumphost" {
   ec2_internal_policy_file = "${file("../policies/ec2_jumphost_policy.json")}"
   s3-config-bucket         = "${local.s3-config-bucket}"
   artefact-bucket          = "${local.artefact-bucket}"
+  region                   = "${local.region}"
+  account_id               = "${local.account_id}"
+}
+
+####################################################
+# IAM - Application Specific
+####################################################
+module "mis_db" {
+  source                   = "../modules/iam"
+  common_name              = "${local.common_name}-mis-db"
+  tags                     = "${local.tags}"
+  ec2_policy_file          = "ec2_policy.json"
+  ec2_internal_policy_file = "${file("../policies/ec2_mis_db_policy.json")}"
+  s3-config-bucket         = "${local.s3-config-bucket}"
+  artefact-bucket          = "${local.artefact-bucket}"
+  backups-bucket           = "${local.backups-bucket}"
+  delius-deps-bucket       = "${local.delius-deps-bucket}"
+  migration-bucket         = "${local.migration-bucket}"
+  runtime_role             = "${local.runtime_role}"
   region                   = "${local.region}"
   account_id               = "${local.account_id}"
 }

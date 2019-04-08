@@ -43,3 +43,17 @@ output "iam_policy_int_jumphost_role_arn" {
 output "iam_policy_int_jumphost_instance_profile_name" {
   value = "${module.jumphost.iam_policy_int_app_instance_profile_name}"
 }
+
+# MIS DB ROLE
+output "iam_policy_int_mis_db_role_name" {
+  value = "${module.mis_db.iam_policy_int_app_role_name}"
+}
+
+output "iam_policy_int_mis_db_role_arn" {
+  value = "${module.mis_db.iam_policy_int_app_role_arn}"
+}
+
+# PROFILE
+output "iam_policy_int_mis_db_instance_profile_name" {
+  value = "${module.mis_db.iam_policy_int_app_instance_profile_name}"
+}

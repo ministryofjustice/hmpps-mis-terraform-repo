@@ -11,3 +11,12 @@ variable "environment_type" {
 }
 
 variable "cross_account_iam_role" {}
+
+
+variable "dependencies_bucket_arn" {
+  description = "arn for Delius Depencies S3 bucket in the Engineering AWS Account"
+}
+
+variable "migration_bucket_arn" {
+  description = "arn for Migration S3 bucket in the Engineering AWS Account"
+}
