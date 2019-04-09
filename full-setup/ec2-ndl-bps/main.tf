@@ -151,7 +151,7 @@ data "template_file" "instance_userdata" {
 }
 
 #-------------------------------------------------------------
-### Create instance - NDL-BWS-001 
+### Create instance - NDL-BWS-001
 #-------------------------------------------------------------
 module "create-ec2-instance" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
@@ -172,6 +172,7 @@ module "create-ec2-instance" {
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
     "${local.sg_outbound_id}",
+    "${local.sg_map_ids["sg_delius_db"]}",
   ]
 }
 
