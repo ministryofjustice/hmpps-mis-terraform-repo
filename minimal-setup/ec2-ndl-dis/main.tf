@@ -154,7 +154,7 @@ data "template_file" "instance_userdata" {
 ### Create instance - NDL-DIS-001
 #-------------------------------------------------------------
 module "create-ec2-instance" {
-  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
+  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2_no_replace_instance"
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.instance_type}"
