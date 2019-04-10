@@ -55,6 +55,7 @@ locals {
   public_cidr_block       = ["${data.terraform_remote_state.common.db_cidr_block}"]
   private_cidr_block      = ["${data.terraform_remote_state.common.private_cidr_block}"]
   db_cidr_block           = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  bws_port                = "${var.bws_port}"
 
   sg_map_ids = {
     sg_mis_db_in  = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"

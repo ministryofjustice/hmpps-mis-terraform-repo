@@ -1,7 +1,3 @@
-locals {
-  bws_port = "8080"
-}
-
 # app lb
 resource "aws_security_group_rule" "lb_https_in" {
   security_group_id = "${local.sg_mis_app_lb}"

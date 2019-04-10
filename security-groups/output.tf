@@ -38,3 +38,7 @@ output "security_groups_sg_delius_db" {
 output "sg_map_ids" {
   value = "${local.sg_map_ids}"
 }
+
+output "bws_port" {
+  value = "${local.bws_port}"
+}

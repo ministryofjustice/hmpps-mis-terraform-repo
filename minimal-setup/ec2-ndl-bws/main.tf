@@ -134,6 +134,7 @@ locals {
   ssh_deployer_key   = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
   nart_role          = "ndl-bws-${data.terraform_remote_state.common.legacy_environment_name}"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+  bws_port           = "${data.terraform_remote_state.security-groups.bws_port}"
 }
 
 #-------------------------------------------------------------
