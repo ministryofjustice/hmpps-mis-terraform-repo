@@ -1,6 +1,6 @@
 locals {
   lb_name     = "${local.short_environment_identifier}-${local.nart_role}"
-  lb_endpoint = "ndl-nart"
+  lb_endpoint = "ndl-bws"
 
   external_lb_security_groups = [
     "${data.terraform_remote_state.security-groups.security_groups_sg_mis_app_lb}",
@@ -27,7 +27,7 @@ module "create_app_elb" {
   bucket_prefix               = "${local.lb_name}"
   interval                    = 60
   ssl_certificate_id          = "${local.certificate_arn}"
-  instance_port               = 80
+  instance_port               = "${local.bws_port}"
   instance_protocol           = "http"
   lb_port                     = 80
   lb_port_https               = 443

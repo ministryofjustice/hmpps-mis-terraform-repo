@@ -11,3 +11,7 @@ variable "environment_type" {
 variable "user_access_cidr_blocks" {
   type = "list"
 }
+
+variable "bws_port" {
+  default = "8080"
+}
