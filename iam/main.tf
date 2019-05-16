@@ -36,22 +36,35 @@ data "terraform_remote_state" "s3buckets" {
     region = "${var.region}"
   }
 }
+#-------------------------------------------------------------
+### Getting the oracledb backup s3 bucket
+#-------------------------------------------------------------
+data "terraform_remote_state" "s3-oracledb-backups" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "s3/oracledb-backups/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
 
 ####################################################
 # Locals
 ####################################################
 
 locals {
-  region             = "${var.region}"
-  common_name        = "${data.terraform_remote_state.common.common_name}"
-  tags               = "${data.terraform_remote_state.common.common_tags}"
-  s3-config-bucket   = "${data.terraform_remote_state.common.common_s3-config-bucket}"
-  artefact-bucket    = "${data.terraform_remote_state.s3buckets.s3bucket}"
-  backups-bucket     = "${data.terraform_remote_state.s3buckets.s3bucket_backups_name}"
-  delius-deps-bucket = "${substr("${var.dependencies_bucket_arn}", 13, -1)}" # name
-  migration-bucket   = "${substr("${var.migration_bucket_arn}", 13, -1)}" # name
-  runtime_role       = "${var.cross_account_iam_role}"
-  account_id         = "${data.terraform_remote_state.common.common_account_id}"
+  region                  = "${var.region}"
+  common_name             = "${data.terraform_remote_state.common.common_name}"
+  tags                    = "${data.terraform_remote_state.common.common_tags}"
+  s3-config-bucket        = "${data.terraform_remote_state.common.common_s3-config-bucket}"
+  artefact-bucket         = "${data.terraform_remote_state.s3buckets.s3bucket}"
+  backups-bucket          = "${data.terraform_remote_state.s3buckets.s3bucket_backups_name}"
+  delius-deps-bucket      = "${substr("${var.dependencies_bucket_arn}", 13, -1)}" # name (cut arn off - then insert name into arn in template??)
+  migration-bucket        = "${substr("${var.migration_bucket_arn}", 13, -1)}" # name
+  s3_oracledb_backups_arn = "${data.terraform_remote_state.s3-oracledb-backups.s3_oracledb_backups.arn}"
+  runtime_role            = "${var.cross_account_iam_role}"
+  account_id              = "${data.terraform_remote_state.common.common_account_id}"
 }
 
 ####################################################
@@ -111,7 +124,7 @@ module "mis_db" {
   ec2_internal_policy_file = "${file("../policies/ec2_mis_db_policy.json")}"
   s3-config-bucket         = "${local.s3-config-bucket}"
   artefact-bucket          = "${local.artefact-bucket}"
-  backups-bucket           = "${local.backups-bucket}"
+  s3_oracledb_backups_arn  = "${local.s3_oracledb_backups_arn}"
   delius-deps-bucket       = "${local.delius-deps-bucket}"
   migration-bucket         = "${local.migration-bucket}"
   runtime_role             = "${local.runtime_role}"

@@ -54,14 +54,14 @@
       ]
     },
     {
-      "Sid": "allowAccessToBackupBucket",
+      "Sid": "allowAccessToOracleDBBackupBucket",
       "Effect": "Allow",
       "Action": [
         "s3:*"
       ],
       "Resource": [
-        "arn:aws:s3:::${backups-bucket}",
-        "arn:aws:s3:::${backups-bucket}/*"
+        "${s3_oracledb_backups_arn}",
+        "${s3_oracledb_backups_arn}/*"
       ]
     },
     {
