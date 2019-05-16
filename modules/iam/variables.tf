@@ -17,19 +17,19 @@ variable depends_on {
 
 variable "artefact-bucket" {}
 
-variable "backups-bucket" {
-  description = "database backups s3 bucket name"
-  default = ""
+variable "s3_oracledb_backups_arn" {
+  description = "Oracle database backups S3 bucket arn"
+  default     = ""
 }
 
 variable "delius-deps-bucket" {
   description = "delius dependencies in Engineering AWS Account name S3 bucket name"
-  default = ""
+  default     = ""
 }
 
 variable "migration-bucket" {
   description = "Migrations in Engineering AWS Account name S3 bucket name"
-  default = ""
+  default     = ""
 }
 
 variable "runtime_role" {
