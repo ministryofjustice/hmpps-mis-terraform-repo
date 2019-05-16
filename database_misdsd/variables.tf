@@ -32,3 +32,7 @@ variable "db_size_misdsd" {
   description = "Details of the database resources size"
   type = "map"
 }
+
+variable "dependencies_bucket_arn" {
+  description = "arn for Delius Depencies S3 bucket in the Engineering AWS Account"
+}

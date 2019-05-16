@@ -38,6 +38,8 @@ module "mis_db_3" {
     database_characterset         = "${var.ansible_vars_mis_db["database_characterset"]}"
     oracle_dbca_template_file     = "${var.ansible_vars_mis_db["oracle_dbca_template_file"]}"
     database_type                 = "standby" # required for the DB module. This file is where the property is set.
+    dependencies_bucket_arn       = "${var.dependencies_bucket_arn}"
+    s3_oracledb_backups_arn       = "${data.terraform_remote_state.s3-oracledb-backups.s3_oracledb_backups.arn}"
 
     ## the following are retrieved from SSM Parameter Store
     ## oradb_sys_password            = "/${environment_name}/mis/mis-database/db/oradb_sys_password"

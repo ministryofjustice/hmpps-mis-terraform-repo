@@ -51,14 +51,14 @@ data "terraform_remote_state" "common" {
 }
 
 #-------------------------------------------------------------
-### Getting the s3 details
+### Getting the oracledb backup s3 bucket
 #-------------------------------------------------------------
-data "terraform_remote_state" "s3bucket" {
+data "terraform_remote_state" "s3-oracledb-backups" {
   backend = "s3"
 
   config {
     bucket = "${var.remote_state_bucket_name}"
-    key    = "${var.environment_type}/s3buckets/terraform.tfstate"
+    key    = "s3/oracledb-backups/terraform.tfstate"
     region = "${var.region}"
   }
 }

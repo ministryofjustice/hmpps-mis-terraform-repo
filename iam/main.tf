@@ -36,6 +36,7 @@ data "terraform_remote_state" "s3buckets" {
     region = "${var.region}"
   }
 }
+
 #-------------------------------------------------------------
 ### Getting the oracledb backup s3 bucket
 #-------------------------------------------------------------
