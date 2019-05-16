@@ -9,7 +9,6 @@ terragrunt = {
       "../common",
       "../security-groups",
       "../iam",
-      "../s3buckets",
     ]
   }
 }
