@@ -60,7 +60,6 @@ locals {
   tags                    = "${data.terraform_remote_state.common.common_tags}"
   s3-config-bucket        = "${data.terraform_remote_state.common.common_s3-config-bucket}"
   artefact-bucket         = "${data.terraform_remote_state.s3buckets.s3bucket}"
-  backups-bucket          = "${data.terraform_remote_state.s3buckets.s3bucket_backups_name}"
   delius-deps-bucket      = "${substr("${var.dependencies_bucket_arn}", 13, -1)}" # name (cut arn off - then insert name into arn in template??)
   migration-bucket        = "${substr("${var.migration_bucket_arn}", 13, -1)}" # name
   s3_oracledb_backups_arn = "${data.terraform_remote_state.s3-oracledb-backups.s3_oracledb_backups.arn}"
