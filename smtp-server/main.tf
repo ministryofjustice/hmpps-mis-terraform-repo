@@ -68,8 +68,8 @@ data "aws_ami" "amazon_ami" {
 ####################################################
 
 locals {
-  vpc_id                       = "${data.terraform_remote_state.common.vpc_id}"
-  sg_outbound_id               = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+  vpc_id              = "${data.terraform_remote_state.common.vpc_id}"
+  sg_outbound_id      = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 
   sg_map_ids = {
     sg_mis_common = "${data.terraform_remote_state.security-groups.sg_mis_common}"
@@ -77,20 +77,20 @@ locals {
 }
 
 locals {
-  sg_mis_common = "${local.sg_map_ids["sg_mis_common"]}"
+  sg_mis_common   = "${local.sg_map_ids["sg_mis_common"]}"
 }
 
 locals {
-    bastion_inventory            = "${var.bastion_inventory}"
-    environment_name             = "${data.terraform_remote_state.common.environment}"
-    private_zone_id              = "${data.terraform_remote_state.common.private_zone_id}"
-    internal_domain              = "${data.terraform_remote_state.common.internal_domain}"
+    bastion_inventory         = "${var.bastion_inventory}"
+    environment_name          = "${data.terraform_remote_state.common.environment}"
+    private_zone_id           = "${data.terraform_remote_state.common.private_zone_id}"
+    internal_domain           = "${data.terraform_remote_state.common.internal_domain}"
 }
 
 locals {
-  app_name             = "smtp"
-  ec2_policy_file      = "ec2_policy.json"
-  ec2_role_policy_file = "policies/ec2.json"
+  app_name                = "smtp"
+  ec2_policy_file         = "ec2_policy.json"
+  ec2_role_policy_file    = "policies/ec2.json"
 }
 
 data "template_file" "iam_policy_app" {
@@ -98,20 +98,20 @@ data "template_file" "iam_policy_app" {
 }
 
 module "iam_app_role" {
-  source     = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//role"
-  rolename   = "${data.terraform_remote_state.common.environment_identifier}-${local.app_name}"
-  policyfile = "${local.ec2_policy_file}"
+  source        = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//role"
+  rolename      = "${data.terraform_remote_state.common.environment_identifier}-${local.app_name}"
+  policyfile    = "${local.ec2_policy_file}"
 }
 
 module "iam_instance_profile" {
-  source = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//instance_profile"
-  role   = "${module.iam_app_role.iamrole_name}"
+  source    = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//instance_profile"
+  role      = "${module.iam_app_role.iamrole_name}"
 }
 
 module "iam_app_policy" {
-  source     = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//rolepolicy"
-  policyfile = "${data.template_file.iam_policy_app.rendered}"
-  rolename   = "${module.iam_app_role.iamrole_name}"
+  source        = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//rolepolicy"
+  policyfile    = "${data.template_file.iam_policy_app.rendered}"
+  rolename      = "${module.iam_app_role.iamrole_name}"
 }
 
 data "template_file" "postfix_user_data" {
@@ -161,17 +161,9 @@ module "create-ec2-instance" {
 #-------------------------------------------------------------
 
 resource "aws_route53_record" "instance" {
-  zone_id = "${local.private_zone_id}"
-  name    = "${local.app_name}.${local.internal_domain}"
-  type    = "A"
-  ttl     = "300"
-  records = ["${module.create-ec2-instance.private_ip}"]
-}
-
-output "id" {
-  value = "${local.ses_user_id}"
-}
-
-output "smtp_pass" {
-  value = "${local.ses_smtp_password}"
+  zone_id      = "${local.private_zone_id}"
+  name         = "${local.app_name}.${local.internal_domain}"
+  type         = "A"
+  ttl          = "300"
+  records      = ["${module.create-ec2-instance.private_ip}"]
 }
