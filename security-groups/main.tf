@@ -67,6 +67,7 @@ locals {
     sg_ldap_inst  = "${data.terraform_remote_state.security-groups.sg_ldap_inst}"
     sg_ldap_proxy = "${data.terraform_remote_state.security-groups.sg_ldap_proxy}"
     sg_jumphost   = "${data.terraform_remote_state.security-groups.sg_jumphost}"
+    sg_delius_db_out = "${data.terraform_remote_state.security-groups.sg_mis_out_to_delius_db_id}"
   }
 }
 
