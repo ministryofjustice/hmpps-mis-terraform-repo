@@ -15,6 +15,10 @@ variable "environment_type" {
   description = "environment"
 }
 
+variable "project_name" {
+  description = "The project name - delius-core"
+}
+
 variable "remote_state_bucket_name" {
   description = "Terraform remote state bucket name"
 }

@@ -11,6 +11,10 @@ variable "region" {
   description = "The AWS region."
 }
 
+variable "project_name" {
+  description = "The project name - delius-core"
+}
+
 variable "environment_type" {
   description = "environment"
 }
