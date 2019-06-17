@@ -25,6 +25,18 @@ data "terraform_remote_state" "common" {
 }
 
 #-------------------------------------------------------------
+### Getting the sg details
+#-------------------------------------------------------------
+data "terraform_remote_state" "security-groups" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "security-groups/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -32,7 +44,7 @@ data "aws_ami" "amazon_ami" {
 
   filter {
     name   = "name"
-    values = ["HMPPS Base Docker Centos *"]
+    values = ["HMPPS Base CentOS *"]
   }
 
   filter {
@@ -51,10 +63,34 @@ data "aws_ami" "amazon_ami" {
   }
 }
 
+####################################################
+# Locals
+####################################################
+
 locals {
-  app_name             = "smtp"
-  ec2_policy_file      = "ec2_policy.json"
-  ec2_role_policy_file = "policies/ec2.json"
+  vpc_id              = "${data.terraform_remote_state.common.vpc_id}"
+  sg_outbound_id      = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+
+  sg_map_ids = {
+    sg_mis_common = "${data.terraform_remote_state.security-groups.sg_mis_common}"
+  }
+}
+
+locals {
+  sg_mis_common   = "${local.sg_map_ids["sg_mis_common"]}"
+}
+
+locals {
+    bastion_inventory         = "${var.bastion_inventory}"
+    environment_name          = "${data.terraform_remote_state.common.environment}"
+    private_zone_id           = "${data.terraform_remote_state.common.private_zone_id}"
+    internal_domain           = "${data.terraform_remote_state.common.internal_domain}"
+}
+
+locals {
+  app_name                = "smtp"
+  ec2_policy_file         = "ec2_policy.json"
+  ec2_role_policy_file    = "policies/ec2.json"
 }
 
 data "template_file" "iam_policy_app" {
@@ -62,20 +98,20 @@ data "template_file" "iam_policy_app" {
 }
 
 module "iam_app_role" {
-  source     = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//role"
-  rolename   = "${data.terraform_remote_state.common.environment_identifier}-${local.app_name}-smtp"
-  policyfile = "${local.ec2_policy_file}"
+  source        = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//role"
+  rolename      = "${data.terraform_remote_state.common.environment_identifier}-${local.app_name}"
+  policyfile    = "${local.ec2_policy_file}"
 }
 
 module "iam_instance_profile" {
-  source = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//instance_profile"
-  role   = "${module.iam_app_role.iamrole_name}"
+  source    = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//instance_profile"
+  role      = "${module.iam_app_role.iamrole_name}"
 }
 
 module "iam_app_policy" {
-  source     = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//rolepolicy"
-  policyfile = "${data.template_file.iam_policy_app.rendered}"
-  rolename   = "${module.iam_app_role.iamrole_name}"
+  source        = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//iam//rolepolicy"
+  policyfile    = "${data.template_file.iam_policy_app.rendered}"
+  rolename      = "${module.iam_app_role.iamrole_name}"
 }
 
 data "template_file" "postfix_user_data" {
@@ -83,12 +119,17 @@ data "template_file" "postfix_user_data" {
 
   vars {
     app_name              = "${local.app_name}"
-    mail_hostname         = "${local.app_name}.${data.terraform_remote_state.common.external_domain}"
-    private_domain        = "${data.terraform_remote_state.common.internal_domain}"
+    bastion_inventory     = "${local.bastion_inventory}"
     env_identifier        = "${data.terraform_remote_state.common.environment_identifier}"
     short_env_identifier  = "${data.terraform_remote_state.common.short_environment_identifier}"
+    private_domain        = "${data.terraform_remote_state.common.internal_domain}"
     account_id            = "${data.terraform_remote_state.common.common_account_id}"
-    bastion_inventory     = "dev"
+    environment_name      = "${local.environment_name}"
+    mail_hostname         = "mail.${data.terraform_remote_state.common.external_domain}"
+    mail_domain           = "${data.terraform_remote_state.common.external_domain}"
+    mail_network          = "${data.terraform_remote_state.common.vpc_cidr_block}"
+    mail_user_name        = "${local.ses_user_id}"
+    mail_passwd           = "${local.ses_smtp_password}"
   }
 }
 
@@ -100,7 +141,7 @@ module "create-ec2-instance" {
   app_name                    = "${data.terraform_remote_state.common.environment_identifier}-${local.app_name}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "t2.small"
-  subnet_id                   = "${data.terraform_remote_state.common.private_subnet_map["az3"]}"
+  subnet_id                   = "${data.terraform_remote_state.common.private_subnet_map["az1"]}"
   iam_instance_profile        = "${module.iam_instance_profile.iam_instance_name}"
   associate_public_ip_address = false
   monitoring                  = true
@@ -110,6 +151,19 @@ module "create-ec2-instance" {
   key_name                    = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
 
   vpc_security_group_ids = [
-    "${aws_security_group.mis_smtp_host.id}"
+    "${local.sg_mis_common}",
+    "${local.sg_outbound_id}",
   ]
+}
+
+#-------------------------------------------------------------
+### Create internal dns record
+#-------------------------------------------------------------
+
+resource "aws_route53_record" "instance" {
+  zone_id      = "${local.private_zone_id}"
+  name         = "${local.app_name}.${local.internal_domain}"
+  type         = "A"
+  ttl          = "300"
+  records      = ["${module.create-ec2-instance.private_ip}"]
 }
