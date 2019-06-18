@@ -11,7 +11,7 @@ def prepare_env() {
     '''
 }
 
-def plan_submodule(config_dir, env_name, git_project_dir, setuptype, submodule_name) {
+def plan_submodule(config_dir, env_name, git_project_dir, submodule_name) {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
         sh """
         #!/usr/env/bin bash
@@ -24,7 +24,7 @@ def plan_submodule(config_dir, env_name, git_project_dir, setuptype, submodule_n
         -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
         bash -c "\
             source env_configs/${env_name}/${env_name}.properties; \
-            echo $submodule_name | grep -q ec2-ndl && cd ${setuptype}${submodule_name} || cd ${submodule_name}; \
+            cd ${submodule_name}; \
             if [ -d .terraform ]; then rm -rf .terraform; fi; sleep 5; \
             terragrunt init; \
             terragrunt plan -detailed-exitcode --out ${env_name}.plan > tf.plan.out; \
@@ -40,17 +40,11 @@ def plan_submodule(config_dir, env_name, git_project_dir, setuptype, submodule_n
             if [ "\$exitcode" == '1' ]; then exit 1; else exit 0; fi
         set -e
         """
-        if (submodule_name.contains("ec2-ndl-")) {
-            return readFile("${git_project_dir}/${setuptype}/${submodule_name}/plan_ret").trim()
-        } else {
-            return readFile("${git_project_dir}/${submodule_name}/plan_ret").trim()
-        }
-
-
+        return readFile("${git_project_dir}/${submodule_name}/plan_ret").trim()
     }
 }
 
-def apply_submodule(config_dir, env_name, git_project_dir, setuptype, submodule_name) {
+def apply_submodule(config_dir, env_name, git_project_dir, submodule_name) {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
         sh """
         #!/usr/env/bin bash
@@ -62,7 +56,7 @@ def apply_submodule(config_dir, env_name, git_project_dir, setuptype, submodule_
         -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
         bash -c "\
             source env_configs/${env_name}/${env_name}.properties; \
-            echo $submodule_name | grep -q ec2-ndl && cd ${setuptype}${submodule_name} || cd ${submodule_name}; \
+            cd ${submodule_name}; \
             terragrunt apply ${env_name}.plan"
         set -e
         """
@@ -91,8 +85,8 @@ def confirm() {
     }
 }
 
-def do_terraform(config_dir, env_name, git_project, setuptype, component) {
-    plancode = plan_submodule(config_dir, env_name, git_project, setuptype, component)
+def do_terraform(config_dir, env_name, git_project, component) {
+    plancode = plan_submodule(config_dir, env_name, git_project, component)
     if (plancode == "2") {
         if ("${confirmation}" == "true") {
            confirm()
@@ -100,11 +94,11 @@ def do_terraform(config_dir, env_name, git_project, setuptype, component) {
             env.Continue = true
         }
         if (env.Continue == "true") {
-           apply_submodule(config_dir, env_name, git_project, setuptype, component)
+           apply_submodule(config_dir, env_name, git_project, component)
         }
     }
     else if (plancode == "3") {
-        apply_submodule(config_dir, env_name, git_project, setuptype, component)
+        apply_submodule(config_dir, env_name, git_project, component)
         env.Continue = true
     }
     else {
@@ -139,18 +133,18 @@ pipeline {
             }
         }
 
-     stage('Delius | MIS Common')           { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'common')}}}
-     stage('Delius | MIS Certs')            { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'certs')}}}
-     stage('Delius | MIS s3buckets')        { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 's3buckets')}}}
-     stage('Delius | MIS iam')              { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'iam')}}}
-     stage('Delius | MIS security-groups')  { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'security-groups')}}}
-	 stage('Delius | MIS ses')              { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'ses')}}}
-	 stage('Delius | MIS smtp-server')      { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'smtp-server')}}}
-     stage('Delius | MIS ec2-ndl-dis')      { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-dis')}}}
-     stage('Delius | MIS ec2-ndl-bcs')      { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-bcs')}}}
-     stage('Delius | MIS ec2-ndl-bfs')      { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-bfs')}}}
-     stage('Delius | MIS ec2-ndl-bps')      { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-bps')}}}
-     stage('Delius | MIS ec2-ndl-bws')      { steps { script {do_terraform(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-bws')}}}
+     stage('Delius | MIS Common')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'common')}}}
+     stage('Delius | MIS Certs')            { steps { script {do_terraform(project.config, environment_name, project.mis, 'certs')}}}
+     stage('Delius | MIS s3buckets')        { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets')}}}
+     stage('Delius | MIS iam')              { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam')}}}
+     stage('Delius | MIS security-groups')  { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups')}}}
+	 stage('Delius | MIS ses')              { steps { script {do_terraform(project.config, environment_name, project.mis, 'ses')}}}
+	 stage('Delius | MIS smtp-server')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'smtp-server')}}}
+     stage('Delius | MIS ec2-ndl-dis')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis')}}}
+     stage('Delius | MIS ec2-ndl-bcs')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs')}}}
+     stage('Delius | MIS ec2-ndl-bfs')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs')}}}
+     stage('Delius | MIS ec2-ndl-bps')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps')}}}
+     stage('Delius | MIS ec2-ndl-bws')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws')}}}
      stage('Smoke test')                    { steps { build job: "DAMS/Environments/${environment_name}/MIS/Smoke_test", parameters: [[$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"]]}}
     }
 
