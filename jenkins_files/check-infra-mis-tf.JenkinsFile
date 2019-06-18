@@ -11,7 +11,7 @@ def prepare_env() {
     '''
 }
 
-def plan_submodule(config_dir, env_name, git_project_dir, setuptype, submodule_name) {
+def plan_submodule(config_dir, env_name, git_project_dir, submodule_name) {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
         sh """
         #!/usr/env/bin bash
@@ -24,7 +24,7 @@ def plan_submodule(config_dir, env_name, git_project_dir, setuptype, submodule_n
         -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
         bash -c "\
             source env_configs/${env_name}/${env_name}.properties; \
-            echo $submodule_name | grep -q ec2-ndl && cd ${setuptype}${submodule_name} || cd ${submodule_name}; \
+            cd ${submodule_name}; \
             if [ -d .terraform ]; then rm -rf .terraform; fi; sleep 5; \
             terragrunt init; \
             terragrunt plan > tf.plan.out; \
@@ -50,7 +50,7 @@ pipeline {
         stage('setup') {
             steps {
                 dir( project.mis ) {
-                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'issue_88_simplify_mis_code', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
                 }
                 dir( project.config ) {
                   git url: 'git@github.com:ministryofjustice/' + project.config, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
@@ -60,18 +60,18 @@ pipeline {
             }
         }
 
-        stage('Delius | MIS Common')           { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'common')}}}
-        stage('Delius | MIS Certs')            { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'certs')}}}
-        stage('Delius | MIS s3buckets')        { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 's3buckets')}}}
-        stage('Delius | MIS iam')              { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'iam')}}}
-        stage('Delius | MIS security-groups')  { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'security-groups')}}}
-        stage('Delius | MIS ses')              { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'ses')}}}
-        stage('Delius | MIS smtp-server')      { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'smtp-server')}}}
-        stage('Delius | MIS ec2-ndl-dis')      { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-dis')}}}
-        stage('Delius | MIS ec2-ndl-bcs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-bcs')}}}
-        stage('Delius | MIS ec2-ndl-bfs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-bfs')}}}
-        stage('Delius | MIS ec2-ndl-bps')      { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-bps')}}}
-        stage('Delius | MIS ec2-ndl-bws')      { steps { script {plan_submodule(project.config, environment_name, project.mis, setuptype, 'ec2-ndl-bws')}}}
+        stage('Delius | MIS Common')           { steps { script {plan_submodule(project.config, environment_name, project.mis, 'common')}}}
+        stage('Delius | MIS Certs')            { steps { script {plan_submodule(project.config, environment_name, project.mis, 'certs')}}}
+        stage('Delius | MIS s3buckets')        { steps { script {plan_submodule(project.config, environment_name, project.mis, 's3buckets')}}}
+        stage('Delius | MIS iam')              { steps { script {plan_submodule(project.config, environment_name, project.mis, 'iam')}}}
+        stage('Delius | MIS security-groups')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'security-groups')}}}
+        stage('Delius | MIS ses')              { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ses')}}}
+        stage('Delius | MIS smtp-server')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'smtp-server')}}}
+        stage('Delius | MIS ec2-ndl-dis')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-dis')}}}
+        stage('Delius | MIS ec2-ndl-bcs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bcs')}}}
+        stage('Delius | MIS ec2-ndl-bfs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bfs')}}}
+        stage('Delius | MIS ec2-ndl-bps')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bps')}}}
+        stage('Delius | MIS ec2-ndl-bws')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bws')}}}
     }
 
     post {
