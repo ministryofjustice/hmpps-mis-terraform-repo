@@ -71,7 +71,7 @@ data "aws_ami" "amazon_ami" {
 
   filter {
     name   = "name"
-    values = ["HMPPS MIS NART BCS Windows Server master *"]
+    values = ["HMPPS MIS NART BFS Windows Server master *"]
   }
 
   filter {
@@ -120,7 +120,7 @@ locals {
   sg_map_ids         = "${data.terraform_remote_state.security-groups.sg_map_ids}"
   instance_profile   = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
   ssh_deployer_key   = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
-  nart_role          = "ndl-dis-${data.terraform_remote_state.common.legacy_environment_name}"
+  nart_role          = "ndl-bps-${data.terraform_remote_state.common.legacy_environment_name}"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
@@ -140,7 +140,7 @@ data "aws_ssm_parameter" "password" {
 ####################################################
 
 data "template_file" "instance_userdata" {
-  template = "${file("../../userdata/userdata.txt")}"
+  template = "${file("../userdata/userdata.txt")}"
 
   vars {
     host_name       = "${local.nart_role}"
@@ -151,9 +151,10 @@ data "template_file" "instance_userdata" {
 }
 
 #-------------------------------------------------------------
-### Create instance - NDL-DIS-001
+### Create instance - NDL-BPS-300
 #-------------------------------------------------------------
 module "create-ec2-instance" {
+  #source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2_no_replace_instance"
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
@@ -172,7 +173,6 @@ module "create-ec2-instance" {
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
     "${local.sg_outbound_id}",
-    "${local.sg_map_ids["sg_mis_db_in"]}",
     "${local.sg_map_ids["sg_delius_db_out"]}",
   ]
 }
