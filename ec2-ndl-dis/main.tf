@@ -151,7 +151,7 @@ data "template_file" "instance_userdata" {
 }
 
 #-------------------------------------------------------------
-### Create instance - NDL-DIS-001
+### Create instance - NDL-DIS-300
 #-------------------------------------------------------------
 module "create-ec2-instance" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2_no_replace_instance"

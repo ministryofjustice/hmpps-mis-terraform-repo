@@ -64,16 +64,8 @@ then
     echo "Output ---> set environment stage complete"
     # set runCmd
     ACTION_TYPE="docker-${ACTION_TYPE}"
-    case ${workDirContainer} in
-      ec2-ndl*)
-        export workDir=${MIS_DEPLOYMENT_TYPE}/${workDirContainer}
-        cd ${workDir}
-        ;;
-      *)
-        export workDir=${workDirContainer}
-        cd ${workDir}
-        ;;
-    esac
+    export workDir=${workDirContainer}
+    cd ${workDir}
     export PLAN_RET_FILE=${HOME}/data/${workDirContainer}_plan_ret
     echo "Output -> Container workDir: ${workDir}"
 fi

@@ -164,7 +164,7 @@ data "template_file" "instance_userdata" {
 }
 
 #-------------------------------------------------------------
-### Create instance - NDL-BWS-001
+### Create instance - NDL-BWS-300
 #-------------------------------------------------------------
 module "create-ec2-instance" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2_no_replace_instance"
