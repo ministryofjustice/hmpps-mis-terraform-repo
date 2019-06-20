@@ -13,8 +13,7 @@ HMPPS_DOMAIN="${private_domain}"
 MAIL_HOSTNAME="${mail_hostname}"
 MAIL_DOMAIN="${mail_domain}"
 MAIL_NETWORK="${mail_network}"
-MAIL_USER_NAME="${mail_user_name}"
-MAIL_PASSWD="${mail_passwd}"
+SES_IAM_USER="${ses_iam_user}"
 
 
 EOF
@@ -30,8 +29,7 @@ export HMPPS_DOMAIN="${private_domain}"
 export MAIL_HOSTNAME="${mail_hostname}"
 export MAIL_DOMAIN="${mail_domain}"
 export MAIL_NETWORK="${mail_network}"
-export MAIL_USER_NAME="${mail_user_name}"
-export MAIL_PASSWD="${mail_passwd}"
+export SES_IAM_USER="${ses_iam_user}"
 
 cd ~
 pip install ansible
@@ -73,9 +71,9 @@ app="postfix"
 main_cf_file="/etc/postfix/main.cf"
 ses_host="email-smtp.eu-west-1.amazonaws.com"
 sasl_passwd_file="/etc/postfix/sasl_passwd"
-sasl_passwd_db="/etc/postfix/sasl_passwd.db"
 master_cf_file="/etc/postfix/master.cf"
 ses_port="587"
+rotate_script="/root/iam_rotate_keys.sh"
 
 #Remove Sendmail
 yum remove sendmail -y
@@ -118,20 +116,83 @@ echo     'debugger_command =
 systemctl start $${app}  ;
 
 #Configure SES opts
-postconf -e "relayhost = [$${ses_host}]:$${ses_port}" "smtp_sasl_auth_enable = yes"     \
-     "smtp_sasl_security_options = noanonymous" "smtp_sasl_password_maps = hash:$${sasl_passwd_file}" \
+postconf -e "relayhost = [$ses_host]:$ses_port" "smtp_sasl_auth_enable = yes"     \
+     "smtp_sasl_security_options = noanonymous" "smtp_sasl_password_maps = hash:$sasl_passwd_file" \
 	 "smtp_use_tls = yes" "smtp_tls_security_level = encrypt" "smtp_tls_note_starttls_offer = yes" ;
 
 #Remove/Comment out -o smtp_fallback_relay= fro master.cf file
 grep -q "\-o smtp_fallback_relay=" $${master_cf_file} && sed -e '/\-o smtp_fallback_relay=/s/^#*/#/' -i $${master_cf_file} ;
 
 
-#Configure sasl_passwd vars_file
-echo "[$${ses_host}]:$${ses_port} $MAIL_USER_NAME:$MAIL_PASSWD" > $${sasl_passwd_file} ;
-postmap hash:$${sasl_passwd_file} ;
-chown root:root $${sasl_passwd_file} $${sasl_passwd_db} ;
-chmod 0600      $${sasl_passwd_file} $${sasl_passwd_db} ;
 
+############################################################################
+#Configure sasl_passwd vars_file
+cat << 'EOF' > /root/iam_rotate_keys.sh
+#!/bin/bash
+
+#vars
+SES_IAM_USER=
+ses_host="email-smtp.eu-west-1.amazonaws.com"
+sasl_passwd_file="/etc/postfix/sasl_passwd"
+sasl_passwd_db="/etc/postfix/sasl_passwd.db"
+ses_port="587"
+
+####Verify if rotations needs to occur
+CURRENT_DATE=$(date +"%Y-%m-%d")
+CREATION_DATE=$(aws iam list-access-keys --user-name $SES_IAM_USER --max-items 1 | grep "CreateDate" | awk '{print $2}' | sed 's/"//g' | sed 's/,//' | cut -f1 -d"T")
+EXISTING_ACCESS_ID=$(aws iam list-access-keys --user-name $SES_IAM_USER --max-items 1 | grep "AccessKeyId" | awk '{print $2}' | sed 's/"//g')
+
+
+
+if [[ $CREATION_DATE -ne $CURRENT_DATE ]]|| [[ ! -f $sasl_passwd_file ]]; then
+        echo "Rotating key"
+        #Create new Access key
+        TEMP_CREDS_FILE="/root/temp_creds_file"
+        aws iam create-access-key --user-name $SES_IAM_USER > $TEMP_CREDS_FILE
+        NEW_ACCESS_ID=$(cat $TEMP_CREDS_FILE | grep AccessKeyId | awk '{print $2}' | sed 's/"//g')
+        NEW_SECRET_KEY=$(cat $TEMP_CREDS_FILE | grep SecretAccessKey | awk '{print $2}'| sed 's/"//g' | sed 's/,//')
+        rm -f $TEMP_CREDS_FILE
+
+	    ###Convert IAM SecretAccessKey to SES SMTP Password
+	    MSG="SendRawEmail";
+        VerInBytes="2";
+        VerInBytes=$(printf \\$(printf '%03o' "$VerInBytes"));
+        SignInBytes=$(echo -n "$MSG"|openssl dgst -sha256 -hmac "$NEW_SECRET_KEY" -binary);
+        SignAndVer=""$VerInBytes""$SignInBytes"";
+        SMTP_PASS=$(echo -n "$SignAndVer"|base64);
+
+        #Configure Postifix to use new creds
+        #Configure sasl_passwd vars_file
+        echo "[$ses_host]:$ses_port $NEW_ACCESS_ID:$SMTP_PASS" > $sasl_passwd_file ;
+        postmap hash:$sasl_passwd_file ;
+        chown root:root $sasl_passwd_file $sasl_passwd_db ;
+        chmod 0600      $sasl_passwd_file $sasl_passwd_db ;
+        systemctl restart postfix
+
+        #Remove Old Creds
+        aws iam  delete-access-key --access-key-id $EXISTING_ACCESS_ID --user-name $SES_IAM_USER > /dev/null 2>&1 ;
+
+         ###Update Param store
+         aws ssm put-parameter --name $SES_IAM_USER-access-key-id          \
+                               --description $SES_IAM_USER-access-key-id   \
+                               --value $NEW_ACCESS_ID --type "SecureString" --overwrite    \
+                               --region eu-west-2 > /dev/null 2>&1
+
+         aws ssm put-parameter --name $SES_IAM_USER-ses-password          \
+                               --description $SES_IAM_USER-ses-password   \
+                               --value $SMTP_PASS    --type "SecureString" --overwrite    \
+                               --region eu-west-2  > /dev/null 2>&1
+else
+        echo "Rotation not required yet"
+fi
+
+EOF
+
+############################################################################
+
+grep -q "SES_IAM_USER=$SES_IAM_USER" $${rotate_script} || sed -i "s/SES_IAM_USER=/SES_IAM_USER=$SES_IAM_USER/" $${rotate_script}
+chmod +x $${rotate_script}
+$${rotate_script}
 #Cert
 postconf -e 'smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt' ;
 
@@ -150,3 +211,9 @@ postconf -e 'myorigin = $mydomain' \
 
 #Restart postfix service
 systemctl restart $${app}
+
+#Create cron job to rotate access AccessKeys
+temp_cron_file="/tmp/temp_cron_file" ;
+crontab -l > $temp_cron_file ;
+grep -q "$rotate_script" $temp_cron_file || echo "30 01 * * 7 root /usr/bin/sh $rotate_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file;
+rm -f $temp_cron_file ;

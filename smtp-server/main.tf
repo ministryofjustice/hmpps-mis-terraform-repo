@@ -128,8 +128,7 @@ data "template_file" "postfix_user_data" {
     mail_hostname         = "mail.${data.terraform_remote_state.common.external_domain}"
     mail_domain           = "${data.terraform_remote_state.common.external_domain}"
     mail_network          = "${data.terraform_remote_state.common.vpc_cidr_block}"
-    mail_user_name        = "${local.ses_user_id}"
-    mail_passwd           = "${local.ses_smtp_password}"
+    ses_iam_user          =  "${local.ses_iam_user}"
   }
 }
 
