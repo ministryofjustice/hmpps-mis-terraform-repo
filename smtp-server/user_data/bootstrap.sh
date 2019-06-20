@@ -215,5 +215,5 @@ systemctl restart $${app}
 #Create cron job to rotate access AccessKeys
 temp_cron_file="/tmp/temp_cron_file" ;
 crontab -l > $temp_cron_file ;
-grep -q "$rotate_script" $temp_cron_file || echo "30 01 * * 7 root /usr/bin/sh $rotate_script" >> $temp_cron_file && crontab $temp_cron_file;
+grep -q "$rotate_script" $temp_cron_file || echo "30 01 * * 7 root /usr/bin/sh $rotate_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file;
 rm -f $temp_cron_file ;
