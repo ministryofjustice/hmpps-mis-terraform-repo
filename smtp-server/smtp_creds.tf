@@ -9,10 +9,6 @@ resource "aws_iam_user" "ses" {
   tags             = "${var.tags}"
 }
 
-resource "aws_iam_access_key" "ses" {
-  user             = "${aws_iam_user.ses.name}"
-}
-
 resource "aws_iam_user_policy" "ses" {
   name             = "AmazonSesSendingAccess"
   user             = "${aws_iam_user.ses.name}"
@@ -31,28 +27,6 @@ resource "aws_iam_user_policy" "ses" {
 EOF
 }
 
-
-###SMTP Password in Param store
-#################################
-
-resource "aws_ssm_parameter" "smtp_password" {
-    name             = "${aws_iam_user.ses.id}-ses-password"
-    type             = "SecureString"
-    description      = "${aws_iam_user.ses.id}-ses-password"
-    overwrite        = "true"
-    value            = "${aws_iam_access_key.ses.ses_smtp_password}"
-}
-
-###SMTP User in param store
-################################
-resource "aws_ssm_parameter" "smtp_user" {
-    name             = "${aws_iam_user.ses.id}-access-key-id"
-    type             = "SecureString"
-    description      = "${aws_iam_user.ses.id}-access-key-id"
-    value            = "${aws_iam_access_key.ses.id}"
-}
-
 locals {
-    ses_user_id       = "${aws_iam_access_key.ses.id}"
-    ses_smtp_password = "${aws_iam_access_key.ses.ses_smtp_password}"
+    ses_iam_user      =  "${aws_iam_user.ses.id}"
 }
