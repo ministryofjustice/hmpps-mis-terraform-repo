@@ -50,7 +50,7 @@ pipeline {
         stage('setup') {
             steps {
                 dir( project.mis ) {
-                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'issue_92_add_db_code_to_mis_pipeline', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
                 }
                 dir( project.config ) {
                   git url: 'git@github.com:ministryofjustice/' + project.config, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
