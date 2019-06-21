@@ -15,3 +15,7 @@ variable "short_environment_identifier" {}
 variable "tags" {
   type = "map"
 }
+
+variable "instance_type" {
+  default = "t2.small"
+}
