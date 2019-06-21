@@ -50,7 +50,7 @@ pipeline {
         stage('setup') {
             steps {
                 dir( project.mis ) {
-                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'issue_92_add_db_code_to_mis_pipeline', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
                 }
                 dir( project.config ) {
                   git url: 'git@github.com:ministryofjustice/' + project.config, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
@@ -67,6 +67,9 @@ pipeline {
         stage('Delius | MIS security-groups')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'security-groups')}}}
         stage('Delius | MIS ses')              { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ses')}}}
         stage('Delius | MIS smtp-server')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'smtp-server')}}}
+        stage('Delius | MIS database_mis')     { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_mis')}}}
+        stage('Delius | MIS database_misboe')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_misboe')}}}
+        stage('Delius | MIS database_misdsd')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_misdsd')}}}
         stage('Delius | MIS ec2-ndl-dis')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-dis')}}}
         stage('Delius | MIS ec2-ndl-bcs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bcs')}}}
         stage('Delius | MIS ec2-ndl-bfs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bfs')}}}
