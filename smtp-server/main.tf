@@ -139,7 +139,7 @@ module "create-ec2-instance" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2"
   app_name                    = "${data.terraform_remote_state.common.environment_identifier}-${local.app_name}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
-  instance_type               = "t2.small"
+  instance_type               = "${var.instance_type}"
   subnet_id                   = "${data.terraform_remote_state.common.private_subnet_map["az1"]}"
   iam_instance_profile        = "${module.iam_instance_profile.iam_instance_name}"
   associate_public_ip_address = false
