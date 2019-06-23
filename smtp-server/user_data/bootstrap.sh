@@ -148,7 +148,7 @@ EXISTING_ACCESS_ID=$(aws iam list-access-keys --user-name $SES_IAM_USER --max-it
 
 if [[ $CREATION_DATE -ne $CURRENT_DATE ]] || [[ ! -f $sasl_passwd_file ]]; then
         echo "$(date) : Rotating key" > $iam_rotation_log
-        echo "Rotation key"
+        echo "Rotating key"
         #Create new Access key
         TEMP_CREDS_FILE="/root/temp_creds_file"
         aws iam create-access-key --user-name $SES_IAM_USER > $TEMP_CREDS_FILE
