@@ -10,6 +10,4 @@ variable "environment_type" {
 
 variable "cloudwatch_log_retention" {}
 
-variable "instance_type" {
-  default = "t2.large"
-}
+variable "bfs_instance_type" {}
