@@ -73,7 +73,7 @@ ses_host="email-smtp.eu-west-1.amazonaws.com"
 sasl_passwd_file="/etc/postfix/sasl_passwd"
 master_cf_file="/etc/postfix/master.cf"
 ses_port="587"
-rotate_script="/root/iam_rotate_keys.sh"
+rotate_script="/root/iam_rotate_keys"
 
 #Remove Sendmail
 yum remove sendmail -y
@@ -127,8 +127,9 @@ grep -q "\-o smtp_fallback_relay=" $${master_cf_file} && sed -e '/\-o smtp_fallb
 
 ############################################################################
 #Configure sasl_passwd vars_file
-cat << 'EOF' > /root/iam_rotate_keys.sh
-#!/bin/bash
+cat << 'EOF' > /root/iam_rotate_keys
+#!/usr/bin/env bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/bin
 
 #vars
 SES_IAM_USER=
@@ -136,6 +137,7 @@ ses_host="email-smtp.eu-west-1.amazonaws.com"
 sasl_passwd_file="/etc/postfix/sasl_passwd"
 sasl_passwd_db="/etc/postfix/sasl_passwd.db"
 ses_port="587"
+iam_rotation_log="/var/log/iam_rotate.log"
 
 ####Verify if rotations needs to occur
 CURRENT_DATE=$(date +"%Y-%m-%d")
@@ -144,7 +146,8 @@ EXISTING_ACCESS_ID=$(aws iam list-access-keys --user-name $SES_IAM_USER --max-it
 
 
 
-if [[ $CREATION_DATE -ne $CURRENT_DATE ]]|| [[ ! -f $sasl_passwd_file ]]; then
+if [[ $CREATION_DATE -ne $CURRENT_DATE ]] || [[ ! -f $sasl_passwd_file ]]; then
+        echo "$(date) : Rotating key" > $iam_rotation_log
         echo "Rotating key"
         #Create new Access key
         TEMP_CREDS_FILE="/root/temp_creds_file"
@@ -183,6 +186,7 @@ if [[ $CREATION_DATE -ne $CURRENT_DATE ]]|| [[ ! -f $sasl_passwd_file ]]; then
                                --value $SMTP_PASS    --type "SecureString" --overwrite    \
                                --region eu-west-2  > /dev/null 2>&1
 else
+        echo "$(date) : Rotation not required yet" > $iam_rotation_log
         echo "Rotation not required yet"
 fi
 
@@ -215,5 +219,5 @@ systemctl restart $${app}
 #Create cron job to rotate access AccessKeys
 temp_cron_file="/tmp/temp_cron_file" ;
 crontab -l > $temp_cron_file ;
-grep -q "$rotate_script" $temp_cron_file || echo "30 01 * * 7 root /usr/bin/sh $rotate_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file;
+grep -q "$rotate_script" $temp_cron_file || echo "30 01 * * 0 /usr/bin/sh $rotate_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file;
 rm -f $temp_cron_file ;
