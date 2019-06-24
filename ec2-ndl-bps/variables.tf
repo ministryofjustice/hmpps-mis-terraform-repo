@@ -10,6 +10,4 @@ variable "environment_type" {
 
 variable "cloudwatch_log_retention" {}
 
-variable "instance_type" {
-  default = "t2.xlarge"
-}
+variable "bps_instance_type" {}

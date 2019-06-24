@@ -170,7 +170,7 @@ module "create-ec2-instance" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2_no_replace_instance"
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
-  instance_type               = "${var.instance_type}"
+  instance_type               = "${var.bws_instance_type}"
   subnet_id                   = "${local.private_subnet_map["az1"]}"
   iam_instance_profile        = "${local.instance_profile}"
   associate_public_ip_address = false
