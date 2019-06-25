@@ -208,3 +208,53 @@ resource "aws_route53_record" "instance_ext" {
   ttl     = "300"
   records = ["${module.create-ec2-instance.private_ip}"]
 }
+
+
+
+#-------------------------------------------------------------
+### Create 2nd instance - NDL-BWS-300
+#-------------------------------------------------------------
+module "create-ec2-instance" {
+  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2_no_replace_instance"
+  app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}"
+  ami_id                      = "${data.aws_ami.amazon_ami.id}"
+  instance_type               = "${var.bws_instance_type}"
+  subnet_id                   = "${local.private_subnet_map["az1"]}"
+  iam_instance_profile        = "${local.instance_profile}"
+  associate_public_ip_address = false
+  monitoring                  = true
+  user_data                   = "${data.template_file.instance_userdata.rendered}"
+  CreateSnapshot              = false
+  tags                        = "${local.tags}"
+  key_name                    = "${local.ssh_deployer_key}"
+  root_device_size            = "60"
+  deploy_node                 = "${var.deploy_node}"
+
+
+  vpc_security_group_ids = [
+    "${local.sg_map_ids["sg_mis_app_in"]}",
+    "${local.sg_map_ids["sg_mis_common"]}",
+    "${local.sg_outbound_id}",
+    "${local.sg_map_ids["sg_delius_db_out"]}"
+  ]
+}
+
+#-------------------------------------------------------------
+# Create route53 entry for instance 2
+#-------------------------------------------------------------
+
+resource "aws_route53_record" "instance" {
+  zone_id = "${local.private_zone_id}"
+  name    = "${local.nart_role}.${local.internal_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance.private_ip}"]
+}
+
+resource "aws_route53_record" "instance_ext" {
+  zone_id = "${local.public_zone_id}"
+  name    = "${local.nart_role}.${local.external_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${module.create-ec2-instance.private_ip}"]
+}
