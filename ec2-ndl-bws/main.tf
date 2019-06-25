@@ -214,7 +214,7 @@ resource "aws_route53_record" "instance_ext" {
 #-------------------------------------------------------------
 ### Create 2nd instance - NDL-BWS-300
 #-------------------------------------------------------------
-module "create-ec2-instance2" {
+module "create-ec2-instance1" {
   source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=enable_creation_of_multiple_instances//modules//ec2_no_replace_instance"
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
@@ -240,10 +240,10 @@ module "create-ec2-instance2" {
 }
 
 #-------------------------------------------------------------
-# Create route53 entry for instance 2
+# Create route53 entry for instance 1
 #-------------------------------------------------------------
 
-resource "aws_route53_record" "instance" {
+resource "aws_route53_record" "instance1" {
   zone_id = "${local.private_zone_id}"
   name    = "${local.nart_role}.${local.internal_domain}"
   type    = "A"
@@ -251,7 +251,7 @@ resource "aws_route53_record" "instance" {
   records = ["${module.create-ec2-instance.private_ip}"]
 }
 
-resource "aws_route53_record" "instance_ext" {
+resource "aws_route53_record" "instance_ext1" {
   zone_id = "${local.public_zone_id}"
   name    = "${local.nart_role}.${local.external_domain}"
   type    = "A"
