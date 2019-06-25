@@ -167,7 +167,7 @@ data "template_file" "instance_userdata" {
 ### Create instance - NDL-BWS-300
 #-------------------------------------------------------------
 module "create-ec2-instance" {
-  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2_no_replace_instance"
+  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=enable_creation_of_multiple_instances//modules//ec2_no_replace_instance"
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.bws_instance_type}"
@@ -214,8 +214,8 @@ resource "aws_route53_record" "instance_ext" {
 #-------------------------------------------------------------
 ### Create 2nd instance - NDL-BWS-300
 #-------------------------------------------------------------
-module "create-ec2-instance" {
-  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//ec2_no_replace_instance"
+module "create-ec2-instance2" {
+  source                      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=enable_creation_of_multiple_instances//modules//ec2_no_replace_instance"
   app_name                    = "${local.environment_identifier}-${local.app_name}-${local.nart_role}"
   ami_id                      = "${data.aws_ami.amazon_ami.id}"
   instance_type               = "${var.bws_instance_type}"
