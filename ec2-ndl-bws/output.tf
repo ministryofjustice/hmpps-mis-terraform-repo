@@ -1,4 +1,3 @@
-# primary ec2
 output "primary_instance_id" {
   value = "${module.create-ec2-instance.instance_id}"
 }
@@ -15,6 +14,17 @@ output "primary_dns" {
 output "primary_dns_ext" {
   value = "${aws_route53_record.instance_ext.fqdn}"
 }
+
+
+# dns
+output "secondary_dns" {
+  value = "${local.nart_role}-002.${local.internal_domain}"
+}
+
+output "secondary_dns_ext" {
+  value = "${local.nart_role}-002.${local.external_domain}"
+}
+
 
 # ELB
 output "bws_elb_id" {
