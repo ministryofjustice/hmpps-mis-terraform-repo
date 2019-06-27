@@ -208,3 +208,94 @@ resource "aws_route53_record" "instance_ext" {
   ttl     = "300"
   records = ["${module.create-ec2-instance.private_ip}"]
 }
+
+
+####################################################
+# instance 2
+####################################################
+
+data "template_file" "instance_secondary" {
+  template = "${file("../userdata/userdata.txt")}"
+
+  vars {
+    host_name       = "${local.nart_role}-002"
+    internal_domain = "${local.internal_domain}"
+    user            = "${data.aws_ssm_parameter.user.value}"
+    password        = "${data.aws_ssm_parameter.password.value}"
+  }
+}
+
+
+#-------------------------------------------------------------
+### Create instance - NDL-BWS-300-002
+### Secondary instance
+#-------------------------------------------------------------
+
+resource "aws_instance" "instance" {
+  ami                         = "${data.aws_ami.amazon_ami.id}"
+  instance_type               = "${var.bws_instance_type}"
+  subnet_id                   = "${local.private_subnet_map["az2"]}"
+  iam_instance_profile        = "${local.instance_profile}"
+  associate_public_ip_address = false
+  vpc_security_group_ids      = ["${local.sg_map_ids["sg_mis_app_in"]}",
+                                "${local.sg_map_ids["sg_mis_common"]}",
+                                "${local.sg_outbound_id}",
+                                "${local.sg_map_ids["sg_delius_db_out"]}"
+                                ]
+  user_data                   = "${data.template_file.instance_secondary.rendered}"
+  key_name                    = "${local.ssh_deployer_key}"
+  count                       = "${var.deploy_node}"
+
+  tags = "${merge(
+    local.tags,
+    map("Name", "${local.environment_identifier}-${local.app_name}-${local.nart_role}-002"),
+    map("CreateSnapshot", "false")
+  )}"
+
+  monitoring = true
+  user_data  = "${data.template_file.instance_secondary.rendered}"
+
+  root_block_device {
+    volume_size = 60
+  }
+
+  lifecycle {
+    ignore_changes = [
+      "ami",
+      "user_data"
+    ]
+  }
+}
+
+#-------------------------------------------------------------
+# Create route53 entry for secondary instance
+#-------------------------------------------------------------
+
+resource "aws_route53_record" "secondary_instance" {
+  zone_id = "${local.private_zone_id}"
+  name    = "${local.nart_role}-002.${local.internal_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${aws_instance.instance.private_ip}"]
+  count   = "${var.deploy_node}"
+}
+
+resource "aws_route53_record" "secondary_instance_ext" {
+  zone_id = "${local.public_zone_id}"
+  name    = "${local.nart_role}-002.${local.external_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = ["${aws_instance.instance.private_ip}"]
+  count   = "${var.deploy_node}"
+}
+
+
+#-------------------------------------------------------------
+# Create elb attachment for secondary instance
+#-------------------------------------------------------------
+
+resource "aws_elb_attachment" "environment" {
+  count     = "${var.deploy_node}"
+  elb       = "${module.create_app_elb.environment_elb_name}"
+  instance  = "${aws_instance.instance.id}"
+}

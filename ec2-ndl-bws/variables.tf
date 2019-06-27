@@ -51,3 +51,5 @@ variable "bws-health_check" {
   type        = "list"
   default     = []
 }
+
+variable "deploy_node" {}
