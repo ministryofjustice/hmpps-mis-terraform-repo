@@ -138,9 +138,7 @@ pipeline {
      stage('Delius | MIS s3buckets')          { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets')}}}
      stage('Delius | MIS iam')                { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam')}}}
      stage('Delius | MIS security-groups')    { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups')}}}
-	 stage('Delius | MIS ses')                { steps { script {do_terraform(project.config, environment_name, project.mis, 'ses')}}}
-	 stage('Delius | MIS smtp-server')        { steps { script {do_terraform(project.config, environment_name, project.mis, 'smtp-server')}}}
-     stage('Delius | database_mis')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_mis')}}}
+     stage('Delius | MIS database_mis')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_mis')}}}
      stage('Delius | MIS database_misboe')    { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_misboe')}}}
      stage('Delius | MIS database_misdsd')    { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_misdsd')}}}
      stage('Delius | MIS ec2-ndl-dis')        { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis')}}}

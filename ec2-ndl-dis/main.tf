@@ -64,6 +64,19 @@ data "terraform_remote_state" "security-groups" {
 }
 
 #-------------------------------------------------------------
+### Getting the security groups details
+#-------------------------------------------------------------
+data "terraform_remote_state" "security-groups_secondary" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "security-groups/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -122,6 +135,7 @@ locals {
   ssh_deployer_key   = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
   nart_role          = "ndl-dis-${data.terraform_remote_state.common.legacy_environment_name}"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+  sg_smtp_ses        = "${data.terraform_remote_state.security-groups_secondary.sg_smtp_ses}"
 }
 
 #-------------------------------------------------------------
@@ -174,6 +188,7 @@ module "create-ec2-instance" {
     "${local.sg_outbound_id}",
     "${local.sg_map_ids["sg_mis_db_in"]}",
     "${local.sg_map_ids["sg_delius_db_out"]}",
+    "${local.sg_smtp_ses}",
   ]
 }
 
