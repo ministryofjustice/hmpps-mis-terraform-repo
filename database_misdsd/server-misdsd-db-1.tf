@@ -1,5 +1,5 @@
 module "misdsd_db_1" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//oracle-database"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=master//modules//oracle-database"
   server_name = "misdsd-db-1"
 
   ami_id               = "${data.aws_ami.centos_oracle_db.id}"
@@ -53,6 +53,7 @@ module "misdsd_db_1" {
   }
 }
 
+#legacy (used for info only)
 output "ami_misdsd_db_1" {
   value = "${module.misdsd_db_1.ami_id}"
 }
@@ -71,4 +72,16 @@ output "private_ip_misdsd_db_1" {
 
 output "db_disks_misdsd_db_1" {
   value = "${module.misdsd_db_1.db_size_parameters}"
+}
+
+# map (tidier)
+output "misdsd_db_1" {
+  value = {
+    ami_id        = "${module.misdsd_db_1.ami_id}",
+    public_fqdn   = "${module.misdsd_db_1.public_fqdn}",
+    internal_fqdn = "${module.misdsd_db_1.internal_fqdn}",
+    private_ip    = "${module.misdsd_db_1.private_ip}",
+    db_disks      = "${module.misdsd_db_1.db_size_parameters}",
+    misdsd_db_1   = "ssh ${module.misdsd_db_1.public_fqdn}",
+  }
 }
