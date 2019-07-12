@@ -1,5 +1,5 @@
 module "misboe_db_3" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//oracle-database"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=master//modules//oracle-database"
   server_name = "misboe-db-3"
 
   ami_id               = "${data.aws_ami.centos_oracle_db.id}"
@@ -50,6 +50,7 @@ module "misboe_db_3" {
   }
 }
 
+#legacy (used for info only)
 output "ami_misboe_db_3" {
   value = "${module.misboe_db_3.ami_id}"
 }
@@ -68,4 +69,16 @@ output "private_ip_misboe_db_3" {
 
 output "db_disks_misboe_db_3" {
   value = "${module.misboe_db_3.db_size_parameters}"
+}
+
+# map (tidier)
+output "misboe_db_3" {
+  value = {
+    ami_id        = "${module.misboe_db_3.ami_id}",
+    public_fqdn   = "${module.misboe_db_3.public_fqdn}",
+    internal_fqdn = "${module.misboe_db_3.internal_fqdn}",
+    private_ip    = "${module.misboe_db_3.private_ip}",
+    db_disks      = "${module.misboe_db_3.db_size_parameters}",
+    misboe_db_3   = "ssh ${module.misboe_db_3.public_fqdn}",
+  }
 }
