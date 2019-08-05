@@ -160,6 +160,7 @@ locals {
   sg_mis_samba                 = ["${data.terraform_remote_state.security-groups.sg_mis_samba}",]
   efs_security_groups          = ["${data.terraform_remote_state.security-groups.sg_mis_efs_in}",]
   tags                         = "${data.terraform_remote_state.vpc.tags}"
+  fs_fqdn                      = "${data.terraform_remote_state.http-file-server.public_fqdn_http_fs_elb}"
 }
 
 
@@ -230,6 +231,7 @@ data "template_file" "http_fs_user_data" {
     efs_dns_name          = "${local.efs_dns_name}"
     mis_user              = "${data.aws_ssm_parameter.user.value}"
     mis_user_pass         = "${data.aws_ssm_parameter.password.value}"
+    fs_fqdn               = "${local.fs_fqdn}"
 
   }
 }

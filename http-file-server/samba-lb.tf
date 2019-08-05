@@ -35,8 +35,3 @@ resource "aws_route53_record" "samba_lb_private" {
   ttl     = "300"
   records = ["${aws_elb.samba_lb.dns_name}"]
 }
-
-
-output "private_fqdn_samba_elb" {
-  value = "${aws_route53_record.samba_lb_private.fqdn}"
-}
