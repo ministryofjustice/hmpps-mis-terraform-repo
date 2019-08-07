@@ -13,8 +13,10 @@ HMPPS_DOMAIN="${private_domain}"
 INT_ZONE_ID="${private_zone_id}"
 EFS_DNS_NAME="${efs_dns_name}"
 SAMBA_USER="${mis_user}"
-SAMBA_USER_PASS="${mis_user_pass}"
 FS_FQDN="${fs_fqdn}"
+LDAP_ELB_NAME="${ldap_elb_name}"
+LDAP_PORT="${ldap_port}"
+MIS_USER_PASS_NAME="${mis_user_pass_name}"
 
 
 EOF
@@ -30,8 +32,10 @@ export HMPPS_DOMAIN="${private_domain}"
 export INT_ZONE_ID="${private_zone_id}"
 export EFS_DNS_NAME="${efs_dns_name}"
 export SAMBA_USER="${mis_user}"
-export SAMBA_USER_PASS="${mis_user_pass}"
 export FS_FQDN="${fs_fqdn}"
+export LDAP_ELB_NAME="${ldap_elb_name}"
+export LDAP_PORT="${ldap_port}"
+export MIS_USER_PASS_NAME="${mis_user_pass_name}"
 
 cd ~
 pip install ansible
@@ -80,6 +84,7 @@ HTML_FILE="index.html"
 URL="https://$FS_FQDN"
 TEMP_OUT_FILE="/tmp/temp_out_file"
 HTTPD_CONF_FILE="/etc/httpd/conf/httpd.conf"
+GRP_DIR_MAP_FILE="/tmp/grp_dir_map_file"
 
 ##Install httpd and modules
 yum -y install httpd  mod_ldap;
@@ -90,13 +95,6 @@ yum -y install nfs-utils ;
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $WEB_DIR  nfs4    defaults" >> /etc/fstab ;
 test -d $WEB_DIR || mkdir $WEB_DIR ;
 mount -a ;
-
-#Configure httpd
-
-#Start httpd
-systemctl start httpd  ;
-systemctl enable httpd ;
-
 
 ####Create html file
 echo "<html>"                      > $WEB_DIR/$HTML_FILE ;
@@ -109,13 +107,13 @@ echo "    </p>"                   >> $WEB_DIR/$HTML_FILE ;
 echo "</html>"                    >> $WEB_DIR/$HTML_FILE ;
 
 ##Samba share
+SAMBA_USER_PASS=$(aws ssm get-parameters --with-decryption --names $MIS_USER_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 yum install samba samba-client samba-common -y ;
 groupadd smbgrp ;
 useradd $SAMBA_USER ;
 usermod $SAMBA_USER -aG smbgrp ;
 
-#smbpasswd -a mismis-test ;       #pass is owncloud
-###maybe create a small script for this one
+#configure samba pass
 echo -ne "$SAMBA_USER_PASS\n$SAMBA_USER_PASS\n" | smbpasswd -a -s $SAMBA_USER ;
 
 chmod -R 0770  $WEB_DIR ;
@@ -222,25 +220,65 @@ IncludeOptional conf.d/*.conf
 EOF
 
 ##Configure access to directories
-for directory in $(cat $TEMP_OUT_FILE) ;
-    do cat << EOF >> /etc/httpd/conf/httpd.conf
 
+#Create group to directory mapping temp file
+cat << EOF >> /tmp/grp_dir_map_file
+BENCH:RES-FS-BENCH-DEBS-RW:RES-FS-BENCH-DEBS-R
+BGSW:RES-FS-BGSW-DEBS-R:RES-FS-BGSW-DEBS-RW
+CGM:RES-FS-CGM-DEBS-RW
+CL:RES-FS-CL-DEBS-R:RES-FS-CL-DEBS-RW
+DDC:RES-FS-DDC-DEBS-RW
+DLNR:RES-FS-DLNR-DEBS-R:RES-FS-DLNR-DEBS-RW
+DTV:RES-FS-DTV-DEBS-RW:RES-FS-DTV-DEBS-R
+Essex:RES-FS-Essex-DEBS-RW:RES-FS-Essex-DEBS-RW
+Hampshire:RES-FS-Hampshire-DEBS-RW
+HLNY:RES-FS-HLNY-DEBS-R:RES-FS-HLNY-DEBS-RW
+KSS:RES-FS-KSS-DEBS-RW
+LONDON:RES-FS-LONDON-DEBS-RW:RES-FS-LONDON-DEBS-R
+Merseyside:RES-FS-Merseyside-DEBS-RW
+Northumbria:RES-FS-Northumbria-DEBS-RW
+NS:RES-FS-NS-DEBS-RW:RES-FS-NS-DEBS-R
+South-Yorkshire:RES-FS-South-Yorkshire-DEBS-RW:RES-FS-South-Yorkshire-DEBS-R
+SWM:RES-FS-SWM-DEBS-RW:RES-FS-SWM-DEBS-R
+Thames:RES-FS-Thames-DEBS-RW:RES-FS-Thames-DEBS-R
+Wales:RES-FS-Wales-DEBS-R
+West-Yorkshire:RES-FS-WestYorkshire-DEBS-RW:RES-FS-WestYorkshire-DEBS-R
+WWM:RES-FS-WWM-DEBS-RW
+EOF
+
+#get Auth LDAP Bind Password
+AuthLDAPBindPassword=$(aws ssm get-parameters --with-decryption --names /${environment_name}/delius/apacheds/apacheds/ldap_admin_password --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+
+#Prepare directory access control
+for directory in $(cat $TEMP_OUT_FILE) ;
+    do multiple_groups=$(grep -wi $(basename $directory) $GRP_DIR_MAP_FILE  | grep -o ":" | wc -l) ;
+    groups1=$(grep -wi $(basename $directory) $GRP_DIR_MAP_FILE | cut -f2 -d ":");
+    groups2=$(grep -wi $(basename $directory) $GRP_DIR_MAP_FILE | cut -f3 -d ":");
+    if [[ $multiple_groups -gt "1" ]]; then
+        filter="(|(memberOf=$groups1)(memberOf=$groups2))"
+    else
+        filter="(memberOf=$groups1)"
+    fi ;
+
+    cat << EOF >> /etc/httpd/conf/httpd.conf
 <Directory /var/www/html/$(basename $directory)>
    AuthType Basic
    AuthName "Restricted"
    AuthBasicProvider ldap
    AuthLDAPBindAuthoritative on
-   AuthLDAPUrl "ldap://ENTERIP/ou=People,dc=field,dc=linuxhostsupport,dc=com"
-   AuthLDAPBindDN "cn=ldapadm,dc=field,dc=linuxhostsupport,dc=com"
-   AuthLDAPBindPassword enterpasshere
-   <RequireAny>
-   require ldap-group cn=londongrp,ou=Group,dc=field,dc=linuxhostsupport,dc=com
-   </RequireAny>
-   AuthLDAPGroupAttributeIsDN off
-   AuthLDAPGroupAttribute memberUid
+   AuthLDAPUrl "ldap://$LDAP_ELB_NAME:$LDAP_PORT/cn=Users,dc=moj,dc=com?cn?sub?$filter"
+   AuthLDAPBindDN "uid=admin,ou=system"
+   AuthLDAPBindPassword $AuthLDAPBindPassword
+   require valid-user
    Options Indexes
  </Directory>
 EOF
 done
 
+#Start httpd
+systemctl start httpd  ;
+systemctl enable httpd ;
+
+#remove temp files
 rm -f $TEMP_OUT_FILE
+rm -f $GRP_DIR_MAP_FILE

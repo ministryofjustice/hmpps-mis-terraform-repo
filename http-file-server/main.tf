@@ -91,6 +91,19 @@ data "terraform_remote_state" "http-file-server" {
 }
 
 #-------------------------------------------------------------
+### Getting the ldap elb details
+#-------------------------------------------------------------
+data "terraform_remote_state" "ldap_elb_name" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "delius-core/application/ldap/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting ACM Cert
 #-------------------------------------------------------------
 data "aws_acm_certificate" "http_fs_cert" {
@@ -134,7 +147,7 @@ data "aws_ami" "amazon_ami" {
 ####################################################
 
 locals {
-  environment_name             = "${var.environment_type}"
+  environment_name             = "${data.terraform_remote_state.vpc.environment_name}"
   internal_domain              = "${data.terraform_remote_state.vpc.private_zone_name}"
   private_zone_id              = "${data.terraform_remote_state.vpc.private_zone_id}"
   external_domain              = "${data.terraform_remote_state.vpc.public_zone_name}"
@@ -161,6 +174,9 @@ locals {
   efs_security_groups          = ["${data.terraform_remote_state.security-groups.sg_mis_efs_in}",]
   tags                         = "${data.terraform_remote_state.vpc.tags}"
   fs_fqdn                      = "${data.terraform_remote_state.http-file-server.public_fqdn_http_fs_elb}"
+  ldap_elb_name                = "${data.terraform_remote_state.ldap_elb_name.private_fqdn_readonly_ldap_elb}"
+  ldap_port                    = "${data.terraform_remote_state.ldap_elb_name.ldap_port}"
+
 }
 
 
@@ -230,8 +246,10 @@ data "template_file" "http_fs_user_data" {
     short_env_identifier  = "${local.short_environment_identifier}"
     efs_dns_name          = "${local.efs_dns_name}"
     mis_user              = "${data.aws_ssm_parameter.user.value}"
-    mis_user_pass         = "${data.aws_ssm_parameter.password.value}"
+    mis_user_pass_name    = "${local.environment_identifier}-${local.mis_app_name}-admin-password"
     fs_fqdn               = "${local.fs_fqdn}"
+    ldap_elb_name         = "${local.ldap_elb_name}"
+    ldap_port             = "${local.ldap_port}"
 
   }
 }

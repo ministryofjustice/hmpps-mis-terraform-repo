@@ -28,8 +28,6 @@ resource "aws_security_group_rule" "efs_out" {
 # SG Rules for lb
 ####################################################
 
-
-
 ### HTTPS in
 resource "aws_security_group_rule" "https_in" {
   security_group_id        = "${data.terraform_remote_state.security-groups.sg_mis_httpfs_lb}"
@@ -91,4 +89,28 @@ resource "aws_security_group_rule" "samba_out" {
   type                     = "egress"
   description              = "SMB out to LB"
   self                     = "true"
+}
+
+####################################################
+# SG Rules for ldap
+####################################################
+
+resource "aws_security_group_rule" "ldap_in" {
+  security_group_id        = "${data.terraform_remote_state.delius_core_security_groups.sg_apacheds_ldap_private_elb_id}"
+  from_port                = 10389
+  to_port                  = 10389
+  protocol                 = "tcp"
+  type                     = "ingress"
+  description              = "https-fs in to ldap lb"
+  source_security_group_id = "${data.terraform_remote_state.security-groups.sg_https_out}"
+}
+
+resource "aws_security_group_rule" "ldap_out" {
+  security_group_id        = "${data.terraform_remote_state.security-groups.sg_https_out}"
+  from_port                = 10389
+  to_port                  = 10389
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "https-fs out to ldap lb"
+  source_security_group_id = "${data.terraform_remote_state.delius_core_security_groups.sg_apacheds_ldap_private_elb_id}"
 }
