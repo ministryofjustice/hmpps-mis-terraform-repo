@@ -179,7 +179,7 @@ module "create-ec2-instance" {
   CreateSnapshot              = false
   tags                        = "${local.tags}"
   key_name                    = "${local.ssh_deployer_key}"
-  root_device_size            = "60"
+  root_device_size            = "${var.bws_root_size}"
 
   vpc_security_group_ids = [
     "${local.sg_map_ids["sg_mis_app_in"]}",
@@ -256,7 +256,7 @@ resource "aws_instance" "instance" {
   user_data  = "${data.template_file.instance_secondary.rendered}"
 
   root_block_device {
-    volume_size = 60
+    volume_size = "${var.bws_root_size}"
   }
 
   lifecycle {

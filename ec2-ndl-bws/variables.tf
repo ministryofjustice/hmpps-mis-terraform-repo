@@ -53,3 +53,5 @@ variable "bws-health_check" {
 }
 
 variable "deploy_node" {}
+
+variable "bws_root_size" {}
