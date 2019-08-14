@@ -180,7 +180,7 @@ module "create-ec2-instance" {
   CreateSnapshot              = false
   tags                        = "${local.tags}"
   key_name                    = "${local.ssh_deployer_key}"
-  root_device_size            = "60"
+  root_device_size            = "${var.dis_root_size}"
 
   vpc_security_group_ids = [
     "${local.sg_map_ids["sg_mis_app_in"]}",

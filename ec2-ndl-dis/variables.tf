@@ -11,3 +11,5 @@ variable "environment_type" {
 variable "cloudwatch_log_retention" {}
 
 variable "dis_instance_type" {}
+
+variable "dis_root_size" {}
