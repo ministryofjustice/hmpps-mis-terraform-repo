@@ -15,3 +15,5 @@ variable "bcs_instance_type" {}
 variable "bcs_root_size" {}
 
 variable "bcs_deploy_secondary" {}
+
+variable "bcs_deploy_tertiary" {}

@@ -135,6 +135,12 @@ locals {
   nart_role          = "ndl-bws-${data.terraform_remote_state.common.legacy_environment_name}"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
   bws_port           = "${data.terraform_remote_state.security-groups.bws_port}"
+
+  # Create name override for the 2nd and 3rd instances
+  # Default value will differ per env, but is in format X00, e.g. 000 for prod, 500 for preprd
+  # Increment the traililng 0 for each additional server
+  nart_role_002 = "${replace(local.nart_role, "00", "001")}"
+
 }
 
 #-------------------------------------------------------------
@@ -218,7 +224,8 @@ data "template_file" "instance_secondary" {
   template = "${file("../userdata/userdata.txt")}"
 
   vars {
-    host_name       = "${local.nart_role}-002"
+    #host_name       = "${local.nart_role}-002"
+    host_name       = "${local.nart_role_002}"
     internal_domain = "${local.internal_domain}"
     user            = "${data.aws_ssm_parameter.user.value}"
     password        = "${data.aws_ssm_parameter.password.value}"
@@ -248,7 +255,7 @@ resource "aws_instance" "instance" {
 
   tags = "${merge(
     local.tags,
-    map("Name", "${local.environment_identifier}-${local.app_name}-${local.nart_role}-002"),
+    map("Name", "${local.environment_identifier}-${local.app_name}-${replace(local.nart_role, "00", "0${count.index + 1}") }"),
     map("CreateSnapshot", "false")
   )}"
 
@@ -273,7 +280,7 @@ resource "aws_instance" "instance" {
 
 resource "aws_route53_record" "secondary_instance" {
   zone_id = "${local.private_zone_id}"
-  name    = "${local.nart_role}-002.${local.internal_domain}"
+  name    = "${local.nart_role_002}.${local.internal_domain}"
   type    = "A"
   ttl     = "300"
   records = ["${aws_instance.instance.private_ip}"]
@@ -282,7 +289,7 @@ resource "aws_route53_record" "secondary_instance" {
 
 resource "aws_route53_record" "secondary_instance_ext" {
   zone_id = "${local.public_zone_id}"
-  name    = "${local.nart_role}-002.${local.external_domain}"
+  name    = "${local.nart_role_002}.${local.external_domain}"
   type    = "A"
   ttl     = "300"
   records = ["${aws_instance.instance.private_ip}"]
