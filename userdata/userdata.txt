@@ -18,5 +18,8 @@ Set-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters
 Set-ItemProperty -path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -name "AltDefaultDomainName" -value $ComputerName
 Set-ItemProperty -path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -name "DefaultDomainName" -value $ComputerName
 
+$MaxSize = (Get-PartitionSupportedSize -DriveLetter C).sizeMax
+Resize-Partition -DriveLetter C -Size $MaxSize
+
 </powershell>
 <persist>true</persist>
