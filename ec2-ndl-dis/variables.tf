@@ -13,3 +13,8 @@ variable "cloudwatch_log_retention" {}
 variable "dis_instance_type" {}
 
 variable "dis_root_size" {}
+
+variable "dis_server_count" {
+  description = "Number of DIS Servers to deploy"
+  default = 1
+}

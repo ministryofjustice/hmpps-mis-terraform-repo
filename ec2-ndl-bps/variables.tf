@@ -12,5 +12,7 @@ variable "cloudwatch_log_retention" {}
 
 variable "bps_instance_type" {}
 variable "bps_root_size" {}
-variable "bps_deploy_secondary" {}
-variable "bps_deploy_tertiary" {}
+variable "bps_server_count" {
+  description = "Number of BPS Servers to deploy"
+  default = 1
+}

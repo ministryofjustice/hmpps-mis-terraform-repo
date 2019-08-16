@@ -13,3 +13,8 @@ variable "cloudwatch_log_retention" {}
 variable "bfs_instance_type" {}
 
 variable "bfs_root_size" {}
+
+variable "bfs_server_count" {
+  description = "Number of BFS Servers to deploy"
+  default = 1
+}
