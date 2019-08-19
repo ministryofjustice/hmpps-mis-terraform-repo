@@ -52,6 +52,9 @@ variable "bws-health_check" {
   default     = []
 }
 
-variable "deploy_node" {}
-
 variable "bws_root_size" {}
+
+variable "bws_server_count" {
+  description = "Number of BWS Servers to deploy"
+  default = 1
+}

@@ -1,28 +1,18 @@
-output "primary_instance_id" {
-  value = "${module.create-ec2-instance.instance_id}"
+output "bws_instance_ids" {
+  value = "${aws_instance.bws_server.*.id}"
 }
 
-output "primary_private_ip" {
-  value = "${module.create-ec2-instance.private_ip}"
+output "bws_private_ips" {
+  value = "${aws_instance.bws_server.*.private_ip}"
 }
 
 # dns
-output "primary_dns" {
-  value = "${aws_route53_record.instance.fqdn}"
+output "bws_primary_dns" {
+  value = "${aws_route53_record.bws_dns.*.fqdn}"
 }
 
-output "primary_dns_ext" {
-  value = "${aws_route53_record.instance_ext.fqdn}"
-}
-
-
-# dns
-output "secondary_dns" {
-  value = "${local.nart_role}-002.${local.internal_domain}"
-}
-
-output "secondary_dns_ext" {
-  value = "${local.nart_role}-002.${local.external_domain}"
+output "bws_primary_dns_ext" {
+  value = "${aws_route53_record.bws_dns.*.fqdn}"
 }
 
 
