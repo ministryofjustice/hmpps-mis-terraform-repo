@@ -88,7 +88,7 @@ ndl-dis-300.mis-test.delius.probation.hmpps.dsd.io
 ```
 
 ## SMTP Relay/SES
-An SMTP relay EC2 instance is in place to forward email notifications from SAP on ec2-ndl-300 to AWS SES. The SAP SMTP client is currently unable to authenticate to AWS SES, therefore an SMTP Server running Postfix is in place between ec2-ndl-300 and AWS SES to enable authentication and connection.
+An SMTP relay EC2 instance is in place to forward email notifications from SAP on ndl-dis-300 to AWS SES. The SAP SMTP client is currently unable to authenticate to AWS SES, therefore an SMTP Server running Postfix is in place between ndl-dis-300 and AWS SES to enable authentication and connection.
 
 ### SMTP Relay/Postfix
 #### Internal DNS
