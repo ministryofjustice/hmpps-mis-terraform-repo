@@ -88,3 +88,28 @@ resource "aws_security_group_rule" "asg_http_in" {
   description              = "${local.common_name}-db-out"
   self                     = "true"
 }
+
+
+####################################################
+# SG Rules for ldap
+####################################################
+
+resource "aws_security_group_rule" "ldap_in" {
+  security_group_id        = "${data.terraform_remote_state.delius_core_security_groups.sg_apacheds_ldap_private_elb_id}"
+  from_port                = 10389
+  to_port                  = 10389
+  protocol                 = "tcp"
+  type                     = "ingress"
+  description              = "nextcloud in to ldap lb"
+  source_security_group_id = "${data.terraform_remote_state.security-groups.sg_https_out}"
+}
+
+ resource "aws_security_group_rule" "ldap_out" {
+  security_group_id        = "${data.terraform_remote_state.security-groups.sg_https_out}"
+  from_port                = 10389
+  to_port                  = 10389
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "nextcloud out to ldap lb"
+  source_security_group_id = "${data.terraform_remote_state.delius_core_security_groups.sg_apacheds_ldap_private_elb_id}"
+}
