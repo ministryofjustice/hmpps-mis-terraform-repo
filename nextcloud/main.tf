@@ -163,14 +163,15 @@ locals {
   public_subnet_ids            = ["${data.terraform_remote_state.common.public_subnet_ids}"]
   private_subnet_ids           = ["${data.terraform_remote_state.common.private_subnet_ids}"]
   tags                         = "${data.terraform_remote_state.vpc.tags}"
-  ldap_elb_name                = "${data.terraform_remote_state.ldap_elb_name.private_fqdn_readonly_ldap_elb}"
+  ldap_elb_name                = "${data.terraform_remote_state.ldap_elb_name.private_fqdn_ldap_elb}"
   ldap_port                    = "${data.terraform_remote_state.ldap_elb_name.ldap_port}"
   nextcloud_admin_user         = "${local.environment_name}-${local.mis_app_name}-nextcloud"
-  nextcloud_admin_pass_param   = "${data.terraform_remote_state.nextcloud.nextcloud_admin_pass_param}"
-  nextcloud_db_user_pass_param = "${data.terraform_remote_state.nextcloud.nextcloud_db_user_pass_param}"
+  nextcloud_admin_pass_param   = "${aws_ssm_parameter.nextcloud_ssm_password.id}"
+  nextcloud_db_user_pass_param = "${aws_ssm_parameter.nextcloud_db_password.id}"
   efs_security_groups          = ["${data.terraform_remote_state.security-groups.sg_mis_nextcloud_efs_in}",]
   efs_dns_name                 = "${module.efs_share.efs_dns_name}"
   nextcloud_db_user            = "${local.mis_app_name}${local.app_name}"
   nextcloud_db_sg              = ["${data.terraform_remote_state.security-groups.sg_mis_nextcloud_db}",]
-  db_dns_name                  = "${data.terraform_remote_state.nextcloud.fqdn_nextcloud_db}"
+  db_dns_name                  = "${aws_route53_record.mariadb_dns_entry.fqdn}"
+  ldap_bind_user               = "${data.terraform_remote_state.ldap_elb_name.ldap_bind_user}"
 }

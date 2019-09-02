@@ -58,6 +58,8 @@ data "template_file" "nextcloud_user_data" {
     efs_dns_name                 = "${local.efs_dns_name}"
     nextcloud_db_user            = "${local.nextcloud_db_user}"
     db_dns_name                  = "${local.db_dns_name}"
+    ldap_bind_param              = "/${local.environment_name}/delius/apacheds/apacheds/ldap_admin_password"
+    ldap_bind_user               = "${local.ldap_bind_user}"
   }
 }
 
