@@ -59,7 +59,7 @@ ndl-bps-501.delius-pre-prod.internal
 ndl-bps-501.pre-prod.delius.probation.hmpps.dsd.io
 ```
 ## BWS
-BWS Endpoint [https://ndl-bws.pre-prod.delius.probation.hmpps.dsd.io](https://ndl-bws.pre-prod.delius.probation.hmpps.dsd.io)
+BWS Endpoint [https://ndl-bws.pre-prod.delius.probation.hmpps.dsd.io/BOE/BI](https://ndl-bws.pre-prod.delius.probation.hmpps.dsd.io/BOE/BI)
 
 #### Internal DNS  
 

@@ -59,7 +59,7 @@ ndl-bps-300.delius-mis-test.internal
 ndl-bps-300.mis-test.delius.probation.hmpps.dsd.io
 ```
 ## BWS
-BWS Endpoint [https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io](https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io)
+BWS Endpoint [https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io/BOE/BI](https://ndl-bws.mis-test.delius.probation.hmpps.dsd.io/BOE/BI)
 
 #### Internal DNS  
 

@@ -66,7 +66,7 @@ ndl-bps-002.probation.service.justice.gov.uk
 ndl-bps-003.probation.service.justice.gov.uk
 ```
 ## BWS
-BWS Endpoint [https://ndl-bws.probation.service.justice.gov.uk](https://ndl-bws.probation.service.justice.gov.uk)
+BWS Endpoint [https://ndl-bws.probation.service.justice.gov.uk/BOE/BI](https://ndl-bws.probation.service.justice.gov.uk/BOE/BI)
 
 #### Internal DNS  
 
