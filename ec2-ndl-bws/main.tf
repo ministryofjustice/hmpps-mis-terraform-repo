@@ -73,6 +73,19 @@ data "terraform_remote_state" "security-groups" {
 }
 
 #-------------------------------------------------------------
+### Getting the sg details
+#-------------------------------------------------------------
+data "terraform_remote_state" "network-security-groups" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "security-groups/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -137,6 +150,7 @@ locals {
   nart_prefix = "${ substr(local.nart_role, 0, length(local.nart_role)-1) }"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
   bws_port           = "${data.terraform_remote_state.security-groups.bws_port}"
+  sg_bws_ldap        = "${data.terraform_remote_state.network-security-groups.sg_bws_ldap}"
 }
 
 #-------------------------------------------------------------
@@ -180,7 +194,8 @@ resource "aws_instance" "bws_server" {
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
     "${local.sg_outbound_id}",
-    "${local.sg_map_ids["sg_delius_db_out"]}"
+    "${local.sg_map_ids["sg_delius_db_out"]}",
+    "${local.sg_bws_ldap}"
   ]
   key_name                    = "${local.ssh_deployer_key}"
 
