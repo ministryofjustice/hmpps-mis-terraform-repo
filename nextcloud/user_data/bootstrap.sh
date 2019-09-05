@@ -173,8 +173,7 @@ $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentName "$LDAP_USE
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentPassword "$LDAP_USER_PASS" ;
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "$BASE_DN" ;
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(memberOf=NEXTCLOUD-USER)))" ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(memberOf=NEXTCLOUD-USER)))(|(cn=%uid)))" ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilterAttributes "cn" ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(memberOf=NEXTCLOUD-USER)))(|(cn=%uid)(memberOf=%uid)(objectClass=%uid)(sn=%uid)(userPassword=%uid)(userSector=%uid)))" ;
 
 
 #Start httpd service
