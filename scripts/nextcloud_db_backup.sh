@@ -25,14 +25,6 @@ then
     exit 1
 fi
 
-# get creds
-get_creds_aws () {
-  sh scripts/get_creds.sh
-  source ${OUTPUT_FILE}
-  exit_on_error $? !!
-  rm -rf ${OUTPUT_FILE}
-  exit_on_error $? !!
-}
 
 ###set environment
 set_env_stage ()
@@ -65,7 +57,6 @@ DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIR
 NEXT_CLOUD_DB_NAME="nextcloud"
 NEXTCLOUD_BACKUP_BUCKET="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-backups"
 DB_HOST="nextcloud-db.${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}.internal"
-
 get_creds_aws
 DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit $?
 DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit $?
@@ -73,6 +64,14 @@ PREFIX_DATE=$(date +%F)
 BACKUP_DIR="/home/tools/data/backup"
 SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
 
+# get creds
+get_creds_aws () {
+  sh scripts/get_creds.sh
+  source ${OUTPUT_FILE}
+  exit_on_error $? !!
+  rm -rf ${OUTPUT_FILE}
+  exit_on_error $? !!
+}
 
 ####Perform db backup or restore
 db_backup () {
