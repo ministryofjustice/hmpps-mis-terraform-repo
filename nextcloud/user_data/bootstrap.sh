@@ -96,9 +96,6 @@ DATA_DIR="/var/www/html/nextcloud/data"
 sudo_cmd="/usr/bin/sudo"
 BASE_DN="cn=Users,dc=moj,dc=com"
 
-echo $LDAP_USER_PASS > /tmp/temp_pass
-
-
 #Nextcloud install
 yum -y install epel-release yum-utils ;
 yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm ;

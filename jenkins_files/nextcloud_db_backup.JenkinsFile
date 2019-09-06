@@ -1,0 +1,76 @@
+def project = [:]
+project.mis  = 'hmpps-mis-terraform-repo'
+project.branch = 'issue_111_nexcloud_deploy'
+
+def prepare_env() {
+    sh '''
+    #!/usr/env/bin bash
+    docker pull mojdigitalstudio/hmpps-base-mysql:latest
+    '''
+}
+
+def do_nextcloud_db_backup(env_name, git_project_dir) {
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+        sh """
+        #!/usr/env/bin bash
+        echo "Nextcloud DB Backup for ${env_name}"
+        set +e
+        cd "${git_project_dir}"
+        CURRENT_DIR=\$(pwd)
+        # set region
+        docker run --rm -v \$(pwd):/home/tools/data \
+          -v \${HOME}/.aws:/home/tools/.aws \
+          -e RUN_MODE=true \
+          mojdigitalstudio/hmpps-base-mysql sh scripts/nextcloud_db_backup.sh db-backup ${env_name}
+        set -e
+        """
+    }
+}
+
+def debug_env() {
+    sh '''
+    #!/usr/env/bin bash
+    pwd
+    ls -al
+    '''
+}
+
+pipeline {
+
+    agent { label "jenkins_slave" }
+
+	stages {
+
+        stage('setup') {
+            steps {
+                slackSend(message: "Build started on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL.replace(':8080','')}|Open>)")
+                dir( project.alfresco ) {
+                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: project.branch, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                }
+
+				                prepare_env()
+				            }
+				        }
+
+				        stage('Nextcloud | DB Backup') {
+				          steps {
+				            script {
+				              do_nextcloud_db_backup(environment_name, project.mis)
+				            }
+				          }
+				        }
+				    }
+
+				    post {
+				        always {
+				            deleteDir()
+				        }
+				        success {
+				            slackSend(message: "Build completed on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} ", color: 'good')
+				        }
+				        failure {
+				            slackSend(message: "Build failed on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} ", color: 'danger')
+				        }
+				    }
+
+				}
