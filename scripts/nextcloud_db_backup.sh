@@ -4,6 +4,16 @@
 JOB_TYPE=$1
 TG_ENVIRONMENT_TYPE=${2}
 
+# Error handler function
+exit_on_error() {
+  exit_code=$1
+  last_command=${@:2}
+  if [ $exit_code -ne 0 ]; then
+      >&2 echo "\"${last_command}\" command failed with exit code ${exit_code}."
+      exit ${exit_code}
+  fi
+}
+
 ##Check args provided
 if [ -z "${JOB_TYPE}" ]
 then
@@ -44,7 +54,7 @@ set_env_stage ()
 
   echo "Using IAM role: ${TERRAGRUNT_IAM_ROLE}"
 
-  export OUTPUT_FILE="env_configs/temp_creds"
+  export OUTPUT_FILE="/home/tools/data/temp_creds"
 
   export temp_role=$(aws sts assume-role --role-arn ${TERRAGRUNT_IAM_ROLE} --role-session-name testing --duration-seconds ${STS_DURATION})
 }
@@ -60,7 +70,7 @@ get_creds_aws
 DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit $?
 DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit $?
 PREFIX_DATE=$(date +%F)
-BACKUP_DIR="/opt/local"
+BACKUP_DIR="/home/tools/data/backup"
 SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
 
 
@@ -70,8 +80,7 @@ case ${JOB_TYPE} in
   db-backup)
     echo "Running db backup"
 
-    # delete sql file from nfs share
-    rm -rf ${BACKUP_DIR}/*.sql
+    mkdir $BACKUP_DIR
 
     # Perform db backup
     mysqldump -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME > $SQL_FILE && echo Success || exit $?
@@ -80,8 +89,8 @@ case ${JOB_TYPE} in
     get_creds_aws
     aws s3 cp --only-show-errors ${SQL_FILE} s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${PREFIX_DATE}/ && echo Success || exit $?
 
-    # delete sql file from nfs share
-#    rm -rf ${SQL_FILE}
+    # delete sql file
+     rm -rf ${SQL_FILE}
 
     ;;
   *)
@@ -89,5 +98,3 @@ case ${JOB_TYPE} in
   ;;
 esac
 }
-
-ls -ltrh $BACKUP_DIR
