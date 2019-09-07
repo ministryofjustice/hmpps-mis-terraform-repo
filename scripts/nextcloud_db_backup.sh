@@ -51,30 +51,6 @@ set_env_stage ()
   export temp_role=$(aws sts assume-role --role-arn ${TERRAGRUNT_IAM_ROLE} --role-session-name testing --duration-seconds ${STS_DURATION})
 }
 
-#####################
-DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
-DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
-NEXT_CLOUD_DB_NAME="nextcloud"
-NEXTCLOUD_BACKUP_BUCKET="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-backups"
-DB_HOST="nextcloud-db.${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}.internal"
-PREFIX_DATE=$(date +%F)
-BACKUP_DIR="/home/tools/data/backup"
-SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
-
-# get creds
-get_creds_aws () {
-  sh scripts/get_creds.sh
-  source ${OUTPUT_FILE}
-  exit_on_error $? !!
-  rm -rf ${OUTPUT_FILE}
-  exit_on_error $? !!
-}
-
-#get db creds
-get_creds_aws
-DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit $?
-DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit $?
-
 ####Perform db backup or restore
 db_backup () {
 case ${JOB_TYPE} in
@@ -99,6 +75,33 @@ case ${JOB_TYPE} in
   ;;
 esac
 }
+
+
+###main
+#Vars
+######
+DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
+DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
+NEXT_CLOUD_DB_NAME="nextcloud"
+NEXTCLOUD_BACKUP_BUCKET="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-backups"
+DB_HOST="nextcloud-db.${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}.internal"
+PREFIX_DATE=$(date +%F)
+BACKUP_DIR="/home/tools/data/backup"
+SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
+
+# get creds
+get_creds_aws () {
+  sh scripts/get_creds.sh
+  source ${OUTPUT_FILE}
+  exit_on_error $? !!
+  rm -rf ${OUTPUT_FILE}
+  exit_on_error $? !!
+}
+
+#get db creds
+get_creds_aws
+DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit $?
+DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit $?
 
 set_env_stage
 db_backup
