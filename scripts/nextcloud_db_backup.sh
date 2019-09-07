@@ -57,7 +57,6 @@ DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIR
 NEXT_CLOUD_DB_NAME="nextcloud"
 NEXTCLOUD_BACKUP_BUCKET="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-backups"
 DB_HOST="nextcloud-db.${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}.internal"
-get_creds_aws
 PREFIX_DATE=$(date +%F)
 BACKUP_DIR="/home/tools/data/backup"
 SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
