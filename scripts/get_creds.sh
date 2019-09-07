@@ -1,7 +1,6 @@
 #!/bin/sh
 
 echo "outPUT = ${OUTPUT_FILE}"
-touch ${OUTPUT_FILE}
 echo "unset AWS_PROFILE
 AWS_DEFAULT_REGION=${TG_REGION}
 export AWS_ACCESS_KEY_ID=$(echo ${temp_role} | jq .Credentials.AccessKeyId | xargs)

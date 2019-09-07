@@ -31,7 +31,7 @@ set_env_stage ()
 
   echo "Using IAM role: ${TERRAGRUNT_IAM_ROLE}"
 
-  export OUTPUT_FILE="${BACKUP_DIR}/temp_creds"
+  export OUTPUT_FILE="${env_config_dir}/temp_creds"
 
   export temp_role=$(aws sts assume-role --role-arn ${TERRAGRUNT_IAM_ROLE} --role-session-name testing --duration-seconds 3600 )
 }
@@ -79,7 +79,6 @@ esac
 ########MAIN
 #Vars
 BACKUP_DIR="/home/tools/data/backup"
-OUTPUT_FILE="${BACKUP_DIR}/temp_creds"
 JOB_TYPE=$1
 TG_ENVIRONMENT_TYPE=${2}
 set_env_stage
