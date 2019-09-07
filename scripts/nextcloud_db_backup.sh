@@ -1,9 +1,5 @@
 #!/bin/bash
 
-####Arg VARS
-JOB_TYPE=$1
-TG_ENVIRONMENT_TYPE=${2}
-
 # Error handler function
 exit_on_error() {
   exit_code=$1
@@ -13,17 +9,6 @@ exit_on_error() {
       exit ${exit_code}
   fi
 }
-
-##Check args provided
-if [ -z "${JOB_TYPE}" ]
-then
-    echo "JOB_TYPE argument not supplied."
-    exit 1
-elif [ -z "${TG_ENVIRONMENT_TYPE}"]
-then
-    echo "TG_ENVIRONMENT_TYPE argument not supplied."
-    exit 1
-fi
 
 
 ###set environment
@@ -46,9 +31,18 @@ set_env_stage ()
 
   echo "Using IAM role: ${TERRAGRUNT_IAM_ROLE}"
 
-  export OUTPUT_FILE="/home/tools/data/temp_creds"
+  export OUTPUT_FILE="${BACKUP_DIR}/temp_creds"
 
   export temp_role=$(aws sts assume-role --role-arn ${TERRAGRUNT_IAM_ROLE} --role-session-name testing --duration-seconds ${STS_DURATION})
+}
+
+# get creds
+get_creds_aws () {
+  sh scripts/get_creds.sh
+  source ${OUTPUT_FILE}
+  exit_on_error $? !!
+  rm -rf ${OUTPUT_FILE}
+  exit_on_error $? !!
 }
 
 ####Perform db backup or restore
@@ -56,6 +50,11 @@ db_backup () {
 case ${JOB_TYPE} in
   db-backup)
     echo "Running db backup"
+
+    #get db creds
+    get_creds_aws
+    DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit $?
+    DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit $?
 
     mkdir $BACKUP_DIR
 
@@ -77,9 +76,14 @@ esac
 }
 
 
-###main
+########MAIN
 #Vars
-######
+BACKUP_DIR="/home/tools/data/backup"
+OUTPUT_FILE="${BACKUP_DIR}/temp_creds"
+set_env_stage
+
+JOB_TYPE=$1
+TG_ENVIRONMENT_TYPE=${2}
 DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
 DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
 NEXT_CLOUD_DB_NAME="nextcloud"
@@ -89,19 +93,16 @@ PREFIX_DATE=$(date +%F)
 BACKUP_DIR="/home/tools/data/backup"
 SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
 
-# get creds
-get_creds_aws () {
-  sh scripts/get_creds.sh
-  source ${OUTPUT_FILE}
-  exit_on_error $? !!
-  rm -rf ${OUTPUT_FILE}
-  exit_on_error $? !!
-}
 
-#get db creds
-get_creds_aws
-DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit $?
-DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit $?
+##Check args provided
+if [ -z "${JOB_TYPE}" ]
+then
+    echo "JOB_TYPE argument not supplied."
+    exit 1
+elif [ -z "${TG_ENVIRONMENT_TYPE}"]
+then
+    echo "TG_ENVIRONMENT_TYPE argument not supplied."
+    exit 1
+fi
 
-set_env_stage
 db_backup
