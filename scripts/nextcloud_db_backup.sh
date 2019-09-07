@@ -14,12 +14,13 @@ exit_on_error() {
 ###set environment
 set_env_stage ()
 {
-  env_config_dir="${HOME}/data/env_configs"
+  env_config_dir="/home/tools/data/env_configs"
 
   echo "Output -> clone configs stage"
   rm -rf ${env_config_dir}
   echo "Output ---> Cloning branch: master"
   git clone https://github.com/ministryofjustice/hmpps-env-configs.git ${env_config_dir}
+  ls  $env_config_dir
   exit_on_error $? !!
 
   echo "Output -> environment stage"
