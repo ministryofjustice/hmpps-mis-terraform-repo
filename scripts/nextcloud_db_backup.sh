@@ -99,3 +99,6 @@ case ${JOB_TYPE} in
   ;;
 esac
 }
+
+set_env_stage
+db_backup
