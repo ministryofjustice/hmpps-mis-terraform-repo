@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "outPUT = ${OUTPUT_FILE}"
 echo "unset AWS_PROFILE
