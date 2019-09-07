@@ -20,7 +20,6 @@ set_env_stage ()
   rm -rf ${env_config_dir}
   echo "Output ---> Cloning branch: master"
   git clone https://github.com/ministryofjustice/hmpps-env-configs.git ${env_config_dir}
-  ls  $env_config_dir
   exit_on_error $? !!
 
   echo "Output -> environment stage"
@@ -81,10 +80,11 @@ esac
 #Vars
 BACKUP_DIR="/home/tools/data/backup"
 OUTPUT_FILE="${BACKUP_DIR}/temp_creds"
-set_env_stage
-
 JOB_TYPE=$1
 TG_ENVIRONMENT_TYPE=${2}
+set_env_stage
+
+
 DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
 DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
 NEXT_CLOUD_DB_NAME="nextcloud"
