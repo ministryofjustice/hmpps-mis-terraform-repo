@@ -63,7 +63,7 @@ case ${JOB_TYPE} in
     mkdir $BACKUP_DIR
 
     # Perform db backup
-    mysqldump -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME > $SQL_FILE && echo Success || exit $?
+    mysqldump -u $DB_USER -p"$DB_PASS" -h $DB_HOS $NEXT_CLOUD_DB_NAME > $SQL_FILE && echo Success || exit $?
 
     # upload sql file
     get_creds_aws
