@@ -89,6 +89,17 @@ resource "aws_security_group_rule" "asg_http_in" {
   self                     = "true"
 }
 
+resource "aws_security_group_rule" "jenkins_db_in" {
+ security_group_id        = "${data.terraform_remote_state.security-groups.sg_mis_nextcloud_db}"
+ from_port                = "3306"
+ to_port                  = "3306"
+ protocol                 = "tcp"
+ type                     = "ingress"
+ description              = "jenkins-db-in"
+ cidr_blocks = [
+    "10.161.96.0/24",
+   ]
+}
 
 ####################################################
 # SG Rules for ldap
