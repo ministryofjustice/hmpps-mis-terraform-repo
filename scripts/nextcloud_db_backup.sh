@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set +e
 # Error handler function
 exit_on_error() {
   exit_code=$1
@@ -109,3 +109,4 @@ then
 fi
 
 db_backup
+set -e
