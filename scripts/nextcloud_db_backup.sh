@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 # Error handler function
 exit_on_error() {
   exit_code=$1
