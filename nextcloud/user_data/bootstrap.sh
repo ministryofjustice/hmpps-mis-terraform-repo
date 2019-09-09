@@ -22,6 +22,7 @@ DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
 DB_DNS_NAME="${db_dns_name}"
 LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 LDAP_USER="${ldap_bind_user}"
+BACKUP_BUCKET="${backup_bucket}"
 
 EOF
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
@@ -45,6 +46,7 @@ export DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
 export DB_DNS_NAME="${db_dns_name}"
 export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 export LDAP_USER="${ldap_bind_user}"
+export BACKUP_BUCKET="${backup_bucket}"
 
 
 cd ~
@@ -175,3 +177,39 @@ $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(
 
 #Start httpd service
 systemctl restart httpd ;
+
+#create crontab for efs backup
+efs_backup_script="/root/efs_backup_script"
+
+#create cron script
+cat << 'EOF' > /root/efs_backup_script
+#!/bin/bash
+
+#Vars
+PREFIX_DATE=$(date +%F)
+NEXTCLOUD_EFS_DIR="nextcloud_efs_backups"
+LOG_FILE="/var/log/efs_backup.log"
+DATA_DIR="/var/www/html/nextcloud/data"
+BACKUP_FILE="nextcloud_efs_backup.tar.gz"
+BACKUP_BUCKET=
+
+#Create log file
+test -f $LOG_FILE || touch $LOG_FILE
+#zip efs dir and push to s3
+echo "Backing up EFS Share"
+tar cfz - $DATA_DIR | aws s3 cp - s3://$BACKUP_BUCKET/$NEXTCLOUD_EFS_DIR/$PREFIX_DATE/$BACKUP_FILE && echo "$(date) : EFS Backup Success" >> $LOG_FILE || echo "$(date) : EFS Backup Failure" >> $LOG_FILE
+EOF
+
+#Add s3 bucket_name
+grep -q "BACKUP_BUCKET=$BACKUP_BUCKET" $${efs_backup_script} || sed -i "s/BACKUP_BUCKET=/BACKUP_BUCKET=$BACKUP_BUCKET/" $${efs_backup_script}
+chmod +x $${efs_backup_script}
+
+#Place cron job to backup efs
+AZ=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | cut -f3 -d"-")
+if [[ $AZ == "2a" ]] ; then
+    temp_cron_file="/tmp/temp_cron_file" ;
+    crontab -l > $temp_cron_file ;
+    grep -q "$efs_backup_script" $temp_cron_file || echo "00 21 * * 0 /usr/bin/sh $efs_backup_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
+else
+    rm -f $efs_backup_script
+fi

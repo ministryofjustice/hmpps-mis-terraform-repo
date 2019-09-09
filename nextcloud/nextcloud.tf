@@ -60,6 +60,7 @@ data "template_file" "nextcloud_user_data" {
     db_dns_name                  = "${local.db_dns_name}"
     ldap_bind_param              = "/${local.environment_name}/delius/apacheds/apacheds/ldap_admin_password"
     ldap_bind_user               = "${local.ldap_bind_user}"
+    backup_bucket                = "${local.backup_bucket}"
   }
 }
 
@@ -109,8 +110,6 @@ resource "aws_autoscaling_group" "asg" {
   name                      = "${local.environment_identifier}-${local.app_name}"
   vpc_zone_identifier       = ["${list(
     data.terraform_remote_state.vpc.vpc_private-subnet-az1,
-	data.terraform_remote_state.vpc.vpc_private-subnet-az2,
-    data.terraform_remote_state.vpc.vpc_private-subnet-az3,
   )}"]
   launch_configuration      = "${aws_launch_configuration.launch_cfg.id}"
   min_size                  = "${var.instance_count}"

@@ -174,4 +174,5 @@ locals {
   nextcloud_db_sg              = ["${data.terraform_remote_state.security-groups.sg_mis_nextcloud_db}",]
   db_dns_name                  = "${aws_route53_record.mariadb_dns_entry.fqdn}"
   ldap_bind_user               = "${data.terraform_remote_state.ldap_elb_name.ldap_bind_user}"
+  backup_bucket                = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket}"
 }
