@@ -5,7 +5,7 @@ project.branch = 'issue_111_nexcloud_deploy'
 def prepare_env() {
     sh '''
     #!/usr/env/bin bash
-    docker pull mojdigitalstudio/hmpps-base:latest
+    docker pull mojdigitalstudio/hmpps-base-mysql:latest
     '''
 }
 
@@ -20,7 +20,7 @@ def do_nextcloud_efs_backup(env_name, git_project_dir) {
         # set region
         docker run --rm -v \$(pwd):/home/tools/data \
           -v \${HOME}/.aws:/home/tools/.aws \
-          mojdigitalstudio/hmpps-base sh scripts/nextcloud_efs_backup.sh efs-backup ${env_name}
+          mojdigitalstudio/hmpps-base-mysql sh scripts/nextcloud_efs_backup.sh efs-backup ${env_name}
         set -e
         """
     }
