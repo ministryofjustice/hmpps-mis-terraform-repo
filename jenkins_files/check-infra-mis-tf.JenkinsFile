@@ -45,34 +45,42 @@ pipeline {
 
     agent { label "jenkins_slave" }
 
+    parameters {
+        string(name: 'MIS_BRANCH', description: 'Target Branch for hmpps-mis-terraform-repo', defaultValue: 'master')
+        string(name: 'CONFIG_BRANCH', description: 'Target Branch for hmpps-env-configs', defaultValue: 'master')
+    }
+
     stages {
 
         stage('setup') {
             steps {
                 dir( project.mis ) {
-                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: env.MIS_BRANCH, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
                 }
                 dir( project.config ) {
-                  git url: 'git@github.com:ministryofjustice/' + project.config, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                  git url: 'git@github.com:ministryofjustice/' + project.config, branch: env.CONFIG_BRANCH, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
                 }
 
                 prepare_env()
             }
         }
-
-        stage('Delius | MIS Common')           { steps { script {plan_submodule(project.config, environment_name, project.mis, 'common')}}}
-        stage('Delius | MIS Certs')            { steps { script {plan_submodule(project.config, environment_name, project.mis, 'certs')}}}
-        stage('Delius | MIS s3buckets')        { steps { script {plan_submodule(project.config, environment_name, project.mis, 's3buckets')}}}
-        stage('Delius | MIS iam')              { steps { script {plan_submodule(project.config, environment_name, project.mis, 'iam')}}}
-        stage('Delius | MIS security-groups')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'security-groups')}}}
-        stage('Delius | MIS database_mis')     { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_mis')}}}
-        stage('Delius | MIS database_misboe')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_misboe')}}}
-        stage('Delius | MIS database_misdsd')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_misdsd')}}}
-        stage('Delius | MIS ec2-ndl-dis')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-dis')}}}
-        stage('Delius | MIS ec2-ndl-bcs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bcs')}}}
-        stage('Delius | MIS ec2-ndl-bfs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bfs')}}}
-        stage('Delius | MIS ec2-ndl-bps')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bps')}}}
-        stage('Delius | MIS ec2-ndl-bws')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bws')}}}
+        stage('TF PLAN') {
+            parallel {
+                stage('Delius | MIS Common')           { steps { script {plan_submodule(project.config, environment_name, project.mis, 'common')}}}
+                stage('Delius | MIS Certs')            { steps { script {plan_submodule(project.config, environment_name, project.mis, 'certs')}}}
+                stage('Delius | MIS s3buckets')        { steps { script {plan_submodule(project.config, environment_name, project.mis, 's3buckets')}}}
+                stage('Delius | MIS iam')              { steps { script {plan_submodule(project.config, environment_name, project.mis, 'iam')}}}
+                stage('Delius | MIS security-groups')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'security-groups')}}}
+                stage('Delius | MIS database_mis')     { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_mis')}}}
+                stage('Delius | MIS database_misboe')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_misboe')}}}
+                stage('Delius | MIS database_misdsd')  { steps { script {plan_submodule(project.config, environment_name, project.mis, 'database_misdsd')}}}
+                stage('Delius | MIS ec2-ndl-dis')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-dis')}}}
+                stage('Delius | MIS ec2-ndl-bcs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bcs')}}}
+                stage('Delius | MIS ec2-ndl-bfs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bfs')}}}
+                stage('Delius | MIS ec2-ndl-bps')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bps')}}}
+                stage('Delius | MIS ec2-ndl-bws')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bws')}}}
+            }
+        }
     }
 
     post {
