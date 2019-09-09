@@ -45,35 +45,16 @@ get_creds_aws () {
   exit_on_error $? !!
 }
 
-####Perform db backup
-db_backup () {
+####Perform efs backup
+efs_backup () {
 case ${JOB_TYPE} in
-  db-backup)
-    echo "Running db backup"
-
-    #get db creds
-    get_creds_aws
-    DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit $?
-    DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit $?
-    DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db"
-    DB_HOST=$(aws rds describe-db-instances --region ${TG_REGION} --db-instance-identifier ${DB_IDENTIFIER} \
-                    --query 'DBInstances[*].[Endpoint]' | grep Address | awk '{print $2}' | sed 's/"//g') && echo Success || exit $?
-
-    mkdir $BACKUP_DIR
-
-    # Perform db backup
-    mysqldump -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME > $SQL_FILE && echo Success || exit $?
-
-    # upload sql file
-    get_creds_aws
-    aws s3 cp --only-show-errors ${SQL_FILE} s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${PREFIX_DATE}/ && echo Success || exit $?
-
-    # delete sql file
-     rm -rf ${SQL_FILE}
-
+  efs-backup)
+    echo "Running EFS backup"
+	mkdir $BACKUP_DIR
+    ping fs-b04be441.efs.eu-west-2.amazonaws.com
     ;;
   *)
-    echo "${JOB_TYPE} argument is not a valid argument. db-backup"
+    echo "${JOB_TYPE} argument is not a valid argument. efs-backup"
   ;;
 esac
 }
@@ -85,14 +66,8 @@ BACKUP_DIR="/home/tools/data/backup"
 JOB_TYPE=$1
 TG_ENVIRONMENT_TYPE=${2}
 set_env_stage
-
-
-DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
-DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
-NEXT_CLOUD_DB_NAME="nextcloud"
 NEXTCLOUD_BACKUP_BUCKET="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-backups"
 PREFIX_DATE=$(date +%F)
-SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
 
 
 ##Check args provided
@@ -106,4 +81,4 @@ then
     exit 1
 fi
 
-db_backup
+efs_backup
