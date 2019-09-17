@@ -13,7 +13,7 @@ variable "nextcloud_instance_type" {}
 variable "bastion_inventory" {}
 
 variable "instance_count" {
-  default = "1"
+  default = "3"
 }
 
 # LB
@@ -48,7 +48,6 @@ variable "password_length" {
 }
 
 
-####################################################################
 variable depends_on {
   default = []
   type    = "list"

@@ -61,6 +61,11 @@ data "template_file" "nextcloud_user_data" {
     ldap_bind_param              = "/${local.environment_name}/delius/apacheds/apacheds/ldap_admin_password"
     ldap_bind_user               = "${local.ldap_bind_user}"
     backup_bucket                = "${local.backup_bucket}"
+    redis_address                = "${local.redis_address}"
+    installer_user               = "${local.installer_user}"
+    config_passw                 = "${local.config_passw}"
+    mis_user                     = "${data.aws_ssm_parameter.user.value}"
+    mis_user_pass_name           = "${local.environment_identifier}-${local.mis_app_name}-admin-password"
   }
 }
 
@@ -81,6 +86,7 @@ resource "aws_launch_configuration" "launch_cfg" {
     "${local.sg_mis_app_in}",
     "${local.efs_security_groups}",
     "${local.nextcloud_db_sg}",
+    "${local.nextcloud_samba_sg}",
   ]
   enable_monitoring    = "true"
   associate_public_ip_address = false
@@ -110,6 +116,8 @@ resource "aws_autoscaling_group" "asg" {
   name                      = "${local.environment_identifier}-${local.app_name}"
   vpc_zone_identifier       = ["${list(
     data.terraform_remote_state.vpc.vpc_private-subnet-az1,
+	data.terraform_remote_state.vpc.vpc_private-subnet-az2,
+    data.terraform_remote_state.vpc.vpc_private-subnet-az3,
   )}"]
   launch_configuration      = "${aws_launch_configuration.launch_cfg.id}"
   min_size                  = "${var.instance_count}"
@@ -136,4 +144,10 @@ resource "aws_autoscaling_group" "asg" {
 resource "aws_autoscaling_attachment" "nextcloud_attachment" {
   autoscaling_group_name = "${aws_autoscaling_group.asg.id}"
   elb                    = "${module.nextcloud_lb.environment_elb_id}"
+}
+
+#samba_lb
+resource "aws_autoscaling_attachment" "samba_attachment" {
+  autoscaling_group_name = "${aws_autoscaling_group.asg.id}"
+  elb                    = "${aws_elb.samba_lb.id}"
 }

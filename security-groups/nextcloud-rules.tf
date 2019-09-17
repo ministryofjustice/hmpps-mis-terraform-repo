@@ -107,8 +107,8 @@ resource "aws_security_group_rule" "jenkins_db_in" {
 
 resource "aws_security_group_rule" "ldap_in" {
   security_group_id        = "${data.terraform_remote_state.delius_core_security_groups.sg_apacheds_ldap_private_elb_id}"
-  from_port                = 10389
-  to_port                  = 10389
+  from_port                = 389
+  to_port                  = 389
   protocol                 = "tcp"
   type                     = "ingress"
   description              = "nextcloud in to ldap lb"
@@ -117,10 +117,58 @@ resource "aws_security_group_rule" "ldap_in" {
 
  resource "aws_security_group_rule" "ldap_out" {
   security_group_id        = "${data.terraform_remote_state.security-groups.sg_https_out}"
-  from_port                = 10389
-  to_port                  = 10389
+  from_port                = 389
+  to_port                  = 389
   protocol                 = "tcp"
   type                     = "egress"
   description              = "nextcloud out to ldap lb"
   source_security_group_id = "${data.terraform_remote_state.delius_core_security_groups.sg_apacheds_ldap_private_elb_id}"
+}
+
+####################################################
+# SG Rules for Redis cache
+####################################################
+
+resource "aws_security_group_rule" "nextcloud_redis_out" {
+ security_group_id        = "${data.terraform_remote_state.security-groups.sg_https_out}"
+ from_port                = "6379"
+ to_port                  = "6379"
+ protocol                 = "tcp"
+ type                     = "egress"
+ description              = "${local.common_name}-redis-out"
+ self                     = "true"
+}
+
+resource "aws_security_group_rule" "nextcloud_redis_in" {
+ security_group_id        = "${data.terraform_remote_state.security-groups.sg_https_out}"
+ from_port                = "6379"
+ to_port                  = "6379"
+ protocol                 = "tcp"
+ type                     = "ingress"
+ description              = "${local.common_name}-redis-in"
+ self                     = "true"
+}
+
+####################################################
+# SG Rules for samba share
+####################################################
+
+resource "aws_security_group_rule" "samba_in" {
+  security_group_id        = "${data.terraform_remote_state.security-groups.sg_mis_samba}"
+  from_port                = 445
+  to_port                  = 445
+  protocol                 = "tcp"
+  type                     = "ingress"
+  description              = "SMB in from LB"
+  self                     = "true"
+}
+
+resource "aws_security_group_rule" "samba_out" {
+  security_group_id        = "${data.terraform_remote_state.security-groups.sg_mis_samba}"
+  from_port                = 445
+  to_port                  = 445
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "SMB out to LB"
+  self                     = "true"
 }

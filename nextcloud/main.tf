@@ -90,6 +90,19 @@ data "terraform_remote_state" "nextcloud" {
   }
 }
 
+
+#-------------------------------------------------------------
+## Getting the admin username and password
+#-------------------------------------------------------------
+data "aws_ssm_parameter" "user" {
+  name = "${local.environment_identifier}-${local.mis_app_name}-admin-user"
+}
+
+data "aws_ssm_parameter" "password" {
+  name = "${local.environment_identifier}-${local.mis_app_name}-admin-password"
+}
+
+
 #-------------------------------------------------------------
 ### Getting the ldap elb details
 #-------------------------------------------------------------
@@ -172,7 +185,11 @@ locals {
   efs_dns_name                 = "${module.efs_share.efs_dns_name}"
   nextcloud_db_user            = "${local.mis_app_name}${local.app_name}"
   nextcloud_db_sg              = ["${data.terraform_remote_state.security-groups.sg_mis_nextcloud_db}",]
+  nextcloud_samba_sg            = ["${data.terraform_remote_state.security-groups.sg_mis_samba}",]
   db_dns_name                  = "${aws_route53_record.mariadb_dns_entry.fqdn}"
   ldap_bind_user               = "${data.terraform_remote_state.ldap_elb_name.ldap_bind_user}"
   backup_bucket                = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket}"
+  redis_address                = "${aws_elasticache_cluster.nextcloud_cache.cache_nodes.0.address}"
+  installer_user               = "installer_user"
+  config_passw                 = "${local.environment_identifier}-${local.app_name}-config-password"
 }

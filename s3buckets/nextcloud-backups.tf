@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "backups" {
   }
 
   lifecycle {
-    prevent_destroy = false
+    prevent_destroy = true
   }
 
   server_side_encryption_configuration {
