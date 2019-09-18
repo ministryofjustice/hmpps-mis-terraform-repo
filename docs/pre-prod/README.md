@@ -24,12 +24,16 @@ SMTP User password - https://eu-west-2.console.aws.amazon.com/systems-manager/pa
 
 ```
 ndl-bcs-501.delius-pre-prod.internal
+ndl-bcs-502.delius-pre-prod.internal
+ndl-bcs-503.delius-pre-prod.internal
 ```
 
 #### External DNS  
 
 ```
 ndl-bcs-501.pre-prod.delius.probation.hmpps.dsd.io
+ndl-bcs-502.pre-prod.delius.probation.hmpps.dsd.io
+ndl-bcs-503.pre-prod.delius.probation.hmpps.dsd.io
 ```
 ## BFS
 
@@ -50,6 +54,8 @@ ndl-bfs-501.pre-prod.delius.probation.hmpps.dsd.io
 
 ```
 ndl-bps-501.delius-pre-prod.internal
+ndl-bps-502.delius-pre-prod.internal
+ndl-bps-503.delius-pre-prod.internal
 
 ```
 
@@ -57,21 +63,25 @@ ndl-bps-501.delius-pre-prod.internal
 
 ```
 ndl-bps-501.pre-prod.delius.probation.hmpps.dsd.io
+ndl-bps-502.pre-prod.delius.probation.hmpps.dsd.io
+ndl-bps-503.pre-prod.delius.probation.hmpps.dsd.io
 ```
 ## BWS
-BWS Endpoint [https://ndl-bws.pre-prod.delius.probation.hmpps.dsd.io](https://ndl-bws.pre-prod.delius.probation.hmpps.dsd.io)
+BWS Endpoint [https://ndl-bws.pre-prod.delius.probation.hmpps.dsd.io/BOE/BI](https://ndl-bws.pre-prod.delius.probation.hmpps.dsd.io/BOE/BI)
 
 #### Internal DNS  
 
 
 ```
 ndl-bws-501.delius-pre-prod.internal
+ndl-bws-502.delius-pre-prod.internal
 ```
 
 #### External DNS  
 
 ```
 ndl-bws-501.pre-prod.delius.probation.hmpps.dsd.io
+ndl-bws-502.pre-prod.delius.probation.hmpps.dsd.io
 ```
 ## DIS
 #### Internal DNS  
