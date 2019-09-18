@@ -64,6 +64,19 @@ data "terraform_remote_state" "security-groups" {
 }
 
 #-------------------------------------------------------------
+### Getting the security groups details
+#-------------------------------------------------------------
+data "terraform_remote_state" "security_groups" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "security-groups/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -113,7 +126,7 @@ locals {
   private_subnet_map           = "${data.terraform_remote_state.common.private_subnet_map}"
   s3bucket                     = "${data.terraform_remote_state.s3bucket.s3bucket}"
   app_hostnames                = "${data.terraform_remote_state.common.app_hostnames}"
-  nextcloud_samba_sg           = ["${data.terraform_remote_state.security-groups.sg_mis_samba}",]
+  nextcloud_samba_sg           = "${data.terraform_remote_state.security_groups.sg_mis_samba}"
 
   public_cidr_block  = ["${data.terraform_remote_state.common.db_cidr_block}"]
   private_cidr_block = ["${data.terraform_remote_state.common.private_cidr_block}"]
