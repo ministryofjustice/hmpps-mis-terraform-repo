@@ -1,6 +1,6 @@
 def project = [:]
 project.mis  = 'hmpps-mis-terraform-repo'
-project.branch = 'issue_111_nexcloud_deploy'
+project.branch = 'master'
 
 def prepare_env() {
     sh '''
