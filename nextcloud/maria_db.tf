@@ -1,6 +1,6 @@
 
 locals {
-  common_name         = "${local.environment_identifier}-${local.app_name}-db"
+  common_name         = "${local.environment_identifier}-${local.app_name}"
   dns_name            = "${local.app_name}-db"
 }
 
