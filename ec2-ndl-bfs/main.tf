@@ -113,6 +113,7 @@ locals {
   private_subnet_map           = "${data.terraform_remote_state.common.private_subnet_map}"
   s3bucket                     = "${data.terraform_remote_state.s3bucket.s3bucket}"
   app_hostnames                = "${data.terraform_remote_state.common.app_hostnames}"
+  nextcloud_samba_sg           = ["${data.terraform_remote_state.security-groups.sg_mis_samba}",]
 
   public_cidr_block  = ["${data.terraform_remote_state.common.db_cidr_block}"]
   private_cidr_block = ["${data.terraform_remote_state.common.private_cidr_block}"]
@@ -166,6 +167,7 @@ resource "aws_instance" "bfs_server" {
     "${local.sg_map_ids["sg_mis_app_in"]}",
     "${local.sg_map_ids["sg_mis_common"]}",
     "${local.sg_outbound_id}",
+    "${local.nextcloud_samba_sg}",
   ]
   key_name                    = "${local.ssh_deployer_key}"
 
