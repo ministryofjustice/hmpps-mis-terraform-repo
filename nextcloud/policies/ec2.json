@@ -1,0 +1,51 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ec2InstanceRole",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:Describe*"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+           "Sid": "ec2Pushtos3",
+           "Effect": "Allow",
+           "Action": [
+               "s3:PutObject",
+               "s3:PutObjectAcl",
+               "s3:GetObject",
+               "s3:ListBucket"
+           ],
+           "Resource": [
+                "${nextcloud_s3_bucket_arn}",
+                "${nextcloud_s3_bucket_arn}/*"
+           ]
+        },
+        {
+            "Sid": "GetParameters",
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameters"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "allowLoggingToCloudWatch",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams"
+            ],
+            "Resource": [
+                "arn:aws:logs:*:*:*"
+            ]
+        }
+
+    ]
+}
