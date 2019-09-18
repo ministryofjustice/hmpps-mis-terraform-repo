@@ -21,15 +21,15 @@
                "s3:ListBucket"
            ],
            "Resource": [
-                "*"
+                "${nextcloud_s3_bucket_arn}",
+                "${nextcloud_s3_bucket_arn}/*"
            ]
         },
         {
-            "Sid": "UpdateParameters",
+            "Sid": "GetParameters",
             "Effect": "Allow",
             "Action": [
-                "ssm:GetParameters",
-                "ssm:PutParameter"
+                "ssm:GetParameters"
             ],
             "Resource": "*"
         },
@@ -45,18 +45,7 @@
             "Resource": [
                 "arn:aws:logs:*:*:*"
             ]
-        },
-        {
-            "Sid": "allowRoute53Update",
-            "Effect": "Allow",
-            "Action": [
-                "route53:GetHostedZone",
-                "route53:ListHostedZones",
-                "route53:ChangeResourceRecordSets",
-                "route53:ListResourceRecordSets",
-                "route53:ListHostedZonesByName"
-            ],
-            "Resource": "*"
         }
+
     ]
 }

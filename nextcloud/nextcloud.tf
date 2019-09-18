@@ -21,6 +21,9 @@ module "iam_app_policy" {
 #-------------------------------------------------------------
 data "template_file" "iam_policy_app" {
   template = "${file("${path.module}/${local.ec2_role_policy_file}")}"
+  vars {
+    nextcloud_s3_bucket_arn = "${local.nextcloud_s3_bucket_arn}"
+  }
 }
 
 

@@ -64,7 +64,6 @@ pipeline {
                 prepare_env()
             }
         }
-        
         stage('TF PLAN') {
             parallel {
                 stage('Delius | MIS Common')           { steps { script {plan_submodule(project.config, environment_name, project.mis, 'common')}}}
@@ -90,5 +89,4 @@ pipeline {
             deleteDir()
         }
     }
-
 }

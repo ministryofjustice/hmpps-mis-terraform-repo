@@ -192,4 +192,5 @@ locals {
   redis_address                = "${aws_elasticache_cluster.nextcloud_cache.cache_nodes.0.address}"
   installer_user               = "installer_user"
   config_passw                 = "${local.environment_identifier}-${local.app_name}-config-password"
+  nextcloud_s3_bucket_arn      = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket_arn}"
 }
