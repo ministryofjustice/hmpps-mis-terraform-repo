@@ -57,3 +57,8 @@ output "iam_policy_int_mis_db_role_arn" {
 output "iam_policy_int_mis_db_instance_profile_name" {
   value = "${module.mis_db.iam_policy_int_app_instance_profile_name}"
 }
+
+#EC2 Backups
+output "mis_ec2_backup_role_arn" {
+  value = "${aws_iam_role.mis_ec2_backup_role.arn}"
+}

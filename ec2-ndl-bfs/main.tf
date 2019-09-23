@@ -5,7 +5,7 @@ terraform {
 
 provider "aws" {
   region  = "${var.region}"
-  version = "~> 1.16"
+  version = "~> 2.17"
 }
 
 ####################################################
@@ -101,6 +101,9 @@ data "aws_ami" "amazon_ami" {
     name   = "root-device-type"
     values = ["ebs"]
   }
+
+
+  owners   = ["895523100917"]
 }
 
 ####################################################
@@ -183,6 +186,11 @@ resource "aws_instance" "bfs_server" {
     "${local.nextcloud_samba_sg}",
   ]
   key_name                    = "${local.ssh_deployer_key}"
+
+  volume_tags = "${merge(
+    map("Name", "${local.environment_identifier}-${local.app_name}-${local.nart_prefix}${count.index + 1}"),
+    map("${var.snap_tag}", true)
+  )}"
 
   tags = "${merge(
     local.tags,
