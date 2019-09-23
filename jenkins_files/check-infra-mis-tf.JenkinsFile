@@ -46,7 +46,7 @@ pipeline {
     agent { label "jenkins_slave" }
 
     parameters {
-        string(name: 'MIS_BRANCH', description: 'Target Branch for hmpps-mis-terraform-repo', defaultValue: 'master')
+        string(name: 'MIS_BRANCH', description: 'Target Branch for hmpps-mis-terraform-repo', defaultValue: 'issue_127_backup_ec2_instances')
         string(name: 'CONFIG_BRANCH', description: 'Target Branch for hmpps-env-configs', defaultValue: 'master')
     }
 
@@ -80,6 +80,7 @@ pipeline {
                 stage('Delius | MIS ec2-ndl-bfs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bfs')}}}
                 stage('Delius | MIS ec2-ndl-bps')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bps')}}}
                 stage('Delius | MIS ec2-ndl-bws')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bws')}}}
+                stage('Delius | MIS ec2-backup')       { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-backup')}}}
             }
         }
     }
