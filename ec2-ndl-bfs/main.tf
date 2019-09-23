@@ -102,7 +102,6 @@ data "aws_ami" "amazon_ami" {
     values = ["ebs"]
   }
 
-
   owners   = ["895523100917"]
 }
 
