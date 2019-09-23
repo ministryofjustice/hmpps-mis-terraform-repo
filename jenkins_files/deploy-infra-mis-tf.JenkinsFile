@@ -160,7 +160,6 @@ pipeline {
      stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam')}}}
      stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups')}}}
      stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud')}}}
-     stage('Delius | MIS ec2-backup')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-backup')}}}
      stage('Provision Databases') {
        parallel {
          stage('Delius | MIS database_mis')     { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_mis')}}}
