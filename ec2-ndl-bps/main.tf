@@ -5,7 +5,7 @@ terraform {
 
 provider "aws" {
   region  = "${var.region}"
-  version = "~> 1.16"
+  version = "~> 2.17"
 }
 
 ####################################################
@@ -88,6 +88,8 @@ data "aws_ami" "amazon_ami" {
     name   = "root-device-type"
     values = ["ebs"]
   }
+
+  owners   = ["895523100917"]
 }
 
 ####################################################
@@ -123,7 +125,7 @@ locals {
   nart_role          = "ndl-bps-${data.terraform_remote_state.common.legacy_environment_name}"
   # Create a prefix that removes the final integer from the nart_role value
   nart_prefix = "${ substr(local.nart_role, 0, length(local.nart_role)-1) }"
-  sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}" 
+  sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 }
 
 #-------------------------------------------------------------
@@ -169,6 +171,11 @@ resource "aws_instance" "bps_server" {
     "${local.sg_map_ids["sg_delius_db_out"]}",
   ]
   key_name                    = "${local.ssh_deployer_key}"
+
+  volume_tags = "${merge(
+    map("Name", "${local.environment_identifier}-${local.app_name}-${local.nart_prefix}${count.index + 1}"),
+    map("${var.snap_tag}", true)
+  )}"  
 
   tags = "${merge(
     local.tags,
