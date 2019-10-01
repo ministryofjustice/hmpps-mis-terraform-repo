@@ -17,7 +17,7 @@
            ],
            "period":300,
            "stat":"Average",
-           "region":"eu-west-2",
+           "region":"${region}",
            "title":"BWS LB Hosts"
         }
      }
