@@ -1,0 +1,25 @@
+{
+  "widgets": [
+    {
+        "type":"metric",
+        "x":0,
+        "y":0,
+        "width":12,
+        "height":6,
+        "properties":{
+           "metrics":[
+              [
+                 "AWS/ELB",
+                 "HealthyHostCount",
+                 "LoadBalancerName",
+                 "${bws_lb_name}"
+              ]
+           ],
+           "period":300,
+           "stat":"Average",
+           "region":"eu-west-2",
+           "title":"BWS LB Hosts"
+        }
+     }
+ ]
+}
