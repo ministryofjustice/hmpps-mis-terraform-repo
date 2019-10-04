@@ -51,3 +51,31 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
               LoadBalancerName  = "${local.bws_lb_name}"
   }
 }
+
+
+resource "aws_cloudwatch_metric_alarm" "ses_auth_fail" {
+  alarm_name                = "Ses_Auth_Fail_Alarm"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "${aws_cloudwatch_log_metric_filter.SesAuthenticationFail.name}"
+  namespace                 = "AWS/LogMetrics"
+  period                    = "60"
+  statistic                 = "Sum"
+  threshold                 = "1"
+  alarm_description         = "This metric monitors BWS lb Latency"
+  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  treat_missing_data        = "notBreaching"
+}
+
+
+resource "aws_cloudwatch_log_metric_filter" "SesAuthenticationFail" {
+  name           = "SesAuthenticationFail"
+  pattern        = "535 Authentication Credentials Invalid"
+  log_group_name = "${var.short_environment_identifier}/smtp_logs"
+
+  metric_transformation {
+    name      = "EventCount"
+    namespace = "smtp"
+    value     = "1"
+  }
+}

@@ -11,3 +11,5 @@ variable "environment_type" {
 variable "alarms_enabled" {
   type = "string"
 }
+
+variable "short_environment_identifier" {}
