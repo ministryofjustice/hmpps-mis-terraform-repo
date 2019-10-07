@@ -5,7 +5,7 @@ terraform {
 
 provider "aws" {
   region  = "${var.region}"
-  version = "~> 1.16"
+  version = "~> 2.17"
 }
 
 ####################################################
@@ -150,6 +150,7 @@ data "aws_ami" "amazon_ami" {
     name = "root-device-type"
     values = ["ebs"]
   }
+  owners   = ["895523100917"]
 }
 
 locals {
