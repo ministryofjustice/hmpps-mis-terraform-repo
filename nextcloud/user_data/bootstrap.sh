@@ -201,8 +201,8 @@ systemctl stop redis ;
 #Configure php memory limit
 sed -i 's/memory_limit = 128M/memory_limit = 513M/' /etc/php.ini
 
-#create crontab for efs backup
-confibackup_script="/root/confibackup_script"
+#create crontab for config backup
+config_backup_script="/root/config_backup_script"
 
 #create cron script
 cat << 'EOF' > /root/config_backup_script
@@ -242,10 +242,8 @@ chmod +x $config_backup_script
 if [[ $AZ == "2a" ]] ; then
     temp_cron_file="/tmp/temp_cron_file" ;
     crontab -l > $temp_cron_file ;
-    grep -q "$config_backup_script" $temp_cron_file || echo "00 01 * * * /usr/bin/sh $confibackup_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
+    grep -q "$config_backup_script" $temp_cron_file || echo "00 01 * * * /usr/bin/sh $config_backup_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
     rm -f $temp_cron_file
-else
-    rm -f $confibackup_script
 fi
 
 
