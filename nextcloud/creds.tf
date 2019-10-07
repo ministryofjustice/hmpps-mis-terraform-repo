@@ -35,7 +35,7 @@ resource "random_string" "nextcloud_special" {
   special          = true
   min_upper        = 2
   min_special      = 2
-  override_special = "!@$%&*()-_=+[]{}<>:?"
+  override_special = "!$%&*()-_=+[]{}<>"
   }
 
 

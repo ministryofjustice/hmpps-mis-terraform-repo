@@ -223,3 +223,19 @@ variable "character_set_name" {
 variable "tags" {
   type = "map"
 }
+
+variable "snap_tag" {
+  default = "Name"
+}
+
+variable "environment_name" {}
+
+variable "ebs_backup" {
+  type = "map"
+
+  default = {
+    schedule           = "cron(0 01 * * ? *)"
+    cold_storage_after = 14
+    delete_after       = 120
+  }
+}
