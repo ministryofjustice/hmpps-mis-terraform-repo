@@ -57,7 +57,6 @@ resource "aws_lb_cookie_stickiness_policy" "bws" {
   name                     = "bws-policy"
   load_balancer            = "${module.create_app_elb.environment_elb_name}"
   lb_port                  = 443
-  cookie_expiration_period = 1800
 }
 
 
