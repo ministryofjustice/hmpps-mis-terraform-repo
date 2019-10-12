@@ -21,7 +21,7 @@ variable "cross_zone_load_balancing" {
 
 variable "idle_timeout" {
   description = "The time in seconds that the connection is allowed to be idle"
-  default     = 60
+  default     = 1800
 }
 
 variable "connection_draining" {
