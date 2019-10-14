@@ -97,8 +97,6 @@ EOF
 ansible-galaxy install -f -r ~/requirements.yml      >> $USER_DATA_LOG_FILE 2>&1
 ansible-playbook ~/bootstrap.yml                     >> $USER_DATA_LOG_FILE 2>&1
 
-
-
 #vars
 web_user="apache"
 web_user_home="/usr/share/httpd"
@@ -126,15 +124,13 @@ yum -y install unzip ;
 yum-config-manager --disable remi-php54 ;
 yum-config-manager --enable remi-php73 ;
 
-
 #install Apache and PHP packages
 yum -y install httpd php php-cli php-mysqlnd php-zip php-devel php-gd php-mcrypt php-mbstring php-curl php-xml php-pear php-bcmath php-json php-pdo php-pecl-apcu php-pecl-apcu-devel php-intl php71-php-pecl-imagick php-ldap redis php-pecl-redis zip mariadb ;
-
 systemctl enable httpd ;
 
 #Download and install nextcloud
-aws s3 cp s3://$BACKUP_BUCKET/installer/nextcloud-16.0.3.zip . ;  >> $USER_DATA_LOG_FILE 2>&1
-unzip nextcloud-16.0.3.zip ;       >> $USER_DATA_LOG_FILE 2>&1
+aws s3 cp s3://$BACKUP_BUCKET/installer/nextcloud-16.0.3.zip .  >> $USER_DATA_LOG_FILE 2>&1 ;
+unzip nextcloud-16.0.3.zip       >> $USER_DATA_LOG_FILE 2>&1 ;
 rm -f *.zip ;
 
 #move nextcloud folder to /var/www/html
@@ -185,9 +181,11 @@ $sudo_cmd -u $web_user php $occ_cmd config:system:set trusted_domains 0 --value=
 $sudo_cmd -u $web_user php $occ_cmd config:system:set overwritehost --value=nextcloud.$EXTERNAL_DOMAIN             >> $USER_DATA_LOG_FILE 2>&1 ;
 $sudo_cmd -u $web_user php $occ_cmd config:system:set overwriteprotocol --value=https                              >> $USER_DATA_LOG_FILE 2>&1 ;
 $sudo_cmd -u $web_user php $occ_cmd config:system:set overwrite.cli.url --value=https://$EXTERNAL_DOMAIN           >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set filesystem_check_changes --value="1"                         >> $USER_DATA_LOG_FILE 2>&1 ;
 
 $sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp                                                      >> $USER_DATA_LOG_FILE 2>&1 ; #Enable 2f app
 $sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap                                                           >> $USER_DATA_LOG_FILE 2>&1 ; #Enable Ldap App
+$sudo_cmd -u $web_user php $occ_cmd config:app:set files default_quota --value="5 GB"                              >> $USER_DATA_LOG_FILE 2>&1 ; #Set default disk qouata
 
 #Configure ldap authentication
 $sudo_cmd -u $web_user php $occ_cmd ldap:delete-config s01                                                                  >> $USER_DATA_LOG_FILE 2>&1 ;
@@ -196,10 +194,11 @@ $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapHost "$LDAP_HOST"   
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapPort "$LDAP_PORT"                                               >> $USER_DATA_LOG_FILE 2>&1 ;
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentName "$LDAP_USER"                                          >> $USER_DATA_LOG_FILE 2>&1 ;
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentPassword "$LDAP_USER_PASS"                                 >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "$BASE_DN"                                                 >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(memberOf=NEXTCLOUD-USER)))"                    >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(memberOf=NEXTCLOUD-USER)))(|(cn=%uid)))"    >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilterAttributes "cn"                                      >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "ou=Fileshare,ou=Users,dc=moj,dc=com;ou=Users,dc=moj,dc=com"                            >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(objectclass=inetOrgPerson)))"                                               >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(objectclass=inetOrgPerson)))(|(mailPrimaryAddress=%uid)(mail=%uid)))"    >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseGroups  "ou=Fileshare,ou=Groups,dc=moj,dc=com"                                           >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseUsers  "ou=Users,dc=moj,dc=com"                                             >> $USER_DATA_LOG_FILE 2>&1 ;
 
 #Configure Redis
 $sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"    >> $USER_DATA_LOG_FILE 2>&1 ;
@@ -212,7 +211,6 @@ $sudo_cmd -u $web_user php $occ_cmd config:system:set redis timeout --value=1.5 
 $sudo_cmd -u $web_user php $occ_cmd config:system:set csrf.disabled --value="true"                            >> $USER_DATA_LOG_FILE 2>&1 ;
 echo "completed -fresh_next_cloud_install" >> $USER_DATA_LOG_FILE 2>&1
 }
-
 
 nextcloud_install_from_config ()
 {
@@ -252,7 +250,6 @@ fresh_next_cloud_install
 nextcloud_install_from_config
 pull_config
 
-
 #stop Redis
 systemctl stop redis ;
 
@@ -262,7 +259,7 @@ sed -i 's/memory_limit = 128M/memory_limit = 513M/' /etc/php.ini
 #create crontab for config backup
 config_backup_script="/root/config_backup_script"
 
-#create cron script
+#create cron scripts
 cat << 'EOF' > /root/config_backup_script
 #!/bin/bash
 
@@ -275,7 +272,6 @@ CONFIG_DIR="/root"
 NEXTCLOUD_CONFIGS_DIR="nextcloud_config_backups"
 CONFIG_PASSW=
 CONFIG_PASS=$(aws ssm get-parameters --with-decryption --names $CONFIG_PASSW --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-
 
 #Create log file
 test -f $LOG_FILE || touch $LOG_FILE
@@ -301,7 +297,6 @@ crontab -l > $temp_cron_file ;
 grep -q "$config_backup_script" $temp_cron_file || echo "00 01 * * * /usr/bin/sh $config_backup_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
 rm -f $temp_cron_file
 
-
 ##Samba share
 SAMBA_USER_PASS=$(aws ssm get-parameters --with-decryption --names $MIS_USER_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
@@ -316,7 +311,14 @@ usermod -a -G apache $web_user ;
 #configure samba pass
 echo -ne "$SAMBA_USER_PASS\n$SAMBA_USER_PASS\n" | smbpasswd -a -s $SAMBA_USER ;
 
-chmod -R 0770  $SAMBA_DIR ;
+chmod -R 770  $SAMBA_DIR ;
+
+cat << EOF > /etc/samba/samba-dfree
+#!/bin/bash
+echo "8000000000 8000000000"
+EOF
+
+chmod +x /etc/samba/samba-dfree
 
 ###Configure samba
 cat << EOF > /etc/samba/smb.conf
@@ -329,6 +331,8 @@ cat << EOF > /etc/samba/smb.conf
         printcap name = cups
         load printers = yes
         cups options = raw
+        dfree command = /etc/samba/samba-dfree
+        dfree cache time = 60
 [Secure]
         comment = Secure File Server Share
         path =   $SAMBA_DIR
@@ -337,6 +341,21 @@ cat << EOF > /etc/samba/smb.conf
         writable = yes
         browsable = yes
 EOF
+
+#Cron job to change shared files ownership to apache every 5 mins in case of new files delivered out side of nextcloud
+apache_ownerership_script="/root/apache_ownerership_script"
+cat << EOF > /root/apache_ownerership_script
+#!/bin/bash
+chown -R $web_user:$web_user $SAMBA_DIR
+chmod -R 770  $SAMBA_DIR
+EOF
+
+#Place cron job to chown shared folders
+temp_cron_file="/tmp/temp_cron_file" ;
+crontab -l > $temp_cron_file ;
+grep -q "$apache_ownerership_script" $temp_cron_file || echo "05 * * * * /usr/bin/sh $apache_ownerership_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
+rm -f $temp_cron_file
+
 
 #Start and enable  samba
 systemctl start smb.service ;
