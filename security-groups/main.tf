@@ -55,21 +55,22 @@ data "terraform_remote_state" "delius_core_security_groups" {
 ####################################################
 
 locals {
-  vpc_id                  = "${data.terraform_remote_state.common.vpc_id}"
-  cidr_block              = "${data.terraform_remote_state.common.vpc_cidr_block}"
-  user_access_cidr_blocks = ["${var.user_access_cidr_blocks}"]
-  bastion_cidr            = ["${data.terraform_remote_state.common.bastion_cidr}"]
-  common_name             = "${data.terraform_remote_state.common.common_name}"
-  region                  = "${data.terraform_remote_state.common.region}"
-  app_name                = "${data.terraform_remote_state.common.mis_app_name}"
-  environment_identifier  = "${data.terraform_remote_state.common.environment_identifier}"
-  environment             = "${data.terraform_remote_state.common.environment}"
-  tags                    = "${data.terraform_remote_state.common.common_tags}"
-  public_cidr_block       = ["${data.terraform_remote_state.common.db_cidr_block}"]
-  private_cidr_block      = ["${data.terraform_remote_state.common.private_cidr_block}"]
-  db_cidr_block           = ["${data.terraform_remote_state.common.db_cidr_block}"]
-  bws_port                = "${var.bws_port}"
-  sg_outbound_id          = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+  vpc_id                      = "${data.terraform_remote_state.common.vpc_id}"
+  cidr_block                  = "${data.terraform_remote_state.common.vpc_cidr_block}"
+  user_access_cidr_blocks     = ["${var.user_access_cidr_blocks}"]
+  env_user_access_cidr_blocks = ["${var.env_user_access_cidr_blocks}"]
+  bastion_cidr                = ["${data.terraform_remote_state.common.bastion_cidr}"]
+  common_name                 = "${data.terraform_remote_state.common.common_name}"
+  region                      = "${data.terraform_remote_state.common.region}"
+  app_name                    = "${data.terraform_remote_state.common.mis_app_name}"
+  environment_identifier      = "${data.terraform_remote_state.common.environment_identifier}"
+  environment                 = "${data.terraform_remote_state.common.environment}"
+  tags                        = "${data.terraform_remote_state.common.common_tags}"
+  public_cidr_block           = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  private_cidr_block          = ["${data.terraform_remote_state.common.private_cidr_block}"]
+  db_cidr_block               = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  bws_port                    = "${var.bws_port}"
+  sg_outbound_id              = "${data.terraform_remote_state.common.common_sg_outbound_id}"
 
   sg_map_ids = {
     sg_mis_db_in  = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"

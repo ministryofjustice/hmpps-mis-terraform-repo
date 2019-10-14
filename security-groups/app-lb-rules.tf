@@ -9,6 +9,7 @@ resource "aws_security_group_rule" "lb_https_in" {
 
   cidr_blocks = [
     "${local.user_access_cidr_blocks}",
+    "${local.env_user_access_cidr_blocks}",
   ]
 }
 
