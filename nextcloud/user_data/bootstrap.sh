@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-USER_DATA_LOG_FILE="/var/log/user_data_log"
-yum install -y python-pip git wget unzip  > $USER_DATA_LOG_FILE 2>&1
+set -x
+exec > >(tee /var/log/user-data.log|logger -t user-data ) 2>&1
+
+yum install -y python-pip git wget unzip
 
 cat << EOF >> /etc/environment
 HMPPS_ROLE=${app_name}
@@ -61,7 +63,7 @@ export MIS_USER_PASS_NAME="${mis_user_pass_name}"
 
 
 cd ~
-pip install ansible              >> $USER_DATA_LOG_FILE 2>&1
+pip install ansible
 
 cat << EOF > ~/requirements.yml
 - name: bootstrap
@@ -75,7 +77,7 @@ cat << EOF > ~/requirements.yml
   src: singleplatform-eng.users
 EOF
 
-wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml   >> $USER_DATA_LOG_FILE 2>&1
+wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
 
 cat << EOF > ~/vars.yml
 # For user_update cron
@@ -94,8 +96,8 @@ cat << EOF > ~/bootstrap.yml
      - users
 EOF
 
-ansible-galaxy install -f -r ~/requirements.yml      >> $USER_DATA_LOG_FILE 2>&1
-ansible-playbook ~/bootstrap.yml                     >> $USER_DATA_LOG_FILE 2>&1
+ansible-galaxy install -f -r ~/requirements.yml
+ansible-playbook ~/bootstrap.yml
 
 #vars
 web_user="apache"
@@ -129,12 +131,12 @@ yum -y install httpd php php-cli php-mysqlnd php-zip php-devel php-gd php-mcrypt
 systemctl enable httpd ;
 
 #Download and install nextcloud
-aws s3 cp s3://$BACKUP_BUCKET/installer/nextcloud-16.0.3.zip .  >> $USER_DATA_LOG_FILE 2>&1 ;
-unzip nextcloud-16.0.3.zip       >> $USER_DATA_LOG_FILE 2>&1 ;
+aws s3 cp s3://$BACKUP_BUCKET/installer/nextcloud-16.0.3.zip .  ;
+unzip nextcloud-16.0.3.zip       ;
 rm -f *.zip ;
 
 #move nextcloud folder to /var/www/html
-mv nextcloud/ /var/www/html/ ;   >> $USER_DATA_LOG_FILE 2>&1
+mv nextcloud/ /var/www/html/ ;
 
 #Create directory Store
 mkdir -p $DATA_DIR ;
@@ -143,7 +145,7 @@ mkdir -p $DATA_DIR ;
 yum -y install nfs-utils ;
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab ;
 mount -a ;
-chown -R $web_user:$web_user $NEXT_CLOUD_DIR >> $USER_DATA_LOG_FILE 2>&1 ;
+chown -R $web_user:$web_user $NEXT_CLOUD_DIR ;
 
 
 #Configure Apache VirtualHost
@@ -165,84 +167,84 @@ EOF
 #Start REDIS
 systemctl start redis ;
 
-chown -R $web_user:$web_user $DATA_DIR >> $USER_DATA_LOG_FILE 2>&1 ;
+chown -R $web_user:$web_user $DATA_DIR ;
 
 fresh_next_cloud_install ()
 {
 #Install and configure nextcloud
-echo "commencing -fresh_next_cloud_install" >> $USER_DATA_LOG_FILE 2>&1
+echo "commencing -fresh_next_cloud_install"
 cd $NEXT_CLOUD_DIR ;
 $sudo_cmd -u $web_user php $occ_cmd maintenance:install --database "mysql" \
     --database-host "$DB_DNS_NAME"  \
     --database-name "nextcloud"  --database-user "$NEXTCLOUD_DB_USER" --database-pass "$NEXTCLOUD_DB_PASS" \
-        --admin-user "$NEXTCLOUD_ADMIN" --admin-pass "$NEXTCLOUD_ADMIN_PASSWORD"   --data-dir "$DATA_DIR"          >> $USER_DATA_LOG_FILE 2>&1 ;
+        --admin-user "$NEXTCLOUD_ADMIN" --admin-pass "$NEXTCLOUD_ADMIN_PASSWORD"   --data-dir "$DATA_DIR"          ;
 
-$sudo_cmd -u $web_user php $occ_cmd config:system:set trusted_domains 0 --value=nextcloud.$EXTERNAL_DOMAIN         >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwritehost --value=nextcloud.$EXTERNAL_DOMAIN             >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwriteprotocol --value=https                              >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwrite.cli.url --value=https://$EXTERNAL_DOMAIN           >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set filesystem_check_changes --value="1"                         >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set trusted_domains 0 --value=nextcloud.$EXTERNAL_DOMAIN         ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set overwritehost --value=nextcloud.$EXTERNAL_DOMAIN             ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set overwriteprotocol --value=https                              ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set overwrite.cli.url --value=https://$EXTERNAL_DOMAIN           ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set filesystem_check_changes --value="1"                         ;
 
-$sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp                                                      >> $USER_DATA_LOG_FILE 2>&1 ; #Enable 2f app
-$sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap                                                           >> $USER_DATA_LOG_FILE 2>&1 ; #Enable Ldap App
-$sudo_cmd -u $web_user php $occ_cmd config:app:set files default_quota --value="5 GB"                              >> $USER_DATA_LOG_FILE 2>&1 ; #Set default disk qouata
+$sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp                                                      ; #Enable 2f app
+$sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap                                                           ; #Enable Ldap App
+$sudo_cmd -u $web_user php $occ_cmd config:app:set files default_quota --value="5 GB"                              ; #Set default disk qouata
 
 #Configure ldap authentication
-$sudo_cmd -u $web_user php $occ_cmd ldap:delete-config s01                                                                  >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:create-empty-config                                                                >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapHost "$LDAP_HOST"                                               >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapPort "$LDAP_PORT"                                               >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentName "$LDAP_USER"                                          >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentPassword "$LDAP_USER_PASS"                                 >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "ou=Fileshare,ou=Users,dc=moj,dc=com;ou=Users,dc=moj,dc=com"                            >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(objectclass=inetOrgPerson)))"                                               >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(objectclass=inetOrgPerson)))(|(mailPrimaryAddress=%uid)(mail=%uid)))"    >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseGroups  "ou=Fileshare,ou=Groups,dc=moj,dc=com"                                           >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseUsers  "ou=Users,dc=moj,dc=com"                                             >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:delete-config s01                                                                  ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:create-empty-config                                                                ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapHost "$LDAP_HOST"                                               ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapPort "$LDAP_PORT"                                               ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentName "$LDAP_USER"                                          ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentPassword "$LDAP_USER_PASS"                                 ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "ou=Fileshare,ou=Users,dc=moj,dc=com;ou=Users,dc=moj,dc=com"                            ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(objectclass=inetOrgPerson)))"                                               ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(objectclass=inetOrgPerson)))(|(mailPrimaryAddress=%uid)(mail=%uid)))"    ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseGroups  "ou=Fileshare,ou=Groups,dc=moj,dc=com"                                           ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseUsers  "ou=Users,dc=moj,dc=com"                                             ;
 
 #Configure Redis
-$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"    >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.locking --value="\\OC\\Memcache\\Redis"        >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set filelocking.enabled --value="true"                      >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis host --value="$REDIS_ADDRESS"                     >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis port --value="6379"                               >> $USER_DATA_LOG_FILE 2>&1 ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis timeout --value=1.5                               >> $USER_DATA_LOG_FILE 2>&1 ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"    ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.locking --value="\\OC\\Memcache\\Redis"        ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set filelocking.enabled --value="true"                      ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set redis host --value="$REDIS_ADDRESS"                     ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set redis port --value="6379"                               ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set redis timeout --value=1.5                               ;
 
-$sudo_cmd -u $web_user php $occ_cmd config:system:set csrf.disabled --value="true"                            >> $USER_DATA_LOG_FILE 2>&1 ;
-echo "completed -fresh_next_cloud_install" >> $USER_DATA_LOG_FILE 2>&1
+$sudo_cmd -u $web_user php $occ_cmd config:system:set csrf.disabled --value="true"                            ;
+echo "completed -fresh_next_cloud_install"
 }
 
 nextcloud_install_from_config ()
 {
-echo "commencing -nextcloud_install_from_config" >> $USER_DATA_LOG_FILE 2>&1
+echo "commencing -nextcloud_install_from_config"
 #Generate temp default config.php to allow import of config from s3
 #Will be overwritten by config import
 temp_data_dir="/var/tmp/nextcloud/data"
 mkdir -p $temp_data_dir
 chown $web_user:$web_user $temp_data_dir
 cd $NEXT_CLOUD_DIR
-$sudo_cmd -u $web_user php $occ_cmd maintenance:install --database "sqlite" --admin-user "$INSTALLER_USER" --admin-pass "$INSTALLER_USER" --data-dir "/var/tmp/nextcloud/data"   >> $USER_DATA_LOG_FILE 2>&1
+$sudo_cmd -u $web_user php $occ_cmd maintenance:install --database "sqlite" --admin-user "$INSTALLER_USER" --admin-pass "$INSTALLER_USER" --data-dir "/var/tmp/nextcloud/data"
 
-$sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp   >> $USER_DATA_LOG_FILE 2>&1#Enable 2f app
-$sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap        >> $USER_DATA_LOG_FILE 2>&1  #Enable Ldap App
-echo "completed -nextcloud_install_from_config" >> $USER_DATA_LOG_FILE 2>&1
+$sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp  #Enable 2f app
+$sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap         #Enable Ldap App
+echo "completed -nextcloud_install_from_config"
 }
 
 pull_config ()
 {
-echo "commencing -pull_config" >> $USER_DATA_LOG_FILE 2>&1
+echo "commencing -pull_config"
 #Pull and import latest config from backup
 cd $web_user_home
-aws s3 cp s3://$BACKUP_BUCKET/nextcloud_config_backups/$CONFIG_EXPORT_FILE $web_user_home/   >> $USER_DATA_LOG_FILE 2>&1
-unzip -P "$CONFIG_PASS" $CONFIG_EXPORT_FILE       >> $USER_DATA_LOG_FILE 2>&1
-chown $web_user:$web_user $UNZIPPED_CONF_FILE     >> $USER_DATA_LOG_FILE 2>&1
+aws s3 cp s3://$BACKUP_BUCKET/nextcloud_config_backups/$CONFIG_EXPORT_FILE $web_user_home/
+unzip -P "$CONFIG_PASS" $CONFIG_EXPORT_FILE
+chown $web_user:$web_user $UNZIPPED_CONF_FILE
 cd $NEXT_CLOUD_DIR
-$sudo_cmd -u $web_user php $occ_cmd config:import $web_user_home/$UNZIPPED_CONF_FILE         >> $USER_DATA_LOG_FILE 2>&1
+$sudo_cmd -u $web_user php $occ_cmd config:import $web_user_home/$UNZIPPED_CONF_FILE
 
 #Reset admin user pass in case it is differennt to the one in the db
 export OC_PASS="$NEXTCLOUD_ADMIN_PASSWORD"
-su -s /bin/sh apache -c "php occ user:resetpassword --password-from-env $NEXTCLOUD_ADMIN"     >> $USER_DATA_LOG_FILE 2>&1
-echo "completed -pull_config" >> $USER_DATA_LOG_FILE 2>&1
+su -s /bin/sh apache -c "php occ user:resetpassword --password-from-env $NEXTCLOUD_ADMIN"
+echo "completed -pull_config"
 }
 
 #Install Nextcloud and import config
@@ -343,17 +345,19 @@ cat << EOF > /etc/samba/smb.conf
 EOF
 
 #Cron job to change shared files ownership to apache every 5 mins in case of new files delivered out side of nextcloud
-apache_ownerership_script="/root/apache_ownerership_script"
-cat << EOF > /root/apache_ownerership_script
+apache_ownership_script="/root/apache_ownership_script"
+cat << EOF > /root/apache_ownership_script
 #!/bin/bash
 chown -R $web_user:$web_user $SAMBA_DIR
 chmod -R 770  $SAMBA_DIR
 EOF
 
+chmod +x $apache_ownership_script
+
 #Place cron job to chown shared folders
 temp_cron_file="/tmp/temp_cron_file" ;
 crontab -l > $temp_cron_file ;
-grep -q "$apache_ownerership_script" $temp_cron_file || echo "05 * * * * /usr/bin/sh $apache_ownerership_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
+grep -q "$apache_ownership_script" $temp_cron_file || echo "*/5 * * * * /usr/bin/sh $apache_ownership_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
 rm -f $temp_cron_file
 
 
