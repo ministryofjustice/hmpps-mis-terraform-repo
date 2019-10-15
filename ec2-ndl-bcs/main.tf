@@ -140,7 +140,7 @@ locals {
   nart_prefix = "${ substr(local.nart_role, 0, length(local.nart_role)-1) }"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
   sg_bws_ldap        = "${data.terraform_remote_state.network-security-groups.sg_bws_ldap}"
-  nextcloud_samba_sg = "${data.terraform_remote_state.security_groups.sg_mis_samba}"
+  nextcloud_samba_sg = "${data.terraform_remote_state.network-security-groups.sg_mis_samba}"
 }
 
 #-------------------------------------------------------------

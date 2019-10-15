@@ -64,6 +64,19 @@ data "terraform_remote_state" "security-groups" {
 }
 
 #-------------------------------------------------------------
+### Getting the sg details
+#-------------------------------------------------------------
+data "terraform_remote_state" "network-security-groups" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "security-groups/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -126,7 +139,7 @@ locals {
   # Create a prefix that removes the final integer from the nart_role value
   nart_prefix = "${ substr(local.nart_role, 0, length(local.nart_role)-1) }"
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
-  nextcloud_samba_sg = "${data.terraform_remote_state.security_groups.sg_mis_samba}"
+  nextcloud_samba_sg = "${data.terraform_remote_state.network-security-groups.sg_mis_samba}"
 }
 
 #-------------------------------------------------------------

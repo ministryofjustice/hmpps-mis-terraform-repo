@@ -152,7 +152,7 @@ locals {
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
   bws_port           = "${data.terraform_remote_state.security-groups.bws_port}"
   sg_bws_ldap        = "${data.terraform_remote_state.network-security-groups.sg_bws_ldap}"
-  nextcloud_samba_sg = "${data.terraform_remote_state.security_groups.sg_mis_samba}"
+  nextcloud_samba_sg = "${data.terraform_remote_state.network-security-groups.sg_mis_samba}"
 }
 
 #-------------------------------------------------------------

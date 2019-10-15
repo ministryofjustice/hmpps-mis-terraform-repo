@@ -322,7 +322,7 @@ usermod -a -G apache $REPORT_USER ;
 echo -ne "$SAMBA_USER_PASS\n$SAMBA_USER_PASS\n" | smbpasswd -a -s $SAMBA_USER ;
 echo -ne "$REPORT_USER_PASSWD\n$REPORT_USER_PASSWD\n" | smbpasswd -a -s $REPORT_USER ;
 
-chmod -R 770  $SAMBA_DIR ;
+chmod -R 0770  $SAMBA_DIR ;
 
 cat << EOF > /etc/samba/samba-dfree
 #!/bin/bash
@@ -358,7 +358,7 @@ apache_ownership_script="/root/apache_ownership_script"
 cat << EOF > /root/apache_ownership_script
 #!/bin/bash
 chown -R $web_user:$web_user $SAMBA_DIR
-chmod -R 77s0  $SAMBA_DIR
+chmod -R 0770  $SAMBA_DIR
 $sudo_cmd -u $web_user php $occ_cmd  files:scan $NEXTCLOUD_ADMIN
 EOF
 

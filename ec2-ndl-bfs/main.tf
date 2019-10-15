@@ -64,9 +64,9 @@ data "terraform_remote_state" "security-groups" {
 }
 
 #-------------------------------------------------------------
-### Getting the security groups details
+### Getting the sg details
 #-------------------------------------------------------------
-data "terraform_remote_state" "security_groups" {
+data "terraform_remote_state" "network-security-groups" {
   backend = "s3"
 
   config {
@@ -128,7 +128,7 @@ locals {
   private_subnet_map           = "${data.terraform_remote_state.common.private_subnet_map}"
   s3bucket                     = "${data.terraform_remote_state.s3bucket.s3bucket}"
   app_hostnames                = "${data.terraform_remote_state.common.app_hostnames}"
-  nextcloud_samba_sg           = "${data.terraform_remote_state.security_groups.sg_mis_samba}"
+  nextcloud_samba_sg           = "${data.terraform_remote_state.network-security-groups.sg_mis_samba}"
 
   public_cidr_block  = ["${data.terraform_remote_state.common.db_cidr_block}"]
   private_cidr_block = ["${data.terraform_remote_state.common.private_cidr_block}"]
