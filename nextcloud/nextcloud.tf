@@ -69,6 +69,7 @@ data "template_file" "nextcloud_user_data" {
     config_passw                 = "${local.config_passw}"
     mis_user                     = "${data.aws_ssm_parameter.user.value}"
     mis_user_pass_name           = "${local.environment_identifier}-${local.mis_app_name}-admin-password"
+    reports_pass_name            = "${local.environment_identifier}-reports-admin-password"
   }
 }
 

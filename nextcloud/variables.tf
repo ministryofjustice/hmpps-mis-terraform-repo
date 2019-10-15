@@ -13,7 +13,7 @@ variable "nextcloud_instance_type" {}
 variable "bastion_inventory" {}
 
 variable "instance_count" {
-  default = "1"
+  default = "2"
 }
 
 # LB

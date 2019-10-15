@@ -152,6 +152,7 @@ locals {
   sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
   bws_port           = "${data.terraform_remote_state.security-groups.bws_port}"
   sg_bws_ldap        = "${data.terraform_remote_state.network-security-groups.sg_bws_ldap}"
+  nextcloud_samba_sg = "${data.terraform_remote_state.network-security-groups.sg_mis_samba}"
 }
 
 #-------------------------------------------------------------
@@ -196,7 +197,8 @@ resource "aws_instance" "bws_server" {
     "${local.sg_map_ids["sg_mis_common"]}",
     "${local.sg_outbound_id}",
     "${local.sg_map_ids["sg_delius_db_out"]}",
-    "${local.sg_bws_ldap}"
+    "${local.sg_bws_ldap}",
+    "${local.nextcloud_samba_sg}",
   ]
   key_name                    = "${local.ssh_deployer_key}"
 
