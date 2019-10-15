@@ -349,7 +349,8 @@ apache_ownership_script="/root/apache_ownership_script"
 cat << EOF > /root/apache_ownership_script
 #!/bin/bash
 chown -R $web_user:$web_user $SAMBA_DIR
-chmod -R 770  $SAMBA_DIR
+chmod -R 760  $SAMBA_DIR
+$sudo_cmd -u $web_user php $occ_cmd  files:scan $NEXTCLOUD_ADMIN
 EOF
 
 chmod +x $apache_ownership_script
