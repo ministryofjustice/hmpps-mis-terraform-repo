@@ -31,6 +31,7 @@ INSTALLER_USER="${installer_user}"
 CONFIG_PASSW="${config_passw}"
 SAMBA_USER="${mis_user}"
 MIS_USER_PASS_NAME="${mis_user_pass_name}"
+REPORTS_PASS_NAME="${reports_pass_name}"
 
 EOF
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
@@ -60,6 +61,7 @@ export INSTALLER_USER="${installer_user}"
 export CONFIG_PASSW="${config_passw}"
 export SAMBA_USER="${mis_user}"
 export MIS_USER_PASS_NAME="${mis_user_pass_name}"
+export REPORTS_PASS_NAME="${reports_pass_name}"
 
 
 cd ~
@@ -301,17 +303,24 @@ rm -f $temp_cron_file
 
 ##Samba share
 SAMBA_USER_PASS=$(aws ssm get-parameters --with-decryption --names $MIS_USER_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
 SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
+
 yum install samba samba-client samba-common -y ;
 groupadd smbgrp ;
 useradd $SAMBA_USER ;
+useradd $REPORT_USER ;
 usermod -a -G smbgrp $SAMBA_USER ;
 usermod -a -G apache $SAMBA_USER ;
 usermod -a -G smbgrp $web_user ;
 usermod -a -G apache $web_user ;
+usermod -a -G smbgrp $REPORT_USER ;
+usermod -a -G apache $REPORT_USER ;
 
 #configure samba pass
 echo -ne "$SAMBA_USER_PASS\n$SAMBA_USER_PASS\n" | smbpasswd -a -s $SAMBA_USER ;
+echo -ne "$REPORT_USER_PASSWD\n$REPORT_USER_PASSWD\n" | smbpasswd -a -s $REPORT_USER ;
 
 chmod -R 770  $SAMBA_DIR ;
 
@@ -349,7 +358,7 @@ apache_ownership_script="/root/apache_ownership_script"
 cat << EOF > /root/apache_ownership_script
 #!/bin/bash
 chown -R $web_user:$web_user $SAMBA_DIR
-chmod -R 760  $SAMBA_DIR
+chmod -R 77s0  $SAMBA_DIR
 $sudo_cmd -u $web_user php $occ_cmd  files:scan $NEXTCLOUD_ADMIN
 EOF
 
