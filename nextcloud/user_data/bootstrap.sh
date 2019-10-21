@@ -118,36 +118,38 @@ PREFIX_DATE=$(date +%F)
 CONFIG_EXPORT_FILE="$PREFIX_DATE-nextcloud-config.json.zip"
 UNZIPPED_CONF_FILE="$PREFIX_DATE-nextcloud-config.json"
 NEXT_CLOUD_DIR="/var/www/html/nextcloud"
+INSTALLER_URL="https://download.nextcloud.com/server/releases/nextcloud-16.0.3.zip"
+ZIPPED_INSTALLER="nextcloud-16.0.3.zip"
 
 #Nextcloud install
-yum -y install epel-release yum-utils ;
-yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm ;
-yum -y install unzip ;
+yum -y install epel-release yum-utils
+yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+yum -y install unzip
 
 #Enable PHP 7.3
-yum-config-manager --disable remi-php54 ;
-yum-config-manager --enable remi-php73 ;
+yum-config-manager --disable remi-php54
+yum-config-manager --enable remi-php73
 
 #install Apache and PHP packages
-yum -y install httpd php php-cli php-mysqlnd php-zip php-devel php-gd php-mcrypt php-mbstring php-curl php-xml php-pear php-bcmath php-json php-pdo php-pecl-apcu php-pecl-apcu-devel php-intl php71-php-pecl-imagick php-ldap redis php-pecl-redis zip mariadb ;
-systemctl enable httpd ;
+yum -y install httpd php php-cli php-mysqlnd php-zip php-devel php-gd php-mcrypt php-mbstring php-curl php-xml php-pear php-bcmath php-json php-pdo php-pecl-apcu php-pecl-apcu-devel php-intl php71-php-pecl-imagick php-ldap redis php-pecl-redis zip mariadb
+systemctl enable httpd
 
 #Download and install nextcloud
-aws s3 cp s3://$BACKUP_BUCKET/installer/nextcloud-16.0.3.zip .  ;
-unzip nextcloud-16.0.3.zip       ;
-rm -f *.zip ;
+aws s3 cp s3://$BACKUP_BUCKET/installer/$ZIPPED_INSTALLER . || curl $INSTALLER_URL --output $ZIPPED_INSTALLER
+unzip $ZIPPED_INSTALLER
+rm -f *.zip
 
 #move nextcloud folder to /var/www/html
-mv nextcloud/ /var/www/html/ ;
+mv nextcloud/ /var/www/html/
 
 #Create directory Store
-mkdir -p $DATA_DIR ;
+mkdir -p $DATA_DIR
 
 #Mount efs
-yum -y install nfs-utils ;
-echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab ;
-mount -a ;
-chown -R $web_user:$web_user $NEXT_CLOUD_DIR ;
+yum -y install nfs-utils
+echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
+mount -a
+chown -R $web_user:$web_user $NEXT_CLOUD_DIR
 
 
 #Configure Apache VirtualHost
@@ -167,52 +169,52 @@ cat << EOF > /etc/httpd/conf.d/nextcloud.conf
 EOF
 
 #Start REDIS
-systemctl start redis ;
+systemctl start redis
 
-chown -R $web_user:$web_user $DATA_DIR ;
+chown -R $web_user:$web_user $DATA_DIR
 
 fresh_next_cloud_install ()
 {
 #Install and configure nextcloud
 echo "commencing -fresh_next_cloud_install"
-cd $NEXT_CLOUD_DIR ;
+cd $NEXT_CLOUD_DIR
 $sudo_cmd -u $web_user php $occ_cmd maintenance:install --database "mysql" \
     --database-host "$DB_DNS_NAME"  \
     --database-name "nextcloud"  --database-user "$NEXTCLOUD_DB_USER" --database-pass "$NEXTCLOUD_DB_PASS" \
-        --admin-user "$NEXTCLOUD_ADMIN" --admin-pass "$NEXTCLOUD_ADMIN_PASSWORD"   --data-dir "$DATA_DIR"          ;
+        --admin-user "$NEXTCLOUD_ADMIN" --admin-pass "$NEXTCLOUD_ADMIN_PASSWORD"   --data-dir "$DATA_DIR"
 
-$sudo_cmd -u $web_user php $occ_cmd config:system:set trusted_domains 0 --value=nextcloud.$EXTERNAL_DOMAIN         ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwritehost --value=nextcloud.$EXTERNAL_DOMAIN             ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwriteprotocol --value=https                              ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwrite.cli.url --value=https://$EXTERNAL_DOMAIN           ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set filesystem_check_changes --value="1"                         ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set trusted_domains 0 --value=nextcloud.$EXTERNAL_DOMAIN
+$sudo_cmd -u $web_user php $occ_cmd config:system:set overwritehost --value=nextcloud.$EXTERNAL_DOMAIN
+$sudo_cmd -u $web_user php $occ_cmd config:system:set overwriteprotocol --value=https
+$sudo_cmd -u $web_user php $occ_cmd config:system:set overwrite.cli.url --value=https://$EXTERNAL_DOMAIN
+$sudo_cmd -u $web_user php $occ_cmd config:system:set filesystem_check_changes --value="1"
 
-$sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp                                                      ; #Enable 2f app
-$sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap                                                           ; #Enable Ldap App
-$sudo_cmd -u $web_user php $occ_cmd config:app:set files default_quota --value="5 GB"                              ; #Set default disk qouata
+$sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp                                                       #Enable 2f app
+$sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap                                                            #Enable Ldap App
+$sudo_cmd -u $web_user php $occ_cmd config:app:set files default_quota --value="5 GB"                               #Set default disk qouata
 
 #Configure ldap authentication
-$sudo_cmd -u $web_user php $occ_cmd ldap:delete-config s01                                                                  ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:create-empty-config                                                                ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapHost "$LDAP_HOST"                                               ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapPort "$LDAP_PORT"                                               ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentName "$LDAP_USER"                                          ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentPassword "$LDAP_USER_PASS"                                 ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "ou=Fileshare,ou=Users,dc=moj,dc=com;ou=Users,dc=moj,dc=com"                            ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(objectclass=inetOrgPerson)))"                                               ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(objectclass=inetOrgPerson)))(|(mailPrimaryAddress=%uid)(mail=%uid)))"    ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseGroups  "ou=Fileshare,ou=Groups,dc=moj,dc=com"                                           ;
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseUsers  "ou=Users,dc=moj,dc=com"                                             ;
+$sudo_cmd -u $web_user php $occ_cmd ldap:delete-config s01
+$sudo_cmd -u $web_user php $occ_cmd ldap:create-empty-config
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapHost "$LDAP_HOST"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapPort "$LDAP_PORT"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentName "$LDAP_USER"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentPassword "$LDAP_USER_PASS"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "ou=Fileshare,ou=Users,dc=moj,dc=com;ou=Users,dc=moj,dc=com"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(objectclass=inetOrgPerson)))"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(objectclass=inetOrgPerson)))(|(mailPrimaryAddress=%uid)(mail=%uid)))"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseGroups  "ou=Fileshare,ou=Groups,dc=moj,dc=com"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseUsers  "ou=Users,dc=moj,dc=com"
 
 #Configure Redis
-$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"    ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.locking --value="\\OC\\Memcache\\Redis"        ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set filelocking.enabled --value="true"                      ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis host --value="$REDIS_ADDRESS"                     ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis port --value="6379"                               ;
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis timeout --value=1.5                               ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"
+$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.locking --value="\\OC\\Memcache\\Redis"
+$sudo_cmd -u $web_user php $occ_cmd config:system:set filelocking.enabled --value="true"
+$sudo_cmd -u $web_user php $occ_cmd config:system:set redis host --value="$REDIS_ADDRESS"
+$sudo_cmd -u $web_user php $occ_cmd config:system:set redis port --value="6379"
+$sudo_cmd -u $web_user php $occ_cmd config:system:set redis timeout --value=1.5
 
-$sudo_cmd -u $web_user php $occ_cmd config:system:set csrf.disabled --value="true"                            ;
+$sudo_cmd -u $web_user php $occ_cmd config:system:set csrf.disabled --value="true"
 echo "completed -fresh_next_cloud_install"
 }
 
@@ -255,7 +257,7 @@ nextcloud_install_from_config
 pull_config
 
 #stop Redis
-systemctl stop redis ;
+systemctl stop redis
 
 #Configure php memory limit
 sed -i 's/memory_limit = 128M/memory_limit = 513M/' /etc/php.ini
@@ -296,8 +298,8 @@ grep -q "CONFIG_PASSW=$CONFIG_PASSW"   $config_backup_script || sed -i "s/CONFIG
 chmod +x $config_backup_script
 
 #Place cron job to backup config
-temp_cron_file="/tmp/temp_cron_file" ;
-crontab -l > $temp_cron_file ;
+temp_cron_file="/tmp/temp_cron_file"
+crontab -l > $temp_cron_file
 grep -q "$config_backup_script" $temp_cron_file || echo "00 01 * * * /usr/bin/sh $config_backup_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
 rm -f $temp_cron_file
 
@@ -307,22 +309,22 @@ REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user
 REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
 SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
 
-yum install samba samba-client samba-common -y ;
-groupadd smbgrp ;
-useradd $SAMBA_USER ;
-useradd $REPORT_USER ;
-usermod -a -G smbgrp $SAMBA_USER ;
-usermod -a -G apache $SAMBA_USER ;
-usermod -a -G smbgrp $web_user ;
-usermod -a -G apache $web_user ;
-usermod -a -G smbgrp $REPORT_USER ;
-usermod -a -G apache $REPORT_USER ;
+yum install samba samba-client samba-common -y
+groupadd smbgrp
+useradd $SAMBA_USER
+useradd $REPORT_USER
+usermod -a -G smbgrp $SAMBA_USER
+usermod -a -G apache $SAMBA_USER
+usermod -a -G smbgrp $web_user
+usermod -a -G apache $web_user
+usermod -a -G smbgrp $REPORT_USER
+usermod -a -G apache $REPORT_USER
 
 #configure samba pass
-echo -ne "$SAMBA_USER_PASS\n$SAMBA_USER_PASS\n" | smbpasswd -a -s $SAMBA_USER ;
-echo -ne "$REPORT_USER_PASSWD\n$REPORT_USER_PASSWD\n" | smbpasswd -a -s $REPORT_USER ;
+echo -ne "$SAMBA_USER_PASS\n$SAMBA_USER_PASS\n" | smbpasswd -a -s $SAMBA_USER
+echo -ne "$REPORT_USER_PASSWD\n$REPORT_USER_PASSWD\n" | smbpasswd -a -s $REPORT_USER
 
-chmod -R 0770  $SAMBA_DIR ;
+chmod -R 0770  $SAMBA_DIR
 
 cat << EOF > /etc/samba/samba-dfree
 #!/bin/bash
@@ -365,13 +367,13 @@ EOF
 chmod +x $apache_ownership_script
 
 #Place cron job to chown shared folders
-temp_cron_file="/tmp/temp_cron_file" ;
-crontab -l > $temp_cron_file ;
+temp_cron_file="/tmp/temp_cron_file"
+crontab -l > $temp_cron_file
 grep -q "$apache_ownership_script" $temp_cron_file || echo "*/5 * * * * /usr/bin/sh $apache_ownership_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
 rm -f $temp_cron_file
 
 
 #Start and enable  samba
-systemctl start smb.service ;
-systemctl enable smb.service ;
-systemctl start httpd;
+systemctl start smb.service
+systemctl enable smb.service
+systemctl start httpd
