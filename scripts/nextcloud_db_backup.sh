@@ -55,7 +55,9 @@ case ${JOB_TYPE} in
     get_creds_aws
     DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit $?
     DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit $?
-    DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db"
+    DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud"
+    exit_on_error $? !!
+
     DB_HOST=$(aws rds describe-db-instances --region ${TG_REGION} --db-instance-identifier ${DB_IDENTIFIER} \
                     --query 'DBInstances[*].[Endpoint]' | grep Address | awk '{print $2}' | sed 's/"//g') && echo Success || exit $?
 
@@ -63,10 +65,12 @@ case ${JOB_TYPE} in
 
     # Perform db backup
     mysqldump -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME > $SQL_FILE && echo Success || exit $?
+    exit_on_error $? !!
 
     # upload sql file
     get_creds_aws
     aws s3 cp --only-show-errors ${SQL_FILE} s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${PREFIX_DATE}/ && echo Success || exit $?
+    exit_on_error $? !!
 
     # delete sql file
      rm -rf ${SQL_FILE}
