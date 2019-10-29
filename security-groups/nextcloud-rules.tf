@@ -173,3 +173,13 @@ resource "aws_security_group_rule" "samba_out" {
   description              = "SMB out to LB"
   self                     = "true"
 }
+
+resource "aws_security_group_rule" "samba_in_deliusdb" {
+ security_group_id        = "${data.terraform_remote_state.security-groups.sg_mis_samba}"
+ from_port                = 445
+ to_port                  = 445
+ protocol                 = "tcp"
+ type                     = "ingress"
+ description              = "delius db in to nextcloud"
+ source_security_group_id = "${data.terraform_remote_state.delius_core_security_groups.sg_delius_db_out_id}"
+}
