@@ -50,6 +50,19 @@ data "terraform_remote_state" "delius_core_security_groups" {
   }
 }
 
+#-------------------------------------------------------------
+### Getting the Nat gateway details
+#-------------------------------------------------------------
+data "terraform_remote_state" "natgateway" {
+  backend = "s3"
+
+   config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "natgateway/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
 ####################################################
 # Locals
 ####################################################
@@ -71,6 +84,9 @@ locals {
   db_cidr_block               = ["${data.terraform_remote_state.common.db_cidr_block}"]
   bws_port                    = "${var.bws_port}"
   sg_outbound_id              = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+  natgateway_az1              = "${data.terraform_remote_state.natgateway.natgateway_common-nat-public-ip-az1}/32"
+  natgateway_az2              = "${data.terraform_remote_state.natgateway.natgateway_common-nat-public-ip-az2}/32"
+  natgateway_az3              = "${data.terraform_remote_state.natgateway.natgateway_common-nat-public-ip-az3}/32"
 
   sg_map_ids = {
     sg_mis_db_in  = "${data.terraform_remote_state.security-groups.sg_mis_db_in}"
