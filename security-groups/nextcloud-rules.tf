@@ -14,6 +14,9 @@ resource "aws_security_group_rule" "https_in" {
   cidr_blocks = [
      "${local.user_access_cidr_blocks}",
      "${local.env_user_access_cidr_blocks}",
+     "${local.natgateway_az1}",
+     "${local.natgateway_az2}",
+     "${local.natgateway_az3}",
     ]
 }
 
@@ -172,14 +175,4 @@ resource "aws_security_group_rule" "samba_out" {
   type                     = "egress"
   description              = "SMB out to LB"
   self                     = "true"
-}
-
-resource "aws_security_group_rule" "samba_in_deliusdb" {
- security_group_id        = "${data.terraform_remote_state.security-groups.sg_mis_samba}"
- from_port                = 445
- to_port                  = 445
- protocol                 = "tcp"
- type                     = "ingress"
- description              = "delius db in to nextcloud"
- source_security_group_id = "${data.terraform_remote_state.delius_core_security_groups.sg_delius_db_out_id}"
 }
