@@ -14,3 +14,8 @@ output "nextcloud_efs_share_dns" {
 output "private_fqdn_samba_elb" {
   value = "${aws_route53_record.samba_lb_private.fqdn}"
 }
+
+
+output "nextcloud_lb_name" {
+  value = "${module.nextcloud_lb.environment_elb_name}"
+}
