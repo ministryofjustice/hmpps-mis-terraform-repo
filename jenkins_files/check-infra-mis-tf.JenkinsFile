@@ -46,8 +46,8 @@ pipeline {
     agent { label "jenkins_slave" }
 
     parameters {
-        string(name: 'MIS_BRANCH', description: 'Target Branch for hmpps-mis-terraform-repo', defaultValue: 'master')
-        string(name: 'CONFIG_BRANCH', description: 'Target Branch for hmpps-env-configs', defaultValue: 'master')
+        string(name: 'MIS_BRANCH', description: 'Target Branch for hmpps-mis-terraform-repo', defaultValue: 'issue_129_mis_monitoring')
+        string(name: 'CONFIG_BRANCH', description: 'Target Branch for hmpps-env-configs', defaultValue: 'issue_550_deploy_mis_in_delius_test')
     }
 
     stages {
