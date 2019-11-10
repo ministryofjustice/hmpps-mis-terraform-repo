@@ -80,6 +80,7 @@ pipeline {
                 stage('Delius | MIS ec2-ndl-bfs')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bfs')}}}
                 stage('Delius | MIS ec2-ndl-bps')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bps')}}}
                 stage('Delius | MIS ec2-ndl-bws')      { steps { script {plan_submodule(project.config, environment_name, project.mis, 'ec2-ndl-bws')}}}
+                stage('Delius | MIS monitoring')       { steps { script {plan_submodule(project.config, environment_name, project.mis, 'monitoring')}}}
             }
         }
     }
