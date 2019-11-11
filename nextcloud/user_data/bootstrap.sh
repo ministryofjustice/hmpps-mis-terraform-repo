@@ -304,43 +304,16 @@ grep -q "$config_backup_script" $temp_cron_file || echo "00 01 * * * /usr/bin/sh
 rm -f $temp_cron_file
 
 #Create DIRS if not present
-cat << 'EOF' > /tmp/shared_files
-CRC:bench
-CRC:bgsw
-CRC:cgm
-CRC:cl
-CRC:ddc
-CRC:dlnr
-CRC:dtv
-CRC:essex
-CRC:hampshire
-CRC:hlny
-CRC:kss
-CRC:london
-CRC:merseyside
-CRC:northumbria
-CRC:ns
-CRC:south-yorkshire
-CRC:swm
-CRC:thames
-CRC:wales
-CRC:west-yorkshire
-CRC:wwm
-National:cfo
-National:wmt
-NPS:
-EOF
-
+folder_file="shared_files.txt"
+aws s3 cp s3://$BACKUP_BUCKET/$folder_file /tmp/
 ##Create Folders
 SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
-for folder in $(cat /tmp/shared_files) ;
+for folder in $(cat /tmp/$folder_file) ;
     do top_dir=$(echo $folder | cut -f1 -d:) ;
     low_dir=$(echo $folder | cut -f2 -d:) ;
     test -d $SAMBA_DIR/$top_dir/$low_dir || mkdir -p $SAMBA_DIR/$top_dir/$low_dir ;
 done
 
-#remove temp folder list
-rm -rf /tmp/shared_files
 
 
 ##Samba share
