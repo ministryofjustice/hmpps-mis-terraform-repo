@@ -303,11 +303,50 @@ crontab -l > $temp_cron_file
 grep -q "$config_backup_script" $temp_cron_file || echo "00 01 * * * /usr/bin/sh $config_backup_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
 rm -f $temp_cron_file
 
+#Create DIRS if not present
+cat << 'EOF' > /tmp/shared_files
+CRC:bench
+CRC:bgsw
+CRC:cgm
+CRC:cl
+CRC:ddc
+CRC:dlnr
+CRC:dtv
+CRC:essex
+CRC:hampshire
+CRC:hlny
+CRC:kss
+CRC:london
+CRC:merseyside
+CRC:northumbria
+CRC:ns
+CRC:south-yorkshire
+CRC:swm
+CRC:thames
+CRC:wales
+CRC:west-yorkshire
+CRC:wwm
+National:cfo
+National:wmt
+NPS:
+EOF
+
+##Create Folders
+SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
+for folder in $(cat /tmp/shared_files) ;
+    do top_dir=$(echo $folder | cut -f1 -d:) ;
+    low_dir=$(echo $folder | cut -f2 -d:) ;
+    test -d $SAMBA_DIR/$top_dir/$low_dir || mkdir -p $SAMBA_DIR/$top_dir/$low_dir ;
+done
+
+#remove temp folder list
+rm -rf /tmp/shared_files
+
+
 ##Samba share
 SAMBA_USER_PASS=$(aws ssm get-parameters --with-decryption --names $MIS_USER_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
-SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
 
 yum install samba samba-client samba-common -y
 groupadd smbgrp
@@ -371,7 +410,6 @@ temp_cron_file="/tmp/temp_cron_file"
 crontab -l > $temp_cron_file
 grep -q "$apache_ownership_script" $temp_cron_file || echo "*/5 * * * * /usr/bin/sh $apache_ownership_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
 rm -f $temp_cron_file
-
 
 #Start and enable  samba
 systemctl start smb.service
