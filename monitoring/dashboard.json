@@ -119,6 +119,126 @@
           "position": "hidden"
         }
       }
+    },
+    {
+      "type":"metric",
+      "x":12,
+      "y":12,
+      "width":12,
+      "height":6,
+      "properties":{
+        "metrics":[
+          [
+            "AWS/ELB",
+            "RequestCount",
+            "LoadBalancerName",
+            "${nextcloud_lb_name}"
+          ]
+        ],
+        "period":60,
+        "stat":"Sum",
+        "region":"${region}",
+        "title":"Nextcloud LB Incoming requests / minute",
+        "view":"timeSeries",
+        "stacked":true,
+        "yAxis":{
+          "left":{
+            "min":0,
+            "max":1500
+          }
+        },
+        "legend": {
+          "position": "hidden"
+        }
+      }
+    },
+  {
+    "type":"metric",
+    "x":0,
+    "y":24,
+    "width":12,
+    "height":6,
+    "properties":{
+      "metrics":[
+        [
+          "AWS/ELB",
+          "Latency",
+          "LoadBalancerName",
+          "${nextcloud_lb_name}"
+        ]
+      ],
+      "period":60,
+      "stat":"Average",
+      "region":"${region}",
+      "title":"Nextcloud LB Response latency (seconds)",
+      "view":"timeSeries",
+      "stacked":true,
+      "yAxis":{
+        "left":{
+          "min":0,
+          "max":5
+        }
+      },
+      "annotations": {
+        "horizontal": [
+          {
+            "visible":true,
+            "color":"#C00000",
+            "label":"Slow",
+            "value":${slow_latency},
+            "fill":"above",
+            "yAxis":"left"
+          }
+        ]
+      },
+      "legend": {
+        "position": "hidden"
+      }
     }
- ]
+  },
+  {
+    "type":"metric",
+    "x":12,
+    "y":24,
+    "width":12,
+    "height":6,
+    "properties":{
+      "metrics":[
+        [
+          "AWS/ELB",
+          "HealthyHostCount",
+          "LoadBalancerName",
+          "${nextcloud_lb_name}"
+        ]
+      ],
+      "period":60,
+      "stat":"Average",
+      "region":"${region}",
+      "title":"Nextcloud LB Healthy Host Count",
+      "view":"timeSeries",
+      "stacked":true,
+      "yAxis":{
+        "left":{
+          "min":0,
+          "max":5
+        }
+      },
+      "annotations": {
+        "horizontal": [
+          {
+            "visible":true,
+            "color":"#C00000",
+            "label":"Unhealthy hosts",
+            "value":1,
+            "fill":"below",
+            "yAxis":"left"
+          }
+        ]
+      },
+      "legend": {
+        "position": "hidden"
+      }
+    }
+  }
+]
 }

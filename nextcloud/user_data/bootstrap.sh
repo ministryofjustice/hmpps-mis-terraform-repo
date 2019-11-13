@@ -200,11 +200,12 @@ $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapHost "$LDAP_HOST"
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapPort "$LDAP_PORT"
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentName "$LDAP_USER"
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentPassword "$LDAP_USER_PASS"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "ou=Fileshare,ou=Users,dc=moj,dc=com;ou=Users,dc=moj,dc=com"
+$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "ou=Users,dc=moj,dc=com"
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(objectclass=inetOrgPerson)))"
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(objectclass=inetOrgPerson)))(|(mailPrimaryAddress=%uid)(mail=%uid)))"
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseGroups  "ou=Fileshare,ou=Groups,dc=moj,dc=com"
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseUsers  "ou=Users,dc=moj,dc=com"
+
 
 #Configure Redis
 $sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"
@@ -271,7 +272,7 @@ cat << 'EOF' > /root/config_backup_script
 
 #Vars
 PREFIX_DATE=$(date +%F)
-LOG_FILE="/var/log/efs_backup.log"
+LOG_FILE="/var/log/config_backup.log"
 BACKUP_BUCKET=
 CONFIG_EXPORT_FILE="$PREFIX_DATE-nextcloud-config.json"
 CONFIG_DIR="/root"
@@ -303,11 +304,23 @@ crontab -l > $temp_cron_file
 grep -q "$config_backup_script" $temp_cron_file || echo "00 01 * * * /usr/bin/sh $config_backup_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
 rm -f $temp_cron_file
 
+#Create DIRS if not present
+folder_file="shared_files.txt"
+aws s3 cp s3://$BACKUP_BUCKET/$folder_file /tmp/
+##Create Folders
+SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
+for folder in $(cat /tmp/$folder_file) ;
+    do top_dir=$(echo $folder | cut -f1 -d:) ;
+    low_dir=$(echo $folder | cut -f2 -d:) ;
+    test -d $SAMBA_DIR/$top_dir/$low_dir || mkdir -p $SAMBA_DIR/$top_dir/$low_dir ;
+done
+
+
+
 ##Samba share
 SAMBA_USER_PASS=$(aws ssm get-parameters --with-decryption --names $MIS_USER_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
-SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
 
 yum install samba samba-client samba-common -y
 groupadd smbgrp
@@ -371,7 +384,6 @@ temp_cron_file="/tmp/temp_cron_file"
 crontab -l > $temp_cron_file
 grep -q "$apache_ownership_script" $temp_cron_file || echo "*/5 * * * * /usr/bin/sh $apache_ownership_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
 rm -f $temp_cron_file
-
 
 #Start and enable  samba
 systemctl start smb.service
