@@ -206,6 +206,7 @@ $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseGroups  "ou=Fileshare,ou=Groups,dc=moj,dc=com"
 $sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseUsers  "ou=Users,dc=moj,dc=com"
 
+
 #Configure Redis
 $sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"
 $sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.locking --value="\\OC\\Memcache\\Redis"
@@ -271,7 +272,7 @@ cat << 'EOF' > /root/config_backup_script
 
 #Vars
 PREFIX_DATE=$(date +%F)
-LOG_FILE="/var/log/efs_backup.log"
+LOG_FILE="/var/log/config_backup.log"
 BACKUP_BUCKET=
 CONFIG_EXPORT_FILE="$PREFIX_DATE-nextcloud-config.json"
 CONFIG_DIR="/root"
