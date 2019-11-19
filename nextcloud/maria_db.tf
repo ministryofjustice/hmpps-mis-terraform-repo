@@ -4,6 +4,25 @@ locals {
   dns_name            = "${local.app_name}-db"
 }
 
+
+
+#-------------------------------------------------------------
+### IAM ROLE FOR RDS
+#-------------------------------------------------------------
+
+module "rds_monitoring_role" {
+  source     = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=pre-shared-vpc//modules//iam//role"
+  rolename   = "${local.common_name}-monitoring"
+  policyfile = "rds_monitoring.json"
+}
+
+resource "aws_iam_role_policy_attachment" "enhanced_monitoring" {
+  role       = "${module.rds_monitoring_role.iamrole_name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+}
+
+
+
 ############################################
 # KMS KEY GENERATION - FOR ENCRYPTION
 ############################################
@@ -110,6 +129,7 @@ module "db_instance" {
   backup_window           = "${var.backup_window}"
 
   monitoring_interval  = "${var.mariadb_monitoring_interval}"
+  monitoring_role_arn  = "${module.rds_monitoring_role.iamrole_arn}"
 
   timezone           = "${var.timezone}"
   character_set_name = "${var.character_set_name}"

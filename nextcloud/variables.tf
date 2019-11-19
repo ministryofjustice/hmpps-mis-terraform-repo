@@ -112,12 +112,12 @@ variable "rds_instance_class" {
 
 variable "rds_allocated_storage" {
   description = "The allocated storage in gigabytes"
-  default     = "100"
+  default     = "1000"
 }
 
 variable "storage_type" {
   description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'standard' if not. Note that this behaviour is different from the AWS web console, where the default is 'gp2'."
-  default     = "gp2"
+  default     = "io1"
 }
 
 variable "storage_encrypted" {
@@ -157,7 +157,7 @@ variable "multi_az" {
 
 variable "iops" {
   description = "The amount of provisioned IOPS. Setting this implies a storage_type of 'io1'"
-  default     = 0
+  default     = 10000
 }
 
 variable "publicly_accessible" {
@@ -177,7 +177,7 @@ variable "auto_minor_version_upgrade" {
 
 variable "apply_immediately" {
   description = "Specifies whether any database modifications are applied immediately, or during the next maintenance window"
-  default     = true
+  default     = false
 }
 
 variable "maintenance_window" {
