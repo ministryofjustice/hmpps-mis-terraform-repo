@@ -152,7 +152,7 @@ variable "snapshot_identifier" {
 
 variable "multi_az" {
   description = "Specifies if the RDS instance is multi-AZ"
-  default     = false
+  default     = "true"
 }
 
 variable "iops" {
@@ -177,7 +177,7 @@ variable "auto_minor_version_upgrade" {
 
 variable "apply_immediately" {
   description = "Specifies whether any database modifications are applied immediately, or during the next maintenance window"
-  default     = false
+  default     = true
 }
 
 variable "maintenance_window" {
@@ -192,12 +192,12 @@ variable "skip_final_snapshot" {
 
 variable "copy_tags_to_snapshot" {
   description = "On delete, copy all Instance tags to the final snapshot (if final_snapshot_identifier is specified)"
-  default     = false
+  default     = true
 }
 
 variable "mariadb_backup_retention_period" {
   description = "The days to retain backups for"
-  default     = 1
+  default     = 28
 }
 
 variable "backup_window" {
@@ -207,7 +207,7 @@ variable "backup_window" {
 
 variable "mariadb_monitoring_interval" {
   description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60."
-  default     = 0
+  default     = 30
 }
 
 variable "timezone" {
