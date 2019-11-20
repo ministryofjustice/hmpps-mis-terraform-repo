@@ -112,12 +112,11 @@ variable "rds_instance_class" {
 
 variable "rds_allocated_storage" {
   description = "The allocated storage in gigabytes"
-  default     = "1000"
 }
 
 variable "storage_type" {
   description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'standard' if not. Note that this behaviour is different from the AWS web console, where the default is 'gp2'."
-  default     = "io1"
+  default     = "gp2"
 }
 
 variable "storage_encrypted" {
@@ -157,7 +156,7 @@ variable "multi_az" {
 
 variable "iops" {
   description = "The amount of provisioned IOPS. Setting this implies a storage_type of 'io1'"
-  default     = 10000
+  default     = 0
 }
 
 variable "publicly_accessible" {
@@ -207,7 +206,6 @@ variable "backup_window" {
 
 variable "mariadb_monitoring_interval" {
   description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60."
-  default     = 30
 }
 
 variable "timezone" {
