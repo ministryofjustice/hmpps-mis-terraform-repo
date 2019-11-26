@@ -100,7 +100,7 @@ case ${JOB_TYPE} in
 
      #Download backup from s3
       echo "Downloading backup file from date ${BACKUP_DATE}"
-      aws s3 cp --only-show-errors s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${BACKUP_DATE}/${SQL_FILE}  ${BACKUP_DIR}   && echo Success || exit 1
+      aws s3 cp --only-show-errors s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${BACKUP_DATE}/${NEXT_CLOUD_DB_NAME}.sql  ${BACKUP_DIR}   && echo Success || exit 1
 
       ###Clean Database
       echo "Dropping Nextcloud DB"
