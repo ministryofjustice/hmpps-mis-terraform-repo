@@ -25,7 +25,6 @@ def do_nextcloud_db_backup(env_name, git_project_dir , action, backup_date) {
         """
     }
 }
-
 def debug_env() {
     sh '''
     #!/usr/env/bin bash
@@ -51,10 +50,10 @@ pipeline {
 				            }
 				        }
 
-				        stage('Nextcloud | DB Backup') {
+				        stage('Nextcloud | DB Backup/Restore') {
 				          steps {
 				            script {
-				              do_nextcloud_db_backup(environment_name, project.mis)
+				              do_nextcloud_db_backup(environment_name, project.mis, action, backup_date)
 				            }
 				          }
 				        }
