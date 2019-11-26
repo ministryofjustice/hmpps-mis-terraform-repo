@@ -1,6 +1,6 @@
 def project = [:]
 project.mis  = 'hmpps-mis-terraform-repo'
-project.branch = 'master'
+project.branch = 'issue_150_nextcloud_db_restore'
 
 def prepare_env() {
     sh '''
@@ -9,7 +9,7 @@ def prepare_env() {
     '''
 }
 
-def do_nextcloud_db_backup(env_name, git_project_dir) {
+def do_nextcloud_db_backup(env_name, git_project_dir , action, backup_date) {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
         sh """
         #!/usr/env/bin bash
@@ -20,7 +20,7 @@ def do_nextcloud_db_backup(env_name, git_project_dir) {
         # set region
         docker run --rm -v \$(pwd):/home/tools/data \
           -v \${HOME}/.aws:/home/tools/.aws \
-          mojdigitalstudio/hmpps-base-mysql sh scripts/nextcloud_db_backup.sh db-backup ${env_name}
+          mojdigitalstudio/hmpps-base-mysql sh scripts/nextcloud_db_backup.sh ${action} ${env_name} ${backup_date}
         set -e
         """
     }
