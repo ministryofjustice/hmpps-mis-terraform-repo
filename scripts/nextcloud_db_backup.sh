@@ -48,7 +48,7 @@ get_creds_aws () {
 ####Perform db backup
 db_backup_restore () {
 
-case ${JOB_TYPE} in
+case "${JOB_TYPE}" in
     db-backup) echo "Running db backup"
 
                #get db creds
@@ -146,7 +146,7 @@ elif [ -z "${TG_ENVIRONMENT_TYPE}"]
 then
     echo "TG_ENVIRONMENT_TYPE argument not supplied."
     exit 1
-elif [${JOB_TYPE} == "db-restore"] && [$ -z "$BACKUP_DATE"]
+elif [${JOB_TYPE} = "db-restore"] && [$ -z "$BACKUP_DATE"]
 then
     echo "JOB_TYPE : db-restore requires date parameter Format: YYYY-MM-DD"
     exit 1
