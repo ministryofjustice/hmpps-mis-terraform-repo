@@ -47,78 +47,75 @@ get_creds_aws () {
 
 ####Perform db backup
 db_backup_restore () {
+
 case ${JOB_TYPE} in
-  db-backup)
-    echo "Running db backup"
+    db-backup) echo "Running db backup"
 
-    #get db creds
-    get_creds_aws
-    DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit 1
-    DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit 1
-    DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud"
+               #get db creds
+               echo "Getting DB details"
+               get_creds_aws
+               DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) || exit 1
+               DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') || exit 1
+               DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud"
 
 
-    DB_HOST=$(aws rds describe-db-instances --region ${TG_REGION} --db-instance-identifier ${DB_IDENTIFIER} \
-                    --query 'DBInstances[*].[Endpoint]' | grep Address | awk '{print $2}' | sed 's/"//g')
-    exit_on_error $? !!
+               DB_HOST=$(aws rds describe-db-instances --region ${TG_REGION} --db-instance-identifier ${DB_IDENTIFIER} --query 'DBInstances[*].[Endpoint]' | grep Address | awk '{print $2}' | sed 's/"//g')
+               exit_on_error $? !!
 
-    mkdir $BACKUP_DIR
+               mkdir $BACKUP_DIR
 
-    # Perform db backup
-    echo "Performing DB Backup"
-    mysqldump -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME > $SQL_FILE
-    exit_on_error $? !!
-    echo "DB Backup complete"
+               # Perform db backup
+               echo "Performing DB Backup"
+               mysqldump -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME > $SQL_FILE
+               exit_on_error $? !!
+               echo "DB Backup complete"
 
-    # upload sql file
-    echo "Uploading Backup file to S3"
-    get_creds_aws
-    aws s3 cp --only-show-errors ${SQL_FILE} s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${PREFIX_DATE}/ && echo Success || exit 1
-    exit_on_error $? !!
-    echo "Upload complete"
+               # upload sql file
+               echo "Uploading Backup file to S3"
+               get_creds_aws
+               aws s3 cp --only-show-errors ${SQL_FILE} s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${PREFIX_DATE}/ && echo Success || exit 1
+               exit_on_error $? !!
+               echo "Upload complete"
 
-    # delete sql file
-     rm -rf ${SQL_FILE}
+               # delete sql file
+               rm -rf ${SQL_FILE}
+               ;;
+    db-restore)
+               echo "Running Nextcloud DB Restore!"
+               echo "File to restore: ${BACKUP_DATE}/nextcloud.sql"
 
-    ;;
-  db-restore)
-     echo "Running Nextcloud DB Restore!"
-     echo "File to restore: ${BACKUP_DATE}/nextcloud.sql"
+               echo "Getting DB details"
+               #get db creds
+               get_creds_aws
+               DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) || exit 1
+               DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') || exit 1
+               DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud"
+               DB_HOST=$(aws rds describe-db-instances --region ${TG_REGION} --db-instance-identifier ${DB_IDENTIFIER} --query 'DBInstances[*].[Endpoint]' | grep Address | awk '{print $2}' | sed 's/"//g')
+               exit_on_error $? !!
 
-     echo "Getting DB details"
-     #get db creds
-     get_creds_aws
-     DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) && echo Success || exit 1
-     DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') && echo Success || exit 1
-     DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud"
-     DB_HOST=$(aws rds describe-db-instances --region ${TG_REGION} --db-instance-identifier ${DB_IDENTIFIER} \
-                     --query 'DBInstances[*].[Endpoint]' | grep Address | awk '{print $2}' | sed 's/"//g')
-     exit_on_error $? !!
+               echo "Creating Backup DIR --$BACKUP_DIR"
+               mkdir $BACKUP_DIR
 
-     echo "Creating Backup DIR --$BACKUP_DIR"
-     mkdir $BACKUP_DIR
+               #Download backup from s3
+               echo "Downloading backup file from date ${BACKUP_DATE}"
+               aws s3 cp --only-show-errors s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${BACKUP_DATE}/${NEXT_CLOUD_DB_NAME}.sql  ${BACKUP_DIR}   && echo "Backup file copied successfully" || exit 1
 
-     #Download backup from s3
-      echo "Downloading backup file from date ${BACKUP_DATE}"
-      aws s3 cp --only-show-errors s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${BACKUP_DATE}/${NEXT_CLOUD_DB_NAME}.sql  ${BACKUP_DIR}   && echo Success || exit 1
+               ###Clean Database
+               echo "Dropping Nextcloud DB"
+               mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST  -e "DROP DATABASE ${NEXT_CLOUD_DB_NAME}"  && echo "DB Dropped successfully" || exit 1
 
-      ###Clean Database
-      echo "Dropping Nextcloud DB"
-      mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST  -e "DROP DATABASE ${NEXT_CLOUD_DB_NAME}"  && echo Success || exit 1
+               echo "Creating fresh Nextcloud DB"
+               mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST  -e "CREATE DATABASE ${NEXT_CLOUD_DB_NAME}" && echo "DB creation Successfull" || exit 1
 
-      echo "Creating fresh Nextcloud DB"
-      mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST  -e "CREATE DATABASE ${NEXT_CLOUD_DB_NAME}" && echo Success || exit 1
+               #Restore db
+               echo "Restoring Nextcloud DB from backup dated: ${BACKUP_DATE} "
+               mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME < $SQL_FILE && echo "DB Restore Successfull" || exit 1
 
-      #Restore db
-      echo "Restoring Nextcloud DB from backup dated: ${BACKUP_DATE} "
-      mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME < $SQL_FILE && echo Success || exit 1
-
-      # delete sql file
-      rm -rf ${SQL_FILE}
-    ;;
-  *)
-    echo "${JOB_TYPE} argument is not a valid argument. db-backup | db-restore"
-  ;;
+               # delete sql file
+               rm -rf ${SQL_FILE}
+               ;;
+    *)         echo "${JOB_TYPE} argument is not a valid argument. db-backup | db-restore"
+               ;;
 esac
 }
 
