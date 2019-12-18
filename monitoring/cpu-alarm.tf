@@ -11,7 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_cpu" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "80"
-  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]}"
+  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]} Please contact the MIS Team or AWS Support Contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
@@ -31,7 +31,7 @@ resource "aws_cloudwatch_metric_alarm" "dis_cpu" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "80"
-  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}"
+  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}  Please contact the MIS Team or AWS Support Contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
@@ -51,7 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "bps_cpu" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "80"
-  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}"
+  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]} Please contact the MIS Team or AWS Support Contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
@@ -71,7 +71,7 @@ resource "aws_cloudwatch_metric_alarm" "bcs_cpu" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "80"
-  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}"
+  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}  Please contact the MIS Team or AWS Support Contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
@@ -91,7 +91,7 @@ resource "aws_cloudwatch_metric_alarm" "bfs_cpu" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "80"
-  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}"
+  alarm_description         = "CPU utilization is very high for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]} Please contact the MIS Team or AWS Support Contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
