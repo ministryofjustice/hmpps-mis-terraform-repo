@@ -7,28 +7,15 @@ exports.handler = function(event, context) {
         var eventMessage = JSON.parse(event.Records[0].Sns.Message);
         var alarmName = eventMessage.AlarmName;
         var alarmDescription = eventMessage.AlarmDescription;
-        var newStateReason = eventMessage.NewStateReason;
 
 
         var environment = alarmName.split("__")[0];
-//        var service = alarmName.split("__")[1];
         var metric = alarmName.split("__")[1];
         var severity = alarmName.split("__")[2];
 
-//        var subChannelForEnvironment=(environment=='prod') ? "production" : "nonprod";
 
             var channel="ndmis-alerts";
 
-
-            var resolvers = "MIS Team (who have not been alerted as severity not high enough)"
-
-
-            if (severity=='critical' || severity=='alert' || severity=='severe' && environment=='dev'){
-                    resolvers=""
-                    +"<@UGN468KUK> " //Eddie
-                    +"<@UAJ5XGGAU> " //Max
-
-            }
 
             var icon_emoji=":twisted_rightwards_arrows:";
 
@@ -50,24 +37,16 @@ exports.handler = function(event, context) {
             "channel": "# " + channel,
             "username": "AWS SNS via Lambda :: Alarm notification",
             "text": "**************************************************************************************************"
+            + "\n\nInfo: " + alarmDescription
             +"\nMetric: " + metric
-            + "\nEnvironment: " + environment
             + "\nSeverity: " + severity
-            + "\nCause: " + newStateReason
-            + "\n\nAction: " + alarmDescription
-            +"\n\nResolvers: " + resolvers
+            + "\nEnvironment: " + environment
             ,
             "icon_emoji": icon_emoji,
             "link_names": "1"
         };
 
-    postData.attachments = [
-            {
-                "color": "Warning",
-                "text":  "\n```"+JSON.stringify(eventMessage,null,'\t')+"```"
-                        +"**************************************************************************************************"
-            }
-        ];
+
 
     var options = {
         method: 'POST',
