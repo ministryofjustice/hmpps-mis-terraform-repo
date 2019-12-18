@@ -5,7 +5,7 @@ exports.handler = function(event, context) {
     console.log(JSON.stringify(event, null, 2));
 
     var postData = {
-        "channel": "# delius-aws-ops-alerts",
+        "channel": "#ndmis-alerts",
         "username": "AWS SNS via Lambda :: Alarm notification",
         "text": "*" + event.Records[0].Sns.Subject +"*",
         "icon_emoji": ":aws:"
@@ -22,7 +22,7 @@ exports.handler = function(event, context) {
         method: 'POST',
         hostname: 'hooks.slack.com',
         port: 443,
-        path: '/services/T02DYEB3A/BGJ1P95C3/f1MBtQ0GoI6kbGUztiSpkOut'
+        path: '/services/T02DYEB3A/BRU7E5QSC/3Rt4FV9FtrDSll5aMPABgRoB'
     };
 
     var req = https.request(options, function(res) {
