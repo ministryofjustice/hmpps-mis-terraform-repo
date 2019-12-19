@@ -26,7 +26,7 @@ exports.handler = function(event, context) {
                icon_emoji = ":alert:";
 
             if (severity=='severe' )
-               icon_emoji = ":alert:";
+               icon_emoji = ":x:";
 
  //environment	service	    tier	metric	severity	resolvergroup(s)
 
