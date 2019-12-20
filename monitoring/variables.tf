@@ -8,7 +8,7 @@ variable "environment_type" {
   description = "environment"
 }
 
-variable "alarms_enabled" {
+variable "mis_alarms_enabled" {
   type = "string"
 }
 

@@ -14,3 +14,13 @@ output "dis_primary_dns" {
 output "dis_primary_dns_ext" {
   value = "${aws_route53_record.dis_dns.*.fqdn}"
 }
+
+#dis ami_id
+output "dis_ami_id" {
+  value = "${aws_instance.dis_server.*.ami}"
+}
+
+#dis instance_type
+output "dis_instance_type" {
+  value = "${aws_instance.dis_server.*.instance_type}"
+}

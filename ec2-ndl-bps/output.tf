@@ -14,3 +14,13 @@ output "bps_primary_dns" {
 output "bps_primary_dns_ext" {
   value = "${aws_route53_record.bps_dns.*.fqdn}"
 }
+
+#bps ami_id
+output "bps_ami_id" {
+  value = "${aws_instance.bps_server.*.ami}"
+}
+
+#bps instance_type
+output "bps_instance_type" {
+  value = "${aws_instance.bps_server.*.instance_type}"
+}

@@ -15,3 +15,13 @@ output "bfs_primary_dns" {
 output "bfs_primary_dns_ext" {
   value = "${aws_route53_record.bfs_dns.*.fqdn}"
 }
+
+#bfs ami_id
+output "bfs_ami_id" {
+  value = "${aws_instance.bfs_server.*.ami}"
+}
+
+#bfs instance_type
+output "bfs_instance_type" {
+  value = "${aws_instance.bfs_server.*.instance_type}"
+}

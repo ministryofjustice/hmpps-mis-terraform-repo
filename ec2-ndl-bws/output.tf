@@ -40,3 +40,13 @@ output "bws_elb_zone_id" {
 output "bws_elb_dns_cname" {
   value = "${aws_route53_record.dns_entry.fqdn}"
 }
+
+#bws ami_id
+output "bws_ami_id" {
+  value = "${aws_instance.bws_server.*.ami}"
+}
+
+#bws instance_type
+output "bws_instance_type" {
+  value = "${aws_instance.bws_server.*.instance_type}"
+}

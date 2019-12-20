@@ -1,6 +1,6 @@
 #BWS LB
 resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts" {
-  alarm_name                = "${local.bws_lb_name}-lb-unhealthy-hosts-count"
+  alarm_name                = "${local.environment_name}__UnHealthyHostCount__alert__BWS__${local.bws_lb_name}-lb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "UnHealthyHostCount"
@@ -8,7 +8,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "1"
-  alarm_description         = "This metric monitors BWS lb unhealthy host count"
+  alarm_description         = "The BWS loadbalancer ${local.bws_lb_name} has 1 Unhealthy host. Please contact the MIS Team or the MIS AWS Support contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
@@ -18,7 +18,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts" {
 
 
 resource "aws_cloudwatch_metric_alarm" "bws_lb_latency" {
-  alarm_name                = "${local.bws_lb_name}-lb-latency"
+  alarm_name                = "${local.environment_name}__Latency__alert__BWS__${local.bws_lb_name}-lb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "Latency"
@@ -26,7 +26,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_latency" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "1"
-  alarm_description         = "This metric monitors BWS lb Latency"
+  alarm_description         = "The BWS loadbalancer ${local.bws_lb_name} is averaging on high latency. Please contact the MIS AWS Support contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_latency" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
-  alarm_name                = "${local.bws_lb_name}_lb-spill_over_count"
+  alarm_name                = "${local.environment_name}__SpilloverCount__severe__BWS__${local.bws_lb_name}-lb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "SpilloverCount"
@@ -44,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
   period                    = "300"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "This metric monitors BWS lb Latency"
+  alarm_description         = "The BWS loadbalancer ${local.bws_lb_name} is averaging a spillover count of 1. Please contact the MIS AWS Support contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
@@ -55,7 +55,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
 
 
 resource "aws_cloudwatch_metric_alarm" "ses_auth_fail" {
-  alarm_name                = "Ses_Auth_Fail_Alarm"
+  alarm_name                = "${local.environment_name}__SesAuthenticationFail__critical__SMTP"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "${aws_cloudwatch_log_metric_filter.SesAuthenticationFail.name}"
@@ -63,7 +63,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_auth_fail" {
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "This metric monitors BWS lb Latency"
+  alarm_description         = "The SMTP Server has failed to authenticate to AWS SES. Emails will not be delivered!. Please contact the AWS Support Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 }
@@ -85,7 +85,7 @@ resource "aws_cloudwatch_log_metric_filter" "SesAuthenticationFail" {
 #Nextcloud LB
 
 resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts" {
-  alarm_name                = "${local.nextcloud_lb_name}-lb-unhealthy-hosts-count"
+  alarm_name                = "${local.environment_name}__UnHealthyHostCount__alert__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "UnHealthyHostCount"
@@ -93,7 +93,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "1"
-  alarm_description         = "This metric monitors Nextcloud lb unhealthy host count"
+  alarm_description         = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} has 1 Unhealthy host. Please contact the MIS AWS Support contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
@@ -103,7 +103,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts" {
 
 
 resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_latency" {
-  alarm_name                = "${local.nextcloud_lb_name}-lb-latency"
+  alarm_name                = "${local.environment_name}__Latency__alert__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "Latency"
@@ -111,7 +111,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_latency" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "1"
-  alarm_description         = "This metric monitors Nextcloud lb Latency"
+  alarm_description         = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} is averaging on high latency. Please contact the MIS Team or the MIS AWS Support contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
@@ -121,7 +121,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_latency" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_spillovercount" {
-  alarm_name                = "${local.nextcloud_lb_name}_lb-spill_over_count"
+  alarm_name                = "${local.environment_name}__SpilloverCount__severe__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
   metric_name               = "SpilloverCount"
@@ -129,7 +129,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_spillovercount" {
   period                    = "300"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "This metric monitors Nextcloud lb Latency"
+  alarm_description         = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} is averaging a spillover count of 1. Please contact the MIS AWS Support contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
