@@ -114,6 +114,8 @@ locals {
   mis_app_name                 = "${data.terraform_remote_state.common.mis_app_name}"
   bws_lb_name                  = "${data.terraform_remote_state.ec2-ndl-bws.bws_elb_name}"
   nextcloud_lb_name            = "${data.terraform_remote_state.nextcloud.nextcloud_lb_name}"
+  log_group_name               = "/mis/application_logs"
+  name_space                   = "MISBOE"
 }
 
 #dashboard

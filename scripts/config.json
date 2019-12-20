@@ -50,7 +50,11 @@
                         },
                         "Memory": {
                                 "measurement": [
-                                        "% Committed Bytes In Use"
+                                    {
+                                        "name":"% Committed Bytes In Use",
+                                        "rename":"MemoryUtilization",
+                                        "unit":"Percent"
+                                    }
                                 ],
                                 "metrics_collection_interval": 60
                         },
