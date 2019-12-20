@@ -145,7 +145,7 @@ resource "aws_sns_topic" "alarm_notification" {
 }
 
 resource "aws_sns_topic_subscription" "alarm_subscription" {
-  count              = "${var.alarms_enabled == "true" ? 1 : 0}"
+  count              = "${var.mis_alarms_enabled == "true" ? 1 : 0}"
   topic_arn          = "${aws_sns_topic.alarm_notification.arn}"
   protocol           = "lambda"
   endpoint           = "${aws_lambda_function.notify-ndmis-slack.arn}"
