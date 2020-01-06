@@ -9,6 +9,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_httpd" {
   threshold                 = "1"
   alarm_description         = "httpd Service in Error state on BWS Hosts. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 }
 
@@ -35,6 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_Tomcat" {
   threshold                 = "1"
   alarm_description         = "Tomcat Service in Error state on BWS Hosts. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 }
 

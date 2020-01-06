@@ -10,6 +10,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts" {
   threshold                 = "1"
   alarm_description         = "The BWS loadbalancer ${local.bws_lb_name} has 1 Unhealthy host. Please contact the MIS Team or the MIS AWS Support contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
               LoadBalancerName  = "${local.bws_lb_name}"
@@ -25,9 +26,10 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_latency" {
   namespace                 = "AWS/ELB"
   period                    = "300"
   statistic                 = "Average"
-  threshold                 = "1"
+  threshold                 = "5"
   alarm_description         = "The BWS loadbalancer ${local.bws_lb_name} is averaging on high latency. Please contact the MIS AWS Support contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
   dimensions {
@@ -46,6 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
   threshold                 = "1"
   alarm_description         = "The BWS loadbalancer ${local.bws_lb_name} is averaging a spillover count of 1. Please contact the MIS AWS Support contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
   dimensions {
@@ -65,6 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_auth_fail" {
   threshold                 = "1"
   alarm_description         = "The SMTP Server has failed to authenticate to AWS SES. Emails will not be delivered!. Please contact the AWS Support Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 }
 
@@ -95,6 +99,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts" {
   threshold                 = "1"
   alarm_description         = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} has 1 Unhealthy host. Please contact the MIS AWS Support contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
               LoadBalancerName  = "${local.nextcloud_lb_name}"
@@ -105,7 +110,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts" {
 resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_latency" {
   alarm_name                = "${local.environment_name}__Latency__alert__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "1"
+  evaluation_periods        = "5"
   metric_name               = "Latency"
   namespace                 = "AWS/ELB"
   period                    = "300"
@@ -113,6 +118,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_latency" {
   threshold                 = "1"
   alarm_description         = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} is averaging on high latency. Please contact the MIS Team or the MIS AWS Support contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
   dimensions {
@@ -131,6 +137,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_spillovercount" {
   threshold                 = "1"
   alarm_description         = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} is averaging a spillover count of 1. Please contact the MIS AWS Support contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
   dimensions {

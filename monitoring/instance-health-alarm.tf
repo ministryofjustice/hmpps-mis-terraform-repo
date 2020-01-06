@@ -13,6 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-health-check" {
   threshold                 = "1"
   alarm_description         = "EC2 Health status failed for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bws.bws_instance_ids[count.index]}"
@@ -32,6 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "bcs_instance-health-check" {
   threshold                 = "1"
   alarm_description         = "EC2 Health status failed for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
@@ -52,6 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "bps_instance-health-check" {
   threshold                 = "1"
   alarm_description         = "EC2 Health status failed for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_ids[count.index]}"
@@ -72,6 +75,7 @@ resource "aws_cloudwatch_metric_alarm" "dis_instance-health-check" {
   threshold                 = "1"
   alarm_description         = "EC2 Health status failed for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_ids[count.index]}"
@@ -92,6 +96,7 @@ resource "aws_cloudwatch_metric_alarm" "bfs_instance-health-check" {
   threshold                 = "1"
   alarm_description         = "EC2 Health status failed for ${data.terraform_remote_state.ec2-ndl-bfs.bfs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bfs.bfs_instance_ids[count.index]}"
