@@ -19,3 +19,7 @@ output "private_fqdn_samba_elb" {
 output "nextcloud_lb_name" {
   value = "${module.nextcloud_lb.environment_elb_name}"
 }
+
+output "samba_lb_name" {
+  value = "${aws_elb.samba_lb.name}"
+}

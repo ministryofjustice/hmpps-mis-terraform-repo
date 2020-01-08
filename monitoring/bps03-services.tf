@@ -2,8 +2,8 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_AdaptiveJobServer" {
   alarm_name                = "${local.environment_name}__PROCTIER003.AdaptiveJobServer__critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
-  metric_name               = "${aws_cloudwatch_log_metric_filter.PROCTIER003_AdaptiveJobServer.name}"
-  namespace                 = "AWS/LogMetrics"
+  metric_name               = "PROCTIER003AdaptiveJobServerCount"
+  namespace                 = "${local.name_space}"
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
@@ -11,15 +11,16 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_AdaptiveJobServer" {
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER003_AdaptiveJobServer" {
- name           = "PROCTIER003.AdaptiveJobServer"
+ name           = "PROCTIER003AdaptiveJobServerCount"
  pattern        = "PROCTIER003.AdaptiveJobServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
-   name      = "EventCount"
+   name      = "PROCTIER003AdaptiveJobServerCount"
    namespace = "${local.name_space}"
    value     = "1"
  }
@@ -29,8 +30,8 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_APS_Webi" {
   alarm_name                = "${local.environment_name}__PROCTIER003.APS.Webi__critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
-  metric_name               = "${aws_cloudwatch_log_metric_filter.PROCTIER003_APS_Webi.name}"
-  namespace                 = "AWS/LogMetrics"
+  metric_name               = "PROCTIER003APSWebiCount"
+  namespace                 = "${local.name_space}"
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
@@ -38,15 +39,16 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_APS_Webi" {
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER003_APS_Webi" {
- name           = "PROCTIER003.APS.Webi"
+ name           = "PROCTIER003APSWebiCount"
  pattern        = "PROCTIER003.APS.Webi"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
-   name      = "EventCount"
+   name      = "PROCTIER003APSWebiCount"
    namespace = "${local.name_space}"
    value     = "1"
  }
@@ -57,8 +59,8 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_ConnectionServer" {
   alarm_name                = "${local.environment_name}__PROCTIER003.ConnectionServer__critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
-  metric_name               = "${aws_cloudwatch_log_metric_filter.PROCTIER003_ConnectionServer.name}"
-  namespace                 = "AWS/LogMetrics"
+  metric_name               = "PROCTIER003ConnectionServerCount"
+  namespace                 = "${local.name_space}"
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
@@ -66,15 +68,16 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_ConnectionServer" {
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER003_ConnectionServer" {
- name           = "PROCTIER003.ConnectionServer"
+ name           = "PROCTIER003ConnectionServerCount"
  pattern        = "PROCTIER003.ConnectionServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
-   name      = "EventCount"
+   name      = "PROCTIER003ConnectionServerCount"
    namespace = "${local.name_space}"
    value     = "1"
  }
@@ -85,8 +88,8 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_ConnectionServer32" {
   alarm_name                = "${local.environment_name}__PROCTIER003.ConnectionServer32__critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
-  metric_name               = "${aws_cloudwatch_log_metric_filter.PROCTIER003_ConnectionServer32.name}"
-  namespace                 = "AWS/LogMetrics"
+  metric_name               = "PROCTIER003ConnectionServer32Count"
+  namespace                 = "${local.name_space}"
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
@@ -94,15 +97,16 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_ConnectionServer32" {
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER003_ConnectionServer32" {
- name           = "PROCTIER003.ConnectionServer32"
+ name           = "PROCTIER003ConnectionServer32Count"
  pattern        = "PROCTIER003.ConnectionServer32"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
-   name      = "EventCount"
+   name      = "PROCTIER003ConnectionServer32Count"
    namespace = "${local.name_space}"
    value     = "1"
  }
@@ -112,8 +116,8 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_WebIntelligenceProcessingSer
   alarm_name                = "${local.environment_name}__PROCTIER003.WebIntelligenceProcessingServer__critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
-  metric_name               = "${aws_cloudwatch_log_metric_filter.PROCTIER003_WebIntelligenceProcessingServer.name}"
-  namespace                 = "AWS/LogMetrics"
+  metric_name               = "PROCTIER003WebIntelligenceProcessingServerCount"
+  namespace                 = "${local.name_space}"
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
@@ -121,15 +125,16 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_WebIntelligenceProcessingSer
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER003_WebIntelligenceProcessingServer" {
- name           = "PROCTIER003.WebIntelligenceProcessingServer"
+ name           = "PROCTIER003WebIntelligenceProcessingServerCount"
  pattern        = "PROCTIER003.WebIntelligenceProcessingServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
-   name      = "EventCount"
+   name      = "PROCTIER003WebIntelligenceProcessingServerCount"
    namespace = "${local.name_space}"
    value     = "1"
  }
@@ -139,8 +144,8 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_WebIntelligenceProcessingSer
   alarm_name                = "${local.environment_name}__PROCTIER003.WebIntelligenceProcessingServer1__critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "1"
-  metric_name               = "${aws_cloudwatch_log_metric_filter.PROCTIER003_WebIntelligenceProcessingServer1.name}"
-  namespace                 = "AWS/LogMetrics"
+  metric_name               = "PROCTIER003WebIntelligenceProcessingServer1Count"
+  namespace                 = "${local.name_space}"
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
@@ -148,15 +153,16 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_WebIntelligenceProcessingSer
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER003_WebIntelligenceProcessingServer1" {
- name           = "PROCTIER003.WebIntelligenceProcessingServer1"
+ name           = "PROCTIER003WebIntelligenceProcessingServer1Count"
  pattern        = "PROCTIER003.WebIntelligenceProcessingServer1"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
-   name      = "EventCount"
+   name      = "PROCTIER003WebIntelligenceProcessingServer1Count"
    namespace = "${local.name_space}"
    value     = "1"
  }
