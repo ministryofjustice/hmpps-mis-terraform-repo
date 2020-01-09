@@ -17,7 +17,7 @@ exports.handler = function(event, context) {
         var severity = alarmName.split("__")[2];
 
 
-            var channel="ndmis-non-prod-alerts";
+            var channel="ndmis-alerts";
 
 
             var icon_emoji=":twisted_rightwards_arrows:";
@@ -74,7 +74,7 @@ exports.handler = function(event, context) {
         method: 'POST',
         hostname: 'hooks.slack.com',
         port: 443,
-        path: '/services/T02DYEB3A/BS16X2JGY/r9e1CJYez7BDmwyliIl7WzLf'
+        path: '/services/T02DYEB3A/BRU7E5QSC/3Rt4FV9FtrDSll5aMPABgRoB'
     };
 
     var req = https.request(options, function(res) {
