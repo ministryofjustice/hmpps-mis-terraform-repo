@@ -9,7 +9,6 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_AdaptiveJobServer" {
   threshold                 = "1"
   alarm_description         = "PROCTIER003.AdaptiveJobServer Service in Error state on ndl-bps-003. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -37,7 +36,6 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_APS_Webi" {
   threshold                 = "1"
   alarm_description         = "PROCTIER003.APS.Webi Service in Error state on ndl-bps-003. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -66,7 +64,6 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_ConnectionServer" {
   threshold                 = "1"
   alarm_description         = "PROCTIER003.ConnectionServer Service in Error state on ndl-bps-003. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -95,7 +92,6 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_ConnectionServer32" {
   threshold                 = "1"
   alarm_description         = "PROCTIER003.ConnectionServer32 Service in Error state on ndl-bps-003. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -123,7 +119,6 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_WebIntelligenceProcessingSer
   threshold                 = "1"
   alarm_description         = "PROCTIER003.WebIntelligenceProcessingServer Service in Error state on ndl-bps-003. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -151,7 +146,6 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER003_WebIntelligenceProcessingSer
   threshold                 = "1"
   alarm_description         = "PROCTIER003.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-003. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }

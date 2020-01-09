@@ -9,7 +9,6 @@
    threshold                 = "1"
    alarm_description         = "CMSTIER001.APS.Core Service in Error state on ndl-bcs-001. Please contact the MIS Team"
    alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
    treat_missing_data        = "notBreaching"
    datapoints_to_alarm       = "1"
  }
@@ -39,7 +38,6 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER001_APS_PromotionManager" {
   threshold                 = "1"
   alarm_description         = "CMSTIER001.APS.PromotionManager Service in Error state on ndl-bcs-001. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -68,7 +66,6 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER001_CentralManagementServer" {
   threshold                 = "1"
   alarm_description         = "CMSTIER001.CentralManagementServer Service in Error state on ndl-bcs-001. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -97,7 +94,6 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER001_ConnectionServer" {
   threshold                 = "1"
   alarm_description         = "CMSTIER001.ConnectionServer Service in Error state on ndl-bcs-001. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -125,7 +121,6 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER001_ConnectionServer32" {
   threshold                 = "1"
   alarm_description         = "CMSTIER001.ConnectionServer32 Service in Error state on ndl-bcs-001. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -154,7 +149,6 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER001_EventServer" {
   threshold                 = "1"
   alarm_description         = "CMSTIER001.EventServer Service in Error state on ndl-bcs-001. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -183,7 +177,6 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER001_InputFilerepository" {
   threshold                 = "1"
   alarm_description         = "CMSTIER001.InputFilerepository Service in Error state on ndl-bcs-001. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
@@ -211,7 +204,6 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER001_OutputFilerepository" {
   threshold                 = "1"
   alarm_description         = "CMSTIER001.OutputFilerepository Service in Error state on ndl-bcs-001. Please contact the MIS Team"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
 }
