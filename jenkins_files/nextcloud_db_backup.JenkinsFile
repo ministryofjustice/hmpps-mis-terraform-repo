@@ -20,7 +20,7 @@ def do_nextcloud_db_backup(env_name, git_project_dir , action, backup_date) {
         # set region
         docker run --rm -v \$(pwd):/home/tools/data \
           -v \${HOME}/.aws:/home/tools/.aws \
-          mojdigitalstudio/hmpps-base-mysql sh scripts/nextcloud_db_backup.sh ${action} ${env_name} ${backup_date}
+          mojdigitalstudio/hmpps-base-mysql scripts/nextcloud_db_backup.sh ${action} ${env_name} ${backup_date}
         set -e
         """
     }

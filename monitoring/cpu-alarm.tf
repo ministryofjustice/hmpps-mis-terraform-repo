@@ -13,6 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_cpu_alert" {
   threshold                 = "85"
   alarm_description         = "CPU utilization is averaging 85% for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bws.bws_instance_ids[count.index]}"
@@ -31,8 +32,9 @@ resource "aws_cloudwatch_metric_alarm" "dis_cpu_alert" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "85"
-  alarm_description         = "CPU utilization is averaging 85% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
+  alarm_description         = "CPU utilization is averaging 85% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please note: During the ETL Run it is normal for resource usage to be high, daily between 18:30-00:00 & 01:00-05:30 when this can be ignored. Otherwise contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_ids[count.index]}"
@@ -53,6 +55,7 @@ resource "aws_cloudwatch_metric_alarm" "bps_cpu_alert" {
   threshold                 = "85"
   alarm_description         = "CPU utilization is averaging 85% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_ids[count.index]}"
@@ -73,6 +76,7 @@ resource "aws_cloudwatch_metric_alarm" "bcs_cpu_alert" {
   threshold                 = "85"
   alarm_description         = "CPU utilization is averaging 85% for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
@@ -93,6 +97,7 @@ resource "aws_cloudwatch_metric_alarm" "bfs_cpu_alert" {
   threshold                 = "85"
   alarm_description         = "CPU utilization is averaging 85% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bfs.bfs_instance_ids[count.index]}"
@@ -114,6 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_cpu_severe" {
   threshold                 = "90"
   alarm_description         = "CPU utilization is averaging 90% for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bws.bws_instance_ids[count.index]}"
@@ -132,8 +138,9 @@ resource "aws_cloudwatch_metric_alarm" "dis_cpu_severe" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "90"
-  alarm_description         = "CPU utilization is averaging 90% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
+  alarm_description         = "CPU utilization is averaging 90% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please note: During the ETL Run it is normal for resource usage to be high, daily between 18:30-00:00 & 01:00-05:30 when this can be ignored. Otherwise contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_ids[count.index]}"
@@ -154,6 +161,7 @@ resource "aws_cloudwatch_metric_alarm" "bps_cpu_severe" {
   threshold                 = "90"
   alarm_description         = "CPU utilization is averaging 90% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_ids[count.index]}"
@@ -174,6 +182,7 @@ resource "aws_cloudwatch_metric_alarm" "bcs_cpu_severe" {
   threshold                 = "90"
   alarm_description         = "CPU utilization is averaging 90% for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
@@ -194,6 +203,7 @@ resource "aws_cloudwatch_metric_alarm" "bfs_cpu_severe" {
   threshold                 = "90"
   alarm_description         = "CPU utilization is averaging 90% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bfs.bfs_instance_ids[count.index]}"
@@ -216,6 +226,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_cpu_critical" {
   threshold                 = "92"
   alarm_description         = "CPU utilization is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bws.bws_instance_ids[count.index]}"
@@ -234,8 +245,9 @@ resource "aws_cloudwatch_metric_alarm" "dis_cpu_critical" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "92"
-  alarm_description         = "CPU utilization is averaging 92% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
+  alarm_description         = "CPU utilization is averaging 92% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please note: During the ETL Run it is normal for resource usage to be high, daily between 18:30-00:00 & 01:00-05:30 when this can be ignored. Otherwise contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_ids[count.index]}"
@@ -256,6 +268,7 @@ resource "aws_cloudwatch_metric_alarm" "bps_cpu_critical" {
   threshold                 = "92"
   alarm_description         = "CPU utilization is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_ids[count.index]}"
@@ -276,6 +289,7 @@ resource "aws_cloudwatch_metric_alarm" "bcs_cpu_critical" {
   threshold                 = "92"
   alarm_description         = "CPU utilization is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
@@ -296,6 +310,7 @@ resource "aws_cloudwatch_metric_alarm" "bfs_cpu_critical" {
   threshold                 = "92"
   alarm_description         = "CPU utilization is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]  
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bfs.bfs_instance_ids[count.index]}"

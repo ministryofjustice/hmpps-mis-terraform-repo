@@ -13,6 +13,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
   threshold                 = "85"
   alarm_description         = "Memory Utilization  is averaging 85% for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]}. Please contact the MIS Team or the MIS AWS Support Contact."
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
   dimensions {
                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bws.bws_instance_ids[count.index]}"
@@ -36,9 +37,10 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
    threshold                 = "85"
    alarm_description         = "Memory Utilization  is averaging 85% for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
    alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
    dimensions {
-                  InstanceId = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
+                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
 				  ImageId      = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_ami_id[count.index]}"
 				  InstanceType = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_type[count.index]}"
 				  objectname   = "Memory"
@@ -59,6 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
    threshold                 = "85"
    alarm_description         = "Memory Utilization  is averaging 85% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
    alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
    dimensions {
                   InstanceId   = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_ids[count.index]}"
@@ -82,6 +85,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
    threshold                 = "85"
    alarm_description         = "Memory Utilization  is averaging 85% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
    alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
    dimensions {
                   InstanceId   = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_ids[count.index]}"
@@ -105,6 +109,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
    threshold                 = "85"
    alarm_description         = "Memory Utilization  is averaging 85% for ${data.terraform_remote_state.ec2-ndl-bfs.bfs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
    alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
    dimensions {
                   InstanceId = "${data.terraform_remote_state.ec2-ndl-bfs.bfs_instance_ids[count.index]}"
@@ -130,6 +135,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
     threshold                 = "88"
     alarm_description         = "Memory Utilization  is averaging 88% for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]}. Please contact the MIS Team or the MIS AWS Support Contact."
     alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+    ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
     dimensions {
                    InstanceId = "${data.terraform_remote_state.ec2-ndl-bws.bws_instance_ids[count.index]}"
@@ -153,9 +159,10 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
      threshold                 = "88"
      alarm_description         = "Memory Utilization  is averaging 88% for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
      alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+     ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
      dimensions {
-                    InstanceId = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
+                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
   				  ImageId      = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_ami_id[count.index]}"
   				  InstanceType = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_type[count.index]}"
   				  objectname   = "Memory"
@@ -176,9 +183,10 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
      threshold                 = "88"
      alarm_description         = "Memory Utilization  is averaging 88% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
      alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+     ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
      dimensions {
-                    InstanceId   = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_ids[count.index]}"
+                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_ids[count.index]}"
   				  ImageId      = "${data.terraform_remote_state.ec2-ndl-bps.bps_ami_id[count.index]}"
   				  InstanceType = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_type[count.index]}"
   				  objectname   = "Memory"
@@ -199,9 +207,10 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
      threshold                 = "88"
      alarm_description         = "Memory Utilization  is averaging 88% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
      alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+     ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
      dimensions {
-                    InstanceId   = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_ids[count.index]}"
+                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_ids[count.index]}"
   				  ImageId      = "${data.terraform_remote_state.ec2-ndl-dis.dis_ami_id[count.index]}"
   				  InstanceType = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_type[count.index]}"
   				  objectname   = "Memory"
@@ -222,6 +231,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
      threshold                 = "88"
      alarm_description         = "Memory Utilization  is averaging 88% for ${data.terraform_remote_state.ec2-ndl-bfs.bfs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
      alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+     ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
      dimensions {
                     InstanceId   = "${data.terraform_remote_state.ec2-ndl-bfs.bfs_instance_ids[count.index]}"
@@ -247,6 +257,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
 	  threshold                 = "92"
 	  alarm_description         = "Memory Utilization  is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bws.bws_primary_dns_ext[count.index]}. Please contact the MIS Team or the MIS AWS Support Contact."
 	  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+      ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
 	  dimensions {
 	                 InstanceId   = "${data.terraform_remote_state.ec2-ndl-bws.bws_instance_ids[count.index]}"
@@ -270,6 +281,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
 	   threshold                 = "92"
 	   alarm_description         = "Memory Utilization  is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bcs.bcs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
 	   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+       ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
 	   dimensions {
 	                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-bcs.bcs_instance_ids[count.index]}"
@@ -293,6 +305,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
 	   threshold                 = "92"
 	   alarm_description         = "Memory Utilization  is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bps.bps_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
 	   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+       ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
 	   dimensions {
 	                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-bps.bps_instance_ids[count.index]}"
@@ -316,6 +329,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
 	   threshold                 = "92"
 	   alarm_description         = "Memory Utilization  is averaging 92% for ${data.terraform_remote_state.ec2-ndl-dis.dis_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
 	   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+       ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
 	   dimensions {
 	                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-dis.dis_instance_ids[count.index]}"
@@ -339,6 +353,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_instance-memory-alert" {
 	   threshold                 = "92"
 	   alarm_description         = "Memory Utilization  is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bfs.bfs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
 	   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+       ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
 
 	   dimensions {
 	                  InstanceId   = "${data.terraform_remote_state.ec2-ndl-bfs.bfs_instance_ids[count.index]}"
