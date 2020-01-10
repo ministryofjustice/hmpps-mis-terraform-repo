@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER003_APS_Core" {
 
 resource "aws_cloudwatch_log_metric_filter" "CMSTIER003_APS_Core" {
  name           = "CMSTIER003APSCoreCount"
- pattern        = "CMSTIER003.APS.Core"
+ pattern        = "${local.exclude_log_level} CMSTIER003.APS.Core"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -43,7 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER003_APS_MonitoringService" {
 
 resource "aws_cloudwatch_log_metric_filter" "CMSTIER003_APS_MonitoringService" {
  name           = "CMSTIER003APSMonitoringServiceCount"
- pattern        = "CMSTIER003.APS.MonitoringService"
+ pattern        = "${local.exclude_log_level} CMSTIER003.APS.MonitoringService"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -70,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER003_CentralManagementServer" {
 
 resource "aws_cloudwatch_log_metric_filter" "CMSTIER003_CentralManagementServer" {
  name           = "CMSTIER003CentralManagementServerCount"
- pattern        = "CMSTIER003.CentralManagementServer"
+ pattern        = "${local.exclude_log_level} CMSTIER003.CentralManagementServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER003_ConnectionServer" {
 
 resource "aws_cloudwatch_log_metric_filter" "CMSTIER003_ConnectionServer" {
  name           = "CMSTIER003ConnectionServerCount"
- pattern        = "CMSTIER003.ConnectionServer"
+ pattern        = "${local.exclude_log_level} CMSTIER003.ConnectionServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER003_ConnectionServer32" {
 
 resource "aws_cloudwatch_log_metric_filter" "CMSTIER003_ConnectionServer32" {
  name           = "CMSTIER003ConnectionServer32Count"
- pattern        = "CMSTIER003.ConnectionServer32"
+ pattern        = "${local.exclude_log_level} CMSTIER003.ConnectionServer32"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -152,7 +152,7 @@ resource "aws_cloudwatch_metric_alarm" "CMSTIER003_WebApplicationContainerServer
 
 resource "aws_cloudwatch_log_metric_filter" "CMSTIER003_WebApplicationContainerServer" {
  name           = "CMSTIER003WebApplicationContainerServerCount"
- pattern        = "CMSTIER003.WebApplicationContainerServer"
+ pattern        = "${local.exclude_log_level} CMSTIER003.WebApplicationContainerServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {

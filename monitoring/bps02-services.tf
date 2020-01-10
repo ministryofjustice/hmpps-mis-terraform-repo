@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_AdaptiveJobServer" {
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_AdaptiveJobServer" {
  name           = "PROCTIER002AdaptiveJobServerCount"
- pattern        = "PROCTIER002.AdaptiveJobServer"
+ pattern        = "${local.exclude_log_level} PROCTIER002.AdaptiveJobServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_APS_Webi" {
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_APS_Webi" {
  name           = "PROCTIER002APSWebiCount"
- pattern        = "PROCTIER002.APS.Webi"
+ pattern        = "${local.exclude_log_level} PROCTIER002.APS.Webi"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -70,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_ConnectionServer" {
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_ConnectionServer" {
  name           = "PROCTIER002ConnectionServerCount"
- pattern        = "PROCTIER002.ConnectionServer"
+ pattern        = "${local.exclude_log_level} PROCTIER002.ConnectionServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_ConnectionServer32" {
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_ConnectionServer32" {
  name           = "PROCTIER002ConnectionServer32Count"
- pattern        = "PROCTIER002.ConnectionServer32"
+ pattern        = "${local.exclude_log_level} PROCTIER002.ConnectionServer32"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessingServer" {
  name           = "PROCTIER002WebIntelligenceProcessingServerCount"
- pattern        = "PROCTIER002.WebIntelligenceProcessingServer"
+ pattern        = "${local.exclude_log_level} PROCTIER002.WebIntelligenceProcessingServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -152,7 +152,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessingServer1" {
  name           = "PROCTIER002WebIntelligenceProcessingServer1Count"
- pattern        = "PROCTIER002.WebIntelligenceProcessingServer1"
+ pattern        = "${local.exclude_log_level} PROCTIER002.WebIntelligenceProcessingServer1"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
