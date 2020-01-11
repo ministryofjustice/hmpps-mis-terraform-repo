@@ -135,6 +135,35 @@ resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessi
  }
 }
 
+##PROCTIER002.WebIntelligenceProcessingServer OK ALARM
+resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingServer_OK" {
+  alarm_name                = "${local.environment_name}__PROCTIER002.WebIntelligenceProcessingServer__OK"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "PROCTIER002WebIntelligenceProcessingServerCount_OK"
+  namespace                 = "${local.name_space}"
+  period                    = "120"
+  statistic                 = "Sum"
+  threshold                 = "1"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer Service in Error state on ndl-bps-002. If no OK alarm is recieved in a few minutes, please contact the MIS Team"
+  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
+}
+
+resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessingServer_OK" {
+ name           = "PROCTIER002WebIntelligenceProcessingServerCount_OK"
+ pattern        = "INFORMATION PROCTIER002.WebIntelligenceProcessingServer has been started"
+ log_group_name = "${local.log_group_name}"
+
+ metric_transformation {
+   name      = "PROCTIER002WebIntelligenceProcessingServerCount_OK"
+   namespace = "${local.name_space}"
+   value     = "1"
+ }
+}
+
+
 resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingServer1" {
   alarm_name                = "${local.environment_name}__PROCTIER002.WebIntelligenceProcessingServer1__critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -157,6 +186,34 @@ resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessi
 
  metric_transformation {
    name      = "PROCTIER002WebIntelligenceProcessingServer1Count"
+   namespace = "${local.name_space}"
+   value     = "1"
+ }
+}
+
+##PROCTIER002.WebIntelligenceProcessingServer1 OK ALARM
+resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingServer1_OK" {
+  alarm_name                = "${local.environment_name}__PROCTIER002.WebIntelligenceProcessingServer1__OK"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "PROCTIER002WebIntelligenceProcessingServer1Count_OK"
+  namespace                 = "${local.name_space}"
+  period                    = "120"
+  statistic                 = "Sum"
+  threshold                 = "1"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-002. If no OK alarm is recieved in a few minutes, please contact the MIS Team"
+  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
+}
+
+resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessingServer1_OK" {
+ name           = "PROCTIER002WebIntelligenceProcessingServer1Count_OK"
+ pattern        = "INFORMATION PROCTIER002.WebIntelligenceProcessingServer1 has been started"
+ log_group_name = "${local.log_group_name}"
+
+ metric_transformation {
+   name      = "PROCTIER002WebIntelligenceProcessingServer1Count_OK"
    namespace = "${local.name_space}"
    value     = "1"
  }
