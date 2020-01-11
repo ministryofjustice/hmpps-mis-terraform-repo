@@ -31,6 +31,12 @@ exports.handler = function(event, context) {
             if (severity=='severe' )
                icon_emoji = ":x:";
 
+            if (severity=='OK' )
+               icon_emoji = ":white_check_mark:";
+
+            if (severity=='OK' )
+               newStateValue='OK';
+
             if (newStateValue=='OK' )
                icon_emoji = ":white_check_mark:";
 

@@ -7,6 +7,7 @@
                                                 "event_format": "text",
                                                 "event_levels": [
                                                         "VERBOSE",
+                                                        "INFORMATION",
                                                         "WARNING",
                                                         "ERROR",
                                                         "CRITICAL"
@@ -19,6 +20,7 @@
                                                 "event_format": "text",
                                                 "event_levels": [
                                                         "VERBOSE",
+                                                        "INFORMATION",
                                                         "WARNING",
                                                         "ERROR",
                                                         "CRITICAL"
