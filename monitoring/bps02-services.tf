@@ -117,7 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer Service in Error state on ndl-bps-002. Please contact the MIS Team"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer Service in Error state on ndl-bps-002. ${local.mis_team_action}"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
@@ -145,7 +145,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
   period                    = "120"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer Service in Error state on ndl-bps-002. If no OK alarm is recieved in a few minutes, please contact the MIS Team"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer Service in Error state on ndl-bps-002. ${local.mis_team_action}"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
@@ -173,7 +173,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-002. Please contact the MIS Team"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-002. ${local.mis_team_action}"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
@@ -201,7 +201,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
   period                    = "120"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-002. If no OK alarm is recieved in a few minutes, please contact the MIS Team"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-002. ${local.mis_team_action}"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"

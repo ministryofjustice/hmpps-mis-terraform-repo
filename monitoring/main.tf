@@ -118,6 +118,7 @@ locals {
   log_group_name               = "/mis/application_logs"
   name_space                   = "LogMetrics"
   exclude_log_level            = "-INFORMATION -WARNING"
+  mis_team_action              = "If no OK alarm is recieved in a few minutes, please contact the MIS Team"
 }
 
 #dashboard
