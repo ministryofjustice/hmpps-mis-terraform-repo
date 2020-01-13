@@ -45,8 +45,8 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_latency" {
   statistic                 = "Average"
   threshold                 = "5"
   alarm_description         = "The BWS loadbalancer ${local.bws_lb_name} is averaging on high latency. Please contact the MIS AWS Support contact."
-  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  #alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  #ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
 
   dimensions {

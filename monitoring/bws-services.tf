@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_httpd" {
 
 resource "aws_cloudwatch_log_metric_filter" "bws_httpd" {
  name           = "BwsHttpdCount"
- pattern        = "httpd"
+ pattern        = "${local.exclude_log_level} httpd"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_Tomcat" {
 
 resource "aws_cloudwatch_log_metric_filter" "bws_Tomcat" {
  name           = "BwsTomcatCount"
- pattern        = "Tomcat"
+ pattern        = "${local.exclude_log_level} Tomcat"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -72,7 +72,7 @@ resource "aws_cloudwatch_metric_alarm" "etl" {
 
 resource "aws_cloudwatch_log_metric_filter" "etl" {
  name           = "EtlCount"
- pattern        = "01.CentralManagementServer stopped unexpectedly."
+ pattern        = "${local.exclude_log_level} 01.CentralManagementServer stopped unexpectedly."
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {

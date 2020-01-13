@@ -1,6 +1,14 @@
 var https = require('https');
 var util = require('util');
 
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+}
+
 exports.handler = function(event, context) {
     console.log(JSON.stringify(event, null, 2));
 
@@ -30,6 +38,15 @@ exports.handler = function(event, context) {
 
             if (severity=='severe' )
                icon_emoji = ":x:";
+
+            if (severity=='OK' )
+               sleep(2000);
+
+            if (severity=='OK' )
+               icon_emoji = ":white_check_mark:";
+
+            if (severity=='OK' )
+               newStateValue='OK';
 
             if (newStateValue=='OK' )
                icon_emoji = ":white_check_mark:";

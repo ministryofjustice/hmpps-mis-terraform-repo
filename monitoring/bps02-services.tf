@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_AdaptiveJobServer" {
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_AdaptiveJobServer" {
  name           = "PROCTIER002AdaptiveJobServerCount"
- pattern        = "PROCTIER002.AdaptiveJobServer"
+ pattern        = "${local.exclude_log_level} PROCTIER002.AdaptiveJobServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_APS_Webi" {
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_APS_Webi" {
  name           = "PROCTIER002APSWebiCount"
- pattern        = "PROCTIER002.APS.Webi"
+ pattern        = "${local.exclude_log_level} PROCTIER002.APS.Webi"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -70,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_ConnectionServer" {
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_ConnectionServer" {
  name           = "PROCTIER002ConnectionServerCount"
- pattern        = "PROCTIER002.ConnectionServer"
+ pattern        = "${local.exclude_log_level} PROCTIER002.ConnectionServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_ConnectionServer32" {
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_ConnectionServer32" {
  name           = "PROCTIER002ConnectionServer32Count"
- pattern        = "PROCTIER002.ConnectionServer32"
+ pattern        = "${local.exclude_log_level} PROCTIER002.ConnectionServer32"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -117,7 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer Service in Error state on ndl-bps-002. Please contact the MIS Team"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer Service in Error state on ndl-bps-002. ${local.mis_team_action}"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessingServer" {
  name           = "PROCTIER002WebIntelligenceProcessingServerCount"
- pattern        = "PROCTIER002.WebIntelligenceProcessingServer"
+ pattern        = "${local.exclude_log_level} PROCTIER002.WebIntelligenceProcessingServer"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
@@ -134,6 +134,35 @@ resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessi
    value     = "1"
  }
 }
+
+##PROCTIER002.WebIntelligenceProcessingServer OK ALARM
+resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingServer_OK" {
+  alarm_name                = "${local.environment_name}__PROCTIER002.WebIntelligenceProcessingServer__OK"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "PROCTIER002WebIntelligenceProcessingServerCount_OK"
+  namespace                 = "${local.name_space}"
+  period                    = "120"
+  statistic                 = "Sum"
+  threshold                 = "1"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer Service in Error state on ndl-bps-002. ${local.mis_team_action}"
+  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
+}
+
+resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessingServer_OK" {
+ name           = "PROCTIER002WebIntelligenceProcessingServerCount_OK"
+ pattern        = "INFORMATION PROCTIER002.WebIntelligenceProcessingServer has been started"
+ log_group_name = "${local.log_group_name}"
+
+ metric_transformation {
+   name      = "PROCTIER002WebIntelligenceProcessingServerCount_OK"
+   namespace = "${local.name_space}"
+   value     = "1"
+ }
+}
+
 
 resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingServer1" {
   alarm_name                = "${local.environment_name}__PROCTIER002.WebIntelligenceProcessingServer1__critical"
@@ -144,7 +173,7 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
   period                    = "60"
   statistic                 = "Sum"
   threshold                 = "1"
-  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-002. Please contact the MIS Team"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-002. ${local.mis_team_action}"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   treat_missing_data        = "notBreaching"
   datapoints_to_alarm       = "1"
@@ -152,11 +181,39 @@ resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingSer
 
 resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessingServer1" {
  name           = "PROCTIER002WebIntelligenceProcessingServer1Count"
- pattern        = "PROCTIER002.WebIntelligenceProcessingServer1"
+ pattern        = "${local.exclude_log_level} PROCTIER002.WebIntelligenceProcessingServer1"
  log_group_name = "${local.log_group_name}"
 
  metric_transformation {
    name      = "PROCTIER002WebIntelligenceProcessingServer1Count"
+   namespace = "${local.name_space}"
+   value     = "1"
+ }
+}
+
+##PROCTIER002.WebIntelligenceProcessingServer1 OK ALARM
+resource "aws_cloudwatch_metric_alarm" "PROCTIER002_WebIntelligenceProcessingServer1_OK" {
+  alarm_name                = "${local.environment_name}__PROCTIER002.WebIntelligenceProcessingServer1__OK"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  metric_name               = "PROCTIER002WebIntelligenceProcessingServer1Count_OK"
+  namespace                 = "${local.name_space}"
+  period                    = "120"
+  statistic                 = "Sum"
+  threshold                 = "1"
+  alarm_description         = "PROCTIER002.WebIntelligenceProcessingServer1 Service in Error state on ndl-bps-002. ${local.mis_team_action}"
+  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
+  treat_missing_data        = "notBreaching"
+  datapoints_to_alarm       = "1"
+}
+
+resource "aws_cloudwatch_log_metric_filter" "PROCTIER002_WebIntelligenceProcessingServer1_OK" {
+ name           = "PROCTIER002WebIntelligenceProcessingServer1Count_OK"
+ pattern        = "INFORMATION PROCTIER002.WebIntelligenceProcessingServer1 has been started"
+ log_group_name = "${local.log_group_name}"
+
+ metric_transformation {
+   name      = "PROCTIER002WebIntelligenceProcessingServer1Count_OK"
    namespace = "${local.name_space}"
    value     = "1"
  }
