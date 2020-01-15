@@ -315,7 +315,7 @@ pipeline {
                 }
             }
         }
-
+      }
     }
 
      stage('Delius | MIS monitoring')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'monitoring')}}}
