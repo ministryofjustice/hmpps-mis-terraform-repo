@@ -83,6 +83,8 @@ ndl-bws-001.probation.service.justice.gov.uk
 ndl-bws-002.probation.service.justice.gov.uk
 ```
 ## DIS
+DIS Endpoint [https://ndl-dis.probation.service.justice.gov.uk/DataServices/](https://ndl-dis.probation.service.justice.gov.uk/DataServices/)
+
 #### Internal DNS  
 
 

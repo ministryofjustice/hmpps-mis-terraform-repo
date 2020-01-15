@@ -84,6 +84,8 @@ ndl-bws-501.pre-prod.delius.probation.hmpps.dsd.io
 ndl-bws-502.pre-prod.delius.probation.hmpps.dsd.io
 ```
 ## DIS
+DIS Endpoint [https://ndl-dis.pre-prod.delius.probation.hmpps.dsd.io/DataServices/](https://ndl-dis.pre-prod.delius.probation.hmpps.dsd.io/DataServices/)
+
 #### Internal DNS  
 
 
