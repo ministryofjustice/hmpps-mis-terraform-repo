@@ -73,6 +73,8 @@ ndl-bws-101.delius-mis-dev.internal
 ndl-bws-101.mis-dev.delius.probation.hmpps.dsd.io
 ```
 ## DIS
+DIS Endpoint [https://ndl-dis.mis-dev.delius.probation.hmpps.dsd.io/DataServices/(https://ndl-dis.mis-dev.delius.probation.hmpps.dsd.io/DataServices/)
+
 #### Internal DNS
 
 
