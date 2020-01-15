@@ -175,7 +175,7 @@ pipeline {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
                     parameters: [
                        [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
-                       [$class: 'StringParameterValue', name: 'target_host', value: 'database_mis'],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'mis_primarydb'],
                        [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
                        [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
                     ]}
@@ -187,7 +187,7 @@ pipeline {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
                     parameters: [
                        [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
-                       [$class: 'StringParameterValue', name: 'target_host', value: 'database_misboe'],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_primarydb'],
                        [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
                        [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
                     ]
@@ -200,7 +200,7 @@ pipeline {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
                     parameters: [
                        [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
-                       [$class: 'StringParameterValue', name: 'target_host', value: 'database_misdsd'],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_primarydb'],
                        [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
                        [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
                     ]
