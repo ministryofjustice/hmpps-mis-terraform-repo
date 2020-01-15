@@ -77,6 +77,15 @@ data "terraform_remote_state" "security-groups_secondary" {
 }
 
 #-------------------------------------------------------------
+### Getting ACM Cert
+#-------------------------------------------------------------
+data "aws_acm_certificate" "cert" {
+  domain      = "*.${data.terraform_remote_state.common.external_domain}"
+  types       = ["AMAZON_ISSUED"]
+  most_recent = true
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -128,18 +137,21 @@ locals {
   private_subnet_map           = "${data.terraform_remote_state.common.private_subnet_map}"
   s3bucket                     = "${data.terraform_remote_state.s3bucket.s3bucket}"
   app_hostnames                = "${data.terraform_remote_state.common.app_hostnames}"
-
-  public_cidr_block  = ["${data.terraform_remote_state.common.db_cidr_block}"]
-  private_cidr_block = ["${data.terraform_remote_state.common.private_cidr_block}"]
-  db_cidr_block      = ["${data.terraform_remote_state.common.db_cidr_block}"]
-  sg_map_ids         = "${data.terraform_remote_state.security-groups.sg_map_ids}"
-  instance_profile   = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
-  ssh_deployer_key   = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
-  nart_role          = "ndl-dis-${data.terraform_remote_state.common.legacy_environment_name}"
+  certificate_arn              = "${data.aws_acm_certificate.cert.arn}"
+  public_cidr_block            = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  private_cidr_block           = ["${data.terraform_remote_state.common.private_cidr_block}"]
+  db_cidr_block                = ["${data.terraform_remote_state.common.db_cidr_block}"]
+  sg_map_ids                   = "${data.terraform_remote_state.security-groups.sg_map_ids}"
+  instance_profile             = "${data.terraform_remote_state.iam.iam_policy_int_app_instance_profile_name}"
+  ssh_deployer_key             = "${data.terraform_remote_state.common.common_ssh_deployer_key}"
+  nart_role                    = "ndl-dis-${data.terraform_remote_state.common.legacy_environment_name}"
   # Create a prefix that removes the final integer from the nart_role value
-  nart_prefix = "${ substr(local.nart_role, 0, length(local.nart_role)-1) }"
-  sg_outbound_id     = "${data.terraform_remote_state.common.common_sg_outbound_id}"
-  sg_smtp_ses        = "${data.terraform_remote_state.security-groups_secondary.sg_smtp_ses}"
+  nart_prefix                  = "${ substr(local.nart_role, 0, length(local.nart_role)-1) }"
+  sg_outbound_id               = "${data.terraform_remote_state.common.common_sg_outbound_id}"
+  sg_smtp_ses                  = "${data.terraform_remote_state.security-groups_secondary.sg_smtp_ses}"
+  dis_port                     = "${data.terraform_remote_state.security-groups.bws_port}"
+  public_subnet_ids            = ["${data.terraform_remote_state.common.public_subnet_ids}"]
+  logs_bucket                  = "${data.terraform_remote_state.common.common_s3_lb_logs_bucket}"
 }
 
 #-------------------------------------------------------------
@@ -230,4 +242,14 @@ resource "aws_route53_record" "dis_dns_ext" {
   type    = "A"
   ttl     = "300"
   records = ["${element(aws_instance.dis_server.*.private_ip, count.index)}"]
+}
+
+
+#-------------------------------------------------------------
+# Create elb attachments
+#-------------------------------------------------------------
+resource "aws_elb_attachment" "environment" {
+  count     = "${var.dis_server_count}"
+  elb       = "${module.create_app_elb.environment_elb_name}"
+  instance  = "${element(aws_instance.dis_server.*.id, count.index)}"
 }
