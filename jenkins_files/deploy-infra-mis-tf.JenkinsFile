@@ -167,6 +167,49 @@ pipeline {
          stage('Delius | MIS database_misdsd')  { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_misdsd')}}}
        }
      }
+     stage('Check Oracle Software Patches on Primary') {
+       parallel {
+         stage('Delius | Check MIS database_mis') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                    parameters: [
+                       [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'mis_primarydb'],
+                       [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                       [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
+                    ]}
+            }
+         } 
+         stage('Delius | Check MIS database_misboe') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                    parameters: [
+                       [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_primarydb'],
+                       [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                       [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
+                    ]
+                }
+            }
+         }
+         stage('Delius | Check MIS database_misdsd') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                    parameters: [
+                       [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_primarydb'],
+                       [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                       [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
+                    ]
+                }
+            }
+         }
+       }
+     }
+
      stage('Provision Servers') {
        parallel {
          stage('Delius | MIS ec2-ndl-dis') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis')}}}
@@ -195,6 +238,87 @@ pipeline {
          ]}}
        }
      }
+
+     stage ('Check Oracle Software and Patches on HA') {
+     parallel {
+
+        stage('Check Oracle Software Patches on MIS DB HA 1') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'mis_standbydb1'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+        stage('Check Oracle Software Patches on MIS DB HA 2') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'mis_standbydb2'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+ 
+        stage('Check Oracle Software Patches on MISBOE DB HA 1') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_standbydb1'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+        stage('Check Oracle Software Patches on MISBOE DB HA 2') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_standbydb2'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+
+        stage('Check Oracle Software Patches on MISDSD DB HA 1') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_standbydb1'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+        stage('Check Oracle Software Patches on MISDSD DB HA 2') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_standbydb2'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+      }
+    }
+
      stage('Delius | MIS monitoring')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'monitoring')}}}
      stage('Smoke test') { steps { build job: "DAMS/Environments/${environment_name}/MIS/Smoke_test", parameters: [[$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"]]}}
     }
