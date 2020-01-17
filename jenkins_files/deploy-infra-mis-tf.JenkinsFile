@@ -137,6 +137,10 @@ pipeline {
 
     agent { label "jenkins_slave" }
 
+    parameters {
+         booleanParam(name: 'deploy_DATABASE_HA', defaultValue: true, description: 'Deploy/update Database High Availibilty?')
+    }
+
     stages {
 
         stage('setup') {
@@ -221,20 +225,26 @@ pipeline {
      }
      stage('Build Database High Availibilty') {
        parallel {
-         stage('Build MIS DB HA')    { steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MIS",
-         parameters: [
-            [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
-            [$class: 'StringParameterValue', name: 'db_group', value: "mis"]
+         stage('Build MIS DB HA')    { 
+             when { expression { return params.deploy_DATABASE_HA } }
+             steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MIS",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'db_group', value: "mis"]
          ]}}
-         stage('Build MISBOE DB HA') { steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISBOE",
-         parameters: [
-            [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
-            [$class: 'StringParameterValue', name: 'db_group', value: "misboe"]
+         stage('Build MISBOE DB HA') { 
+             when { expression { return params.deploy_DATABASE_HA } }
+             steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISBOE",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'db_group', value: "misboe"]
          ]}}
-         stage('Build MISDSD DB HA') { steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISDSD",
-         parameters: [
-            [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
-            [$class: 'StringParameterValue', name: 'db_group', value: "misdsd"]
+         stage('Build MISDSD DB HA') { 
+             when { expression { return params.deploy_DATABASE_HA } }
+             steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISDSD",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'db_group', value: "misdsd"]
          ]}}
        }
      }
