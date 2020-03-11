@@ -1,9 +1,9 @@
-module "misboe_db_2" {
+module "misboe_db_3" {
   source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=master//modules//oracle-database"
-  server_name = "misboe-db-2"
+  server_name = "misboe-db-3"
 
   ami_id               = "${data.aws_ami.centos_oracle_db.id}"
-  db_subnet            = "${data.terraform_remote_state.vpc.vpc_db-subnet-az2}"
+  db_subnet            = "${data.terraform_remote_state.vpc.vpc_db-subnet-az3}"
   key_name             = "${data.terraform_remote_state.vpc.ssh_deployer_key}"
   iam_instance_profile = "${data.terraform_remote_state.iam.iam_policy_int_mis_db_instance_profile_name}"
 
@@ -25,7 +25,8 @@ module "misboe_db_2" {
   environment_type = "${var.environment_type}"
   region           = "${var.region}"
 
-  kms_key_id      = "${module.kms_key_misboe_db.kms_arn}"
+  #kms_key_id      = "${module.kms_key_misboe_db.kms_arn}"
+  kms_key_id      = "${data.terraform_remote_state.misboe-db-1.kms_arn}"
   public_zone_id  = "${data.terraform_remote_state.vpc.public_zone_id}"
   private_zone_id = "${data.terraform_remote_state.vpc.private_zone_id}"
   private_domain  = "${data.terraform_remote_state.vpc.private_zone_name}"
@@ -52,34 +53,34 @@ module "misboe_db_2" {
 }
 
 #legacy (used for info only)
-output "ami_misboe_db_2" {
-  value = "${module.misboe_db_2.ami_id}"
+output "ami_misboe_db_3" {
+  value = "${module.misboe_db_3.ami_id}"
 }
 
-output "public_fqdn_misboe_db_2" {
-  value = "${module.misboe_db_2.public_fqdn}"
+output "public_fqdn_misboe_db_3" {
+  value = "${module.misboe_db_3.public_fqdn}"
 }
 
-output "internal_fqdn_misboe_db_2" {
-  value = "${module.misboe_db_2.internal_fqdn}"
+output "internal_fqdn_misboe_db_3" {
+  value = "${module.misboe_db_3.internal_fqdn}"
 }
 
-output "private_ip_misboe_db_2" {
-  value = "${module.misboe_db_2.private_ip}"
+output "private_ip_misboe_db_3" {
+  value = "${module.misboe_db_3.private_ip}"
 }
 
-output "db_disks_misboe_db_2" {
-  value = "${module.misboe_db_2.db_size_parameters}"
+output "db_disks_misboe_db_3" {
+  value = "${module.misboe_db_3.db_size_parameters}"
 }
 
 # map (tidier)
-output "misboe_db_2" {
+output "misboe_db_3" {
   value = {
-    ami_id        = "${module.misboe_db_2.ami_id}",
-    public_fqdn   = "${module.misboe_db_2.public_fqdn}",
-    internal_fqdn = "${module.misboe_db_2.internal_fqdn}",
-    private_ip    = "${module.misboe_db_2.private_ip}",
-    db_disks      = "${module.misboe_db_2.db_size_parameters}",
-    misboe_db_2   = "ssh ${module.misboe_db_2.public_fqdn}",
+    ami_id        = "${module.misboe_db_3.ami_id}",
+    public_fqdn   = "${module.misboe_db_3.public_fqdn}",
+    internal_fqdn = "${module.misboe_db_3.internal_fqdn}",
+    private_ip    = "${module.misboe_db_3.private_ip}",
+    db_disks      = "${module.misboe_db_3.db_size_parameters}",
+    misboe_db_3   = "ssh ${module.misboe_db_3.public_fqdn}",
   }
 }
