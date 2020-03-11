@@ -2,14 +2,11 @@ def project = [:]
 project.config    = 'hmpps-env-configs'
 project.mis       = 'hmpps-mis-terraform-repo'
 
-// Parameters required for job
-// parameters:
-//     choice:
-//       name: 'environment_name'
-//       description: 'Environment name.'
-//     booleanParam:
-//       name: 'confirmation'
-//       description: 'Whether to require manual confirmation of terraform plans.'
+
+parameters {
+  booleanParam(name: 'deploy_DatabaseStandBy1', defaultValue: true, description: 'Deploy/update Database StandBy 1?')
+  booleanParam(name: 'deploy_DatabaseStandBy2', defaultValue: true, description: 'Deploy/update Database StandBy 2?')
+}      
 
 
 def prepare_env() {
@@ -164,13 +161,66 @@ pipeline {
      stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam')}}}
      stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups')}}}
      stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud')}}}
-     stage('Provision Databases') {
+     
+     stage('Provision Databases - Primaries') {
        parallel {
-         stage('Delius | MIS database_mis')     { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_mis')}}}
-         stage('Delius | MIS database_misboe')  { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_misboe')}}}
-         stage('Delius | MIS database_misdsd')  { steps { script {do_terraform(project.config, environment_name, project.mis, 'database_misdsd')}}}
+         stage('Delius | MIS database_mis_primary')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_mis/server-mis-db-1') }
+            }
+         }
+
+         stage('Delius | MIS database_misboe_primary')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misboe/server-misboe-db-1') }
+            }
+         }
+
+         stage('Delius | MIS database_misdsd_primary')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misdsd/server-misdsd-db-1') }
+            }
+         }
        }
      }
+
+     stage('Provision Databases - Standby 1') {
+       when { expression { return (params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1) } }  
+       parallel {
+         stage('Delius | MIS database_mis_standby1')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_mis/server-mis-db-2') }
+            }
+         }
+
+         stage('Delius | MIS database_misboe_standby1')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misboe/server-misboe-db-2') }
+            }
+         }
+
+         stage('Delius | MIS database_misdsd_standby1')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misdsd/server-misdsd-db-2') }
+            }
+         }
+       }
+     }
+
+     stage('Provision Databases - Standby 2') {
+       when { expression { return (params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2) } }  
+       parallel {
+         stage('Delius | MIS database_mis_standby2')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_mis/server-mis-db-3') }
+            }
+         }
+
+         stage('Delius | MIS database_misboe_standby2')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misboe/server-misboe-db-3') }
+            }
+         }
+
+         stage('Delius | MIS database_misdsd_standby2')     { 
+            steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misdsd/server-misdsd-db-3') }
+            }
+         }
+       }
+     }
+
      stage('Check Oracle Software Patches on Primary') {
        parallel {
          stage('Delius | Check MIS database_mis') {
@@ -223,7 +273,7 @@ pipeline {
          stage('Delius | MIS ec2-ndl-bws') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws')}}}
        }
      }
-     stage('Build Database High Availibilty') {
+     stage('Build Database High Availability') {
        parallel {
          stage('Build MIS DB HA')    { 
              when { expression { return params.deploy_DATABASE_HA } }
@@ -253,6 +303,7 @@ pipeline {
      parallel {
 
         stage('Check Oracle Software Patches on MIS DB HA 1') {
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } } 
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
@@ -265,6 +316,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MIS DB HA 2') {
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } } 
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
@@ -278,6 +330,7 @@ pipeline {
         }
  
         stage('Check Oracle Software Patches on MISBOE DB HA 1') {
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } } 
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
@@ -290,6 +343,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MISBOE DB HA 2') {
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } } 
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
@@ -303,6 +357,7 @@ pipeline {
         }
 
         stage('Check Oracle Software Patches on MISDSD DB HA 1') {
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } } 
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
@@ -315,6 +370,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MISDSD DB HA 2') {
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } } 
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
