@@ -1,5 +1,5 @@
 module "mis_db_1" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=master//modules//oracle-database"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=DAM-659//modules//oracle-database"
   server_name = "mis-db-1"
 
   ami_id               = "${data.aws_ami.centos_oracle_db.id}"
@@ -31,7 +31,7 @@ module "mis_db_1" {
   private_domain  = "${data.terraform_remote_state.vpc.private_zone_name}"
   vpc_account_id  = "${data.terraform_remote_state.vpc.vpc_account_id}"
   db_size         = "${var.db_size_mis}"
-
+  
   ansible_vars = {
     service_user_name             = "${var.ansible_vars_mis_db["service_user_name"]}"
     database_global_database_name = "${var.ansible_vars_mis_db["database_global_database_name"]}"
@@ -51,6 +51,8 @@ module "mis_db_1" {
     ## oradb_sysman_password         = "/${environment_name}/mis/mis-database/db/oradb_sysman_password"
     ## oradb_dbsnmp_password         = "/${environment_name}/mis/mis-database/db/oradb_dbsnmp_password"
     ## oradb_asmsnmp_password        = "/${environment_name}/mis/mis-database/db/oradb_asmsnmp_password"
+
+    database_standby_number = "0"
   }
 }
 

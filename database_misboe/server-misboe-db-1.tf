@@ -1,5 +1,5 @@
 module "misboe_db_1" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=master//modules//oracle-database"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=DAM-659//modules//oracle-database"
   server_name = "misboe-db-1"
 
   ami_id               = "${data.aws_ami.centos_oracle_db.id}"
@@ -51,6 +51,8 @@ module "misboe_db_1" {
     ## oradb_sysman_password         = "/${environment_name}/mis/misboe-database/db/oradb_sysman_password"
     ## oradb_dbsnmp_password         = "/${environment_name}/mis/misboe-database/db/oradb_dbsnmp_password"
     ## oradb_asmsnmp_password        = "/${environment_name}/mis/misboe-database/db/oradb_asmsnmp_password"
+
+    database_standby_number = "0"
   }
 }
 
