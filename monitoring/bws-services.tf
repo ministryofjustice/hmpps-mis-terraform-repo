@@ -1,83 +1,70 @@
-resource "aws_cloudwatch_metric_alarm" "bws_httpd" {
-  alarm_name                = "${local.environment_name}__httpd__critical__bws"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "1"
-  metric_name               = "BwsHttpdCount"
-  namespace                 = "${local.name_space}"
-  period                    = "60"
-  statistic                 = "Sum"
-  threshold                 = "1"
-  alarm_description         = "httpd Service in Error state on BWS Hosts. Please contact the MIS Team"
-  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  treat_missing_data        = "notBreaching"
-  datapoints_to_alarm       = "1"
-}
-
-resource "aws_cloudwatch_log_metric_filter" "bws_httpd" {
- name           = "BwsHttpdCount"
- pattern        = "${local.exclude_log_level} httpd"
- log_group_name = "${local.log_group_name}"
-
- metric_transformation {
-   name      = "BwsHttpdCount"
-   namespace = "${local.name_space}"
-   value     = "1"
- }
-}
-
-resource "aws_cloudwatch_metric_alarm" "bws_Tomcat" {
-  alarm_name                = "${local.environment_name}__Tomcat__critical__bws"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "1"
-  metric_name               = "BwsTomcatCount"
-  namespace                 = "${local.name_space}"
-  period                    = "60"
-  statistic                 = "Sum"
-  threshold                 = "1"
-  alarm_description         = "Tomcat Service in Error state on BWS Hosts. Please contact the MIS Team"
-  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  treat_missing_data        = "notBreaching"
-  datapoints_to_alarm       = "1"
-}
-
-resource "aws_cloudwatch_log_metric_filter" "bws_Tomcat" {
- name           = "BwsTomcatCount"
- pattern        = "${local.exclude_log_level} Tomcat"
- log_group_name = "${local.log_group_name}"
-
- metric_transformation {
-   name      = "BwsTomcatCount"
-   namespace = "${local.name_space}"
-   value     = "1"
- }
+### Terraform modules ###
+locals {
+#DIS ETL VARS
+  host_dis1                                   = "ndl-dis-${local.nart_prefix}1"
+  ETL                                         = "01.CentralManagementServer"
+  httpd                                       = "httpd"
+  host_bws                                    = "BWS Hosts"
+  tomcat                                      = "tomcat"  
 }
 
 
-#####ETL
-resource "aws_cloudwatch_metric_alarm" "etl" {
-  alarm_name                = "${local.environment_name}__ETL__critical"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "1"
-  metric_name               = "EtlCount"
-  namespace                 = "${local.name_space}"
-  period                    = "60"
-  statistic                 = "Sum"
-  threshold                 = "1"
-  alarm_description         = "ETL Job Service in Error state on ndl-dis-001. Please contact the MIS Team"
-  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  treat_missing_data        = "notBreaching"
-  datapoints_to_alarm       = "1"
+################################################
+#
+#            ALARMS BWS HTTPD
+#
+################################################
+module "bwshttpd" {
+  source                         = "modules/service-alarms/"
+  service_name                   = "httpd"
+  alarm_name                     = "${local.environment_name}__BWS_Httpd"
+  name_space                     = "${local.name_space}"
+  host                           = "${local.host_bws}"
+  mis_team_action                = "${local.mis_team_action}"
+  alarm_actions                  = "${aws_sns_topic.alarm_notification.arn}"
+  pattern                        = "${local.exclude_log_level} ${local.httpd}"
+  log_group_name                 = "${local.log_group_name}"
+  metric_name                    = "BwsHttpd"
+  pattern_ok                     = "${local.include_log_level} ${local.httpd} ${local.started_message}"
 }
 
 
-resource "aws_cloudwatch_log_metric_filter" "etl" {
- name           = "EtlCount"
- pattern        = "${local.exclude_log_level} 01.CentralManagementServer stopped unexpectedly."
- log_group_name = "${local.log_group_name}"
+################################################
+#
+#            ALARMS DIS1 ETL
+#
+################################################
+module "bwstomcat" {
+  source                         = "modules/service-alarms/"
+  service_name                   = "tomcat"
+  alarm_name                     = "${local.environment_name}__BWS_Tomcat"
+  name_space                     = "${local.name_space}"
+  host                           = "${local.host_bws}"
+  mis_team_action                = "${local.mis_team_action}"
+  alarm_actions                  = "${aws_sns_topic.alarm_notification.arn}"
+  pattern                        = "${local.exclude_log_level} ${local.tomcat}"
+  log_group_name                 = "${local.log_group_name}"
+  metric_name                    = "BwsTomcat"
+  pattern_ok                     = "${local.include_log_level} ${local.tomcat} ${local.started_message}"
+}
 
- metric_transformation {
-   name      = "EtlCount"
-   namespace = "${local.name_space}"
-   value     = "1"
- }
+
+
+################################################
+#
+#            ALARMS DIS1 ETL
+#
+################################################
+module "etl" {
+  source                         = "modules/service-alarms/"
+  service_name                   = "ETL"
+  alarm_name                     = "${local.environment_name}__ETL"
+  name_space                     = "${local.name_space}"
+  host                           = "${local.host_dis1}"
+  mis_team_action                = "${local.mis_team_action}"
+  alarm_actions                  = "${aws_sns_topic.alarm_notification.arn}"
+  pattern                        = "${local.exclude_log_level} ${local.ETL} Service stopped unexpectedly."
+  log_group_name                 = "${local.log_group_name}"
+  metric_name                    = "01CentralManagementServer"
+  pattern_ok                     = "${local.include_log_level} ${local.ETL} ${local.started_message}"
 }
