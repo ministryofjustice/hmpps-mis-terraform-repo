@@ -147,7 +147,7 @@ module "CMSTIER001_OutputFilerepository" {
   alarm_actions                  = "${aws_sns_topic.alarm_notification.arn}"
   pattern                        = "${local.exclude_log_level} ${local.CMSTIER001_OutputFilerepository}"
   log_group_name                 = "${local.log_group_name}"
-  metric_name                    = "CMSTIER001InputFilerepository"
+  metric_name                    = "CMSTIER001OutputFilerepository"
   pattern_ok                     = "${local.include_log_level} ${local.CMSTIER001_OutputFilerepository} ${local.started_message}"
 }
 

@@ -85,7 +85,7 @@ module "PROCTIER001_ConnectionServer" {
   alarm_actions                  = "${aws_sns_topic.alarm_notification.arn}"
   pattern                        = "${local.exclude_log_level} ${local.PROCTIER001_ConnectionServer}"
   log_group_name                 = "${local.log_group_name}"
-  metric_name                    = "PROCTIER001APSWebi"
+  metric_name                    = "PROCTIER001ConnectionServer"
   pattern_ok                     = "${local.include_log_level} ${local.PROCTIER001_ConnectionServer} ${local.started_message}"
 }
 
@@ -163,7 +163,7 @@ module "PROCTIER002_ConnectionServer" {
   alarm_actions                  = "${aws_sns_topic.alarm_notification.arn}"
   pattern                        = "${local.exclude_log_level} ${local.PROCTIER002_ConnectionServer}"
   log_group_name                 = "${local.log_group_name}"
-  metric_name                    = "PROCTIER002APSWebi"
+  metric_name                    = "PROCTIER002ConnectionServer"
   pattern_ok                     = "${local.include_log_level} ${local.PROCTIER002_ConnectionServer} ${local.started_message}"
 }
 
@@ -241,7 +241,7 @@ module "PROCTIER003_ConnectionServer" {
   alarm_actions                  = "${aws_sns_topic.alarm_notification.arn}"
   pattern                        = "${local.exclude_log_level} ${local.PROCTIER003_ConnectionServer}"
   log_group_name                 = "${local.log_group_name}"
-  metric_name                    = "PROCTIER003APSWebi"
+  metric_name                    = "PROCTIER003ConnectionServer"
   pattern_ok                     = "${local.include_log_level} ${local.PROCTIER003_ConnectionServer} ${local.started_message}"
 }
 

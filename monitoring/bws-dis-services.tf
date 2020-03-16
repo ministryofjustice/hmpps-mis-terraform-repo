@@ -5,7 +5,7 @@ locals {
   ETL                                         = "01.CentralManagementServer"
   httpd                                       = "httpd"
   host_bws                                    = "BWS Hosts"
-  tomcat                                      = "tomcat"  
+  tomcat                                      = "tomcat"
 }
 
 
