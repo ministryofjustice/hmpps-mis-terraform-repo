@@ -13,5 +13,3 @@ variable "mis_alarms_enabled" {
 }
 
 variable "short_environment_identifier" {}
-
-variable "bps_server_count" {}
