@@ -97,11 +97,10 @@ data "terraform_remote_state" "mis-db-1" {
 
   config {
     bucket = "${var.remote_state_bucket_name}"
-    key    = "${var.environment_type}/database_mis/server-mis-db-1/terraform.tfstate"
+    key    = "${var.environment_type}/database_mis/terraform.tfstate"
     region = "${var.region}"
   }
 }
-
 
 
 #-------------------------------------------------------------
