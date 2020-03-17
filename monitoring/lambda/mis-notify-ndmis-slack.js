@@ -15,20 +15,21 @@ exports.handler = function(event, context) {
         var eventMessage = JSON.parse(event.Records[0].Sns.Message);
         var alarmName = eventMessage.AlarmName;
         var alarmDescription = eventMessage.AlarmDescription;
-        var newStateReason = eventMessage.NewStateReason;
         var newStateValue = eventMessage.NewStateValue;
-        var oldStateValue = eventMessage.OldStateValue;
 
 
         var environment = alarmName.split("__")[0];
         var metric = alarmName.split("__")[1];
         var severity = alarmName.split("__")[2];
+        var channel="ndmis-non-prod-alerts";
+        var url_path = "/services/T02DYEB3A/BS16X2JGY/r9e1CJYez7BDmwyliIl7WzLf";
+        var icon_emoji=":twisted_rightwards_arrows:";
 
+            if (environment=='prod' )
+               channel="ndmis-alerts";
 
-            var channel="ndmis-alerts";
-
-
-            var icon_emoji=":twisted_rightwards_arrows:";
+            if (environment=='prod' )
+                url_path = "/services/T02DYEB3A/BRU7E5QSC/3Rt4FV9FtrDSll5aMPABgRoB";
 
             if (severity=='alert' )
                 icon_emoji = ":warning:";
@@ -85,13 +86,11 @@ exports.handler = function(event, context) {
                       "link_names": "1"
                   };
 
-
-
     var options = {
         method: 'POST',
         hostname: 'hooks.slack.com',
         port: 443,
-        path: '/services/T02DYEB3A/BRU7E5QSC/3Rt4FV9FtrDSll5aMPABgRoB'
+        path: url_path
     };
 
     var req = https.request(options, function(res) {
