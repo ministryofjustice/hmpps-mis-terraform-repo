@@ -1,5 +1,5 @@
 module "mis_db_3" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=master//modules//oracle-database"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=DAM-659//modules//oracle-database"
   server_name = "mis-db-3"
 
   ami_id               = "${data.aws_ami.centos_oracle_db.id}"
@@ -48,6 +48,8 @@ module "mis_db_3" {
     ## oradb_sysman_password         = "/${environment_name}/mis/mis-database/db/oradb_sysman_password"
     ## oradb_dbsnmp_password         = "/${environment_name}/mis/mis-database/db/oradb_dbsnmp_password"
     ## oradb_asmsnmp_password        = "/${environment_name}/mis/mis-database/db/oradb_asmsnmp_password"
+
+    database_standby_number = "2"
   }
 }
 
