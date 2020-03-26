@@ -23,12 +23,16 @@ SMTP User password - https://eu-west-2.console.aws.amazon.com/systems-manager/pa
 
 ```
 ndl-bcs-411.delius-stage.internal
+ndl-bcs-412.delius-stage.internal
+ndl-bcs-413.delius-stage.internal
 ```
 
 #### External DNS
 
 ```
 ndl-bcs-411.stage.delius.probation.hmpps.dsd.io
+ndl-bcs-412.stage.delius.probation.hmpps.dsd.io
+ndl-bcs-413.stage.delius.probation.hmpps.dsd.io
 ```
 ## BFS
 
@@ -49,13 +53,17 @@ ndl-bfs-411.stage.delius.probation.hmpps.dsd.io
 
 ```
 ndl-bps-411.delius-stage.internal
-
+ndl-bps-412.delius-stage.internal
+ndl-bps-413.delius-stage.internal
 ```
 
 #### External DNS
 
 ```
 ndl-bps-411.stage.delius.probation.hmpps.dsd.io
+ndl-bps-412.stage.delius.probation.hmpps.dsd.io
+ndl-bps-413.stage.delius.probation.hmpps.dsd.io
+
 ```
 ## BWS
 BWS Endpoint [https://ndl-bws.stage.delius.probation.hmpps.dsd.io/BOE/BI](https://ndl-bws.stage.delius.probation.hmpps.dsd.io/BOE/BI)
@@ -65,12 +73,14 @@ BWS Endpoint [https://ndl-bws.stage.delius.probation.hmpps.dsd.io/BOE/BI](https:
 
 ```
 ndl-bws-411.delius-stage.internal
+ndl-bws-412.delius-stage.internal
 ```
 
 #### External DNS
 
 ```
 ndl-bws-411.stage.delius.probation.hmpps.dsd.io
+ndl-bws-412.stage.delius.probation.hmpps.dsd.io
 ```
 ## DIS
 DIS Endpoint [https://ndl-dis.stage.delius.probation.hmpps.dsd.io/DataServices](https://ndl-dis.stage.delius.probation.hmpps.dsd.io/DataServices/)
