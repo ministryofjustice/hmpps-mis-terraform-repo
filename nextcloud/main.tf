@@ -133,7 +133,7 @@ data "aws_ami" "amazon_ami" {
 
   filter {
     name   = "name"
-    values = ["HMPPS Base CentOS *"]
+    values = ["HMPPS Nextcloud *"]
   }
 
   filter {
@@ -186,7 +186,7 @@ locals {
   efs_dns_name                 = "${module.efs_share.efs_dns_name}"
   nextcloud_db_user            = "${local.mis_app_name}${local.app_name}"
   nextcloud_db_sg              = ["${data.terraform_remote_state.security-groups.sg_mis_nextcloud_db}",]
-  nextcloud_samba_sg            = ["${data.terraform_remote_state.security-groups.sg_mis_samba}",]
+  nextcloud_samba_sg           = ["${data.terraform_remote_state.security-groups.sg_mis_samba}",]
   db_dns_name                  = "${aws_route53_record.mariadb_dns_entry.fqdn}"
   ldap_bind_user               = "${data.terraform_remote_state.ldap_elb_name.ldap_bind_user}"
   backup_bucket                = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket}"
@@ -194,4 +194,8 @@ locals {
   installer_user               = "installer_user"
   config_passw                 = "${local.environment_identifier}-${local.app_name}-config-password"
   nextcloud_s3_bucket_arn      = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket_arn}"
+  public_cidr_block            = ["${data.terraform_remote_state.common.public_cidr_block}"]
+  cidr_block_a_subnet          = "${replace (element(local.public_cidr_block, 0), "/", "\\/")}"
+  cidr_block_b_subnet          = "${replace (element(local.public_cidr_block, 1), "/", "\\/")}"
+  cidr_block_c_subnet          = "${replace (element(local.public_cidr_block, 2), "/", "\\/")}"
 }

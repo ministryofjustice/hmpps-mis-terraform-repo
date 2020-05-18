@@ -40,7 +40,15 @@ variable "connection_draining_timeout" {
 variable "nextcloud_health_check" {
   description = "A health check block"
   type        = "list"
-  default     = []
+  default     = [
+    {
+      target              = "HTTP:80/index.php/login"
+      interval            = 30
+      healthy_threshold   = 10
+      unhealthy_threshold = 2
+      timeout             = 5
+    },
+  ]
 }
 
 variable "password_length" {
