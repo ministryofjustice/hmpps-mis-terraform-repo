@@ -136,7 +136,7 @@ remote_user_filename: "${bastion_inventory}"
 external_domain: $EXTERNAL_DOMAIN
 internal_domain: $HMPPS_DOMAIN
 nextcloud_dir: $NEXT_CLOUD_DIR
-data_dir: $DATA_DIR
+data_dir: $DATA_DIR/
 nextcloud_admin: $NEXTCLOUD_ADMIN
 app_name: $HMPPS_ROLE
 ldap_host: $LDAP_HOST
@@ -162,6 +162,9 @@ samba_group: "smbgrp"
 samba_group_gid: "10667"
 web_group: "apache"
 report_user: $REPORT_USER
+nc_conf_destination: "/etc/httpd/conf.d/nextcloud.conf"
+config_sh_script: "/root/import-config.sh"
+share_files_root: "files/shared_files"
 EOF
 
 cat << EOF > ~/bootstrap.yml
