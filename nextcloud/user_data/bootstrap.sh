@@ -165,6 +165,10 @@ report_user: $REPORT_USER
 nc_conf_destination: "/etc/httpd/conf.d/nextcloud.conf"
 config_sh_script: "/root/import-config.sh"
 share_files_root: "files/shared_files"
+report_user_pass: $REPORT_USER_PASSWD
+samba_pass_sh_script: "/root/samba-pass.sh"
+dfree_value: "8000000000 8000000000"
+dfree_destination: "/etc/samba/samba-dfree"
 EOF
 
 cat << EOF > ~/bootstrap.yml
