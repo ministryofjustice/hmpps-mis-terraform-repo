@@ -3,6 +3,7 @@
 set -x
 exec > >(tee /var/log/user-data.log|logger -t user-data ) 2>&1
 yum install -y python-pip git wget unzip
+systemctl stop httpd smb
 
 cat << EOF >> /etc/environment
 HMPPS_ROLE=${app_name}
@@ -30,13 +31,17 @@ nextcloud_secret=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_S
 nextcloud_dbuser=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_dbuser --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 nextcloud_dbpassword=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_dbpassword --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 nextcloud_s01ldap_agent_password=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_s01ldap_agent_password --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+nextcloud_instance_id=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud-id --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 EFS_DNS_NAME="${efs_dns_name}"
+EXTERNAL_DOMAIN="${external_domain}"
+REPORTS_PASS_NAME="${reports_pass_name}"
+REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
+NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
 
 
 INT_ZONE_ID="${private_zone_id}"
 LDAP_PORT="${ldap_port}"
-EXTERNAL_DOMAIN="${external_domain}"
-NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
 NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
 NEXTCLOUD_DB_USER="${nextcloud_db_user}"
 DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
@@ -47,7 +52,7 @@ INSTALLER_USER="${installer_user}"
 CONFIG_PASSW="${config_passw}"
 SAMBA_USER="${mis_user}"
 MIS_USER_PASS_NAME="${mis_user_pass_name}"
-REPORTS_PASS_NAME="${reports_pass_name}"
+
 
 
 
@@ -79,12 +84,16 @@ export nextcloud_secret=$(aws ssm get-parameters --with-decryption --names $NEXT
 export nextcloud_dbuser=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_dbuser --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 export nextcloud_dbpassword=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_dbpassword --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 export nextcloud_s01ldap_agent_password=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_s01ldap_agent_password --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+export nextcloud_instance_id=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud-id --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 export EFS_DNS_NAME="${efs_dns_name}"
+export EXTERNAL_DOMAIN="${external_domain}"
+export REPORTS_PASS_NAME="${reports_pass_name}"
+export REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+export REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
+export NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
 
 export INT_ZONE_ID="${private_zone_id}"
 export LDAP_PORT="${ldap_port}"
-export EXTERNAL_DOMAIN="${external_domain}"
-export NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
 export NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
 export NEXTCLOUD_DB_USER="${nextcloud_db_user}"
 export DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
@@ -95,7 +104,7 @@ export INSTALLER_USER="${installer_user}"
 export CONFIG_PASSW="${config_passw}"
 export SAMBA_USER="${mis_user}"
 export MIS_USER_PASS_NAME="${mis_user_pass_name}"
-export REPORTS_PASS_NAME="${reports_pass_name}"
+
 
 #Mount EFS
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
@@ -148,6 +157,11 @@ nextcloud_dbpassword: $nextcloud_dbpassword
 nextcloud_s01ldap_agent_password: $nextcloud_s01ldap_agent_password
 web_user: $WEB_USER
 NEXTCLOUD_CONF: $NEXTCLOUD_CONF
+instance_id: $nextcloud_instance_id
+samba_group: "smbgrp"
+samba_group_gid: "10667"
+web_group: "apache"
+report_user: $REPORT_USER
 EOF
 
 cat << EOF > ~/bootstrap.yml
@@ -165,3 +179,5 @@ EOF
 
 ansible-galaxy install -f -r ~/requirements.yml
 ansible-playbook ~/bootstrap.yml
+
+systemctl start httpd smb

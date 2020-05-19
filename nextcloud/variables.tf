@@ -44,7 +44,7 @@ variable "nextcloud_health_check" {
     {
       target              = "HTTP:80/index.php/login"
       interval            = 30
-      healthy_threshold   = 10
+      healthy_threshold   = 2
       unhealthy_threshold = 2
       timeout             = 5
     },
