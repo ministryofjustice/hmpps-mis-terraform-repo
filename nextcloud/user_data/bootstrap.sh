@@ -174,6 +174,7 @@ passdb_backend: "tdbsam"
 import_config_file: "/usr/share/httpd/nextcloud-conf.json"
 config_passw: $CONFIG_PASSW
 backup_sh_script: "/root/backup.sh"
+fileowner_sh_script: "/root/file-owner.sh"
 EOF
 
 cat << EOF > ~/bootstrap.yml
