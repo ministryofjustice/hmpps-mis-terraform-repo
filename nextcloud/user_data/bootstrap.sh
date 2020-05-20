@@ -169,6 +169,7 @@ report_user_pass: $REPORT_USER_PASSWD
 samba_pass_sh_script: "/root/samba-pass.sh"
 dfree_value: "8000000000 8000000000"
 dfree_destination: "/etc/samba/samba-dfree"
+smb_conf_file: "/etc/samba/smb.conf"
 EOF
 
 cat << EOF > ~/bootstrap.yml
