@@ -170,6 +170,7 @@ samba_pass_sh_script: "/root/samba-pass.sh"
 dfree_value: "8000000000 8000000000"
 dfree_destination: "/etc/samba/samba-dfree"
 smb_conf_file: "/etc/samba/smb.conf"
+passdb_backend: "tdbsam"
 EOF
 
 cat << EOF > ~/bootstrap.yml
