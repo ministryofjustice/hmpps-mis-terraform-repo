@@ -171,6 +171,9 @@ dfree_value: "8000000000 8000000000"
 dfree_destination: "/etc/samba/samba-dfree"
 smb_conf_file: "/etc/samba/smb.conf"
 passdb_backend: "tdbsam"
+import_config_file: "/usr/share/httpd/nextcloud-conf.json"
+config_passw: $CONFIG_PASSW
+backup_sh_script: "/root/backup.sh"
 EOF
 
 cat << EOF > ~/bootstrap.yml
@@ -188,5 +191,3 @@ EOF
 
 ansible-galaxy install -f -r ~/requirements.yml
 ansible-playbook ~/bootstrap.yml
-
-systemctl start httpd smb
