@@ -175,6 +175,12 @@ import_config_file: "/usr/share/httpd/nextcloud-conf.json"
 config_passw: $CONFIG_PASSW
 backup_sh_script: "/root/backup.sh"
 fileowner_sh_script: "/root/file-owner.sh"
+OCS_API: "ocs/v2.php/apps/files_sharing/api/v1"
+nextcloud_user_param: $NEXTCLOUD_ADMIN_PASS_PARAM
+local_url: "http://localhost"
+shares_script: "/root/configure-shares.sh"
+input_file: "/root/input_file"
+ocs_share_root: "/shared_files"
 EOF
 
 cat << EOF > ~/bootstrap.yml
