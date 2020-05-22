@@ -38,25 +38,18 @@ REPORTS_PASS_NAME="${reports_pass_name}"
 REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
 NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
-
-
-INT_ZONE_ID="${private_zone_id}"
-LDAP_PORT="${ldap_port}"
-NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
 NEXTCLOUD_DB_USER="${nextcloud_db_user}"
 DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
-DB_DNS_NAME="${db_dns_name}"
-LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
-BACKUP_BUCKET="${backup_bucket}"
+NEXTCLOUD_DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 INSTALLER_USER="${installer_user}"
 CONFIG_PASSW="${config_passw}"
-SAMBA_USER="${mis_user}"
-MIS_USER_PASS_NAME="${mis_user_pass_name}"
-
-
-
-
+DB_DNS_NAME="${db_dns_name}"
+NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
+NEXTCLOUD_ADMIN_PASSWORD=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_ADMIN_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
+LDAP_PORT="${ldap_port}"
 EOF
+
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
 ## just configured, so lets export them
 export HMPPS_ROLE="${app_name}"
@@ -91,20 +84,16 @@ export REPORTS_PASS_NAME="${reports_pass_name}"
 export REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 export REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
 export NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
-
-export INT_ZONE_ID="${private_zone_id}"
-export LDAP_PORT="${ldap_port}"
-export NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
-export NEXTCLOUD_DB_USER="${nextcloud_db_user}"
-export DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
 export DB_DNS_NAME="${db_dns_name}"
-export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
-export BACKUP_BUCKET="${backup_bucket}"
+export NEXTCLOUD_DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+export DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
 export INSTALLER_USER="${installer_user}"
 export CONFIG_PASSW="${config_passw}"
-export SAMBA_USER="${mis_user}"
-export MIS_USER_PASS_NAME="${mis_user_pass_name}"
-
+export NEXTCLOUD_DB_USER="${nextcloud_db_user}"
+export NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
+export NEXTCLOUD_ADMIN_PASSWORD=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_ADMIN_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
+export LDAP_PORT="${ldap_port}"
 
 #Mount EFS
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
@@ -130,7 +119,6 @@ EOF
 
 wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
 ##IMPORT CONFIG
-
 cat << EOF > ~/vars.yml
 remote_user_filename: "${bastion_inventory}"
 external_domain: $EXTERNAL_DOMAIN
@@ -138,6 +126,7 @@ internal_domain: $HMPPS_DOMAIN
 nextcloud_dir: $NEXT_CLOUD_DIR
 data_dir: $DATA_DIR/
 nextcloud_admin: $NEXTCLOUD_ADMIN
+nextcloud_user_param: $NEXTCLOUD_ADMIN_PASS_PARAM
 app_name: $HMPPS_ROLE
 ldap_host: $LDAP_HOST
 redis_host: $REDIS_HOST
@@ -150,14 +139,8 @@ ldap_user: $LDAP_USER
 whitelist_1: $WHITELISTA
 whitelist_2: $WHITELISTB
 whitelist_3: $WHITELISTC
-nextcloud_passwordsalt: $nextcloud_passwordsalt
-nextcloud_secret: $nextcloud_secret
-nextcloud_dbuser: $nextcloud_dbuser
-nextcloud_dbpassword: $nextcloud_dbpassword
-nextcloud_s01ldap_agent_password: $nextcloud_s01ldap_agent_password
 web_user: $WEB_USER
 NEXTCLOUD_CONF: $NEXTCLOUD_CONF
-instance_id: $nextcloud_instance_id
 samba_group: "smbgrp"
 samba_group_gid: "10667"
 web_group: "apache"
@@ -176,11 +159,19 @@ config_passw: $CONFIG_PASSW
 backup_sh_script: "/root/backup.sh"
 fileowner_sh_script: "/root/file-owner.sh"
 OCS_API: "ocs/v2.php/apps/files_sharing/api/v1"
-nextcloud_user_param: $NEXTCLOUD_ADMIN_PASS_PARAM
 local_url: "http://localhost"
 shares_script: "/root/configure-shares.sh"
 input_file: "/root/input_file"
 ocs_share_root: "/shared_files"
+nextcloud_ssm_path: $NEXTCLOUD_SSM_PATH
+installer_user: $INSTALLER_USER
+db_dns_name: $DB_DNS_NAME
+nextcloud_rds_db_user: $NEXTCLOUD_DB_USER
+nextcloud_rds_db_param: $DB_PASS_PARAM
+ldap_port: $LDAP_PORT
+ldap_bind_param: $LDAP_BIND_PASS_PARAM
+base_install_script: /root/base-install.sh
+key_id: "alias/aws/ssm"
 EOF
 
 cat << EOF > ~/bootstrap.yml
