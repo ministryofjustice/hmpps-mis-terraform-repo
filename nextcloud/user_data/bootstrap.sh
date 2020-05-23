@@ -8,9 +8,6 @@ systemctl stop httpd smb
 HMPPS_ENVIRONMENT=${environment_name}
 HMPPS_ROLE=${app_name}
 NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
-HMPPS_STACKNAME=${env_identifier}
-NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
-DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
 
 cat << EOF >> /etc/environment
 HMPPS_ROLE=${app_name}
