@@ -5,6 +5,13 @@ exec > >(tee /var/log/user-data.log|logger -t user-data ) 2>&1
 yum install -y python-pip git wget unzip
 systemctl stop httpd smb
 
+HMPPS_ENVIRONMENT=${environment_name}
+HMPPS_ROLE=${app_name}
+NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
+HMPPS_STACKNAME=${env_identifier}
+NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
+DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
+
 cat << EOF >> /etc/environment
 HMPPS_ROLE=${app_name}
 HMPPS_FQDN=${app_name}.${private_domain}
@@ -26,26 +33,16 @@ WHITELISTA="${cidr_block_a_subnet}"
 WHITELISTB="${cidr_block_b_subnet}"
 WHITELISTC="${cidr_block_c_subnet}"
 NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
-nextcloud_passwordsalt=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_passwordsalt --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-nextcloud_secret=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_secret --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-nextcloud_dbuser=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_dbuser --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-nextcloud_dbpassword=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_dbpassword --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-nextcloud_s01ldap_agent_password=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_s01ldap_agent_password --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-nextcloud_instance_id=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud-id --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 EFS_DNS_NAME="${efs_dns_name}"
 EXTERNAL_DOMAIN="${external_domain}"
 REPORTS_PASS_NAME="${reports_pass_name}"
-REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
 NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
 NEXTCLOUD_DB_USER="${nextcloud_db_user}"
 DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
-NEXTCLOUD_DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 INSTALLER_USER="${installer_user}"
 CONFIG_PASSW="${config_passw}"
 DB_DNS_NAME="${db_dns_name}"
 NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
-NEXTCLOUD_ADMIN_PASSWORD=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_ADMIN_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 LDAP_PORT="${ldap_port}"
 EOF
@@ -72,26 +69,16 @@ export WHITELISTA="${cidr_block_a_subnet}"
 export WHITELISTB="${cidr_block_b_subnet}"
 export WHITELISTC="${cidr_block_c_subnet}"
 export NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
-export nextcloud_passwordsalt=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_passwordsalt --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-export nextcloud_secret=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_secret --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-export nextcloud_dbuser=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_dbuser --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-export nextcloud_dbpassword=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_dbpassword --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-export nextcloud_s01ldap_agent_password=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud_s01ldap_agent_password --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-export nextcloud_instance_id=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_SSM_PATH/nextcloud-id --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 export EFS_DNS_NAME="${efs_dns_name}"
 export EXTERNAL_DOMAIN="${external_domain}"
 export REPORTS_PASS_NAME="${reports_pass_name}"
-export REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-export REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
 export NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
 export DB_DNS_NAME="${db_dns_name}"
-export NEXTCLOUD_DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 export DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
 export INSTALLER_USER="${installer_user}"
 export CONFIG_PASSW="${config_passw}"
 export NEXTCLOUD_DB_USER="${nextcloud_db_user}"
 export NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
-export NEXTCLOUD_ADMIN_PASSWORD=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_ADMIN_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 export LDAP_PORT="${ldap_port}"
 
@@ -144,11 +131,10 @@ NEXTCLOUD_CONF: $NEXTCLOUD_CONF
 samba_group: "smbgrp"
 samba_group_gid: "10667"
 web_group: "apache"
-report_user: $REPORT_USER
 nc_conf_destination: "/etc/httpd/conf.d/nextcloud.conf"
 config_sh_script: "/root/import-config.sh"
 share_files_root: "files/shared_files"
-report_user_pass: $REPORT_USER_PASSWD
+reports_pass_name: $REPORTS_PASS_NAME
 samba_pass_sh_script: "/root/samba-pass.sh"
 dfree_value: "8000000000 8000000000"
 dfree_destination: "/etc/samba/samba-dfree"
@@ -172,6 +158,7 @@ ldap_port: $LDAP_PORT
 ldap_bind_param: $LDAP_BIND_PASS_PARAM
 base_install_script: /root/base-install.sh
 key_id: "alias/aws/ssm"
+hmpps_stack_name: $HMPPS_STACKNAME
 EOF
 
 cat << EOF > ~/bootstrap.yml
