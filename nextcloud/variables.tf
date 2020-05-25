@@ -14,7 +14,7 @@ variable "bastion_inventory" {}
 
 ##when building for the 1st time, build with 1
 ##Then increase after initial build
-variable "instance_count" {
+variable "nextcloud_instance_count" {
   default = "1"
 }
 
@@ -42,15 +42,7 @@ variable "connection_draining_timeout" {
 variable "nextcloud_health_check" {
   description = "A health check block"
   type        = "list"
-  default     = [
-    {
-      target              = "HTTP:80/index.php/login"
-      interval            = 30
-      healthy_threshold   = 2
-      unhealthy_threshold = 2
-      timeout             = 5
-    },
-  ]
+  default     = []
 }
 
 variable "password_length" {

@@ -83,7 +83,7 @@ data "template_file" "nextcloud_user_data" {
 
 #Launch cfg
 resource "aws_launch_configuration" "launch_cfg" {
-  name_prefix          = "${local.short_environment_identifier}-nextcloud-launch-cfg-"
+  name_prefix          = "${var.environment_type}-nextcloud-launch-cfg-"
   image_id             = "${data.aws_ami.amazon_ami.id}"
   iam_instance_profile = "${module.iam_instance_profile.iam_instance_name}"
   instance_type        = "${var.nextcloud_instance_type}"
@@ -120,22 +120,22 @@ data "null_data_source" "tags" {
 
 #ASG
 resource "aws_autoscaling_group" "asg" {
-  name                      = "${local.environment_identifier}-${local.app_name}"
+  name                      = "${var.environment_type}-${local.app_name}"
   vpc_zone_identifier       = ["${list(
     data.terraform_remote_state.vpc.vpc_private-subnet-az1,
 	  data.terraform_remote_state.vpc.vpc_private-subnet-az2,
     data.terraform_remote_state.vpc.vpc_private-subnet-az3,
   )}"]
   launch_configuration      = "${aws_launch_configuration.launch_cfg.id}"
-  min_size                  = "${var.instance_count}"
-  max_size                  = "${var.instance_count}"
-  desired_capacity          = "${var.instance_count}"
+  min_size                  = "${var.nextcloud_instance_count}"
+  max_size                  = "${var.nextcloud_instance_count}"
+  desired_capacity          = "${var.nextcloud_instance_count}"
   health_check_type         = "EC2"
   tags = [
     "${data.null_data_source.tags.*.outputs}",
     {
       key                 = "Name"
-      value               = "${local.environment_identifier}-${local.app_name}"
+      value               = "${var.environment_type}-${local.app_name}-asg"
       propagate_at_launch = true
     }
   ]
