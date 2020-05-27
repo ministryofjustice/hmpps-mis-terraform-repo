@@ -26,9 +26,6 @@ NEXTCLOUD_CONF=nextcloud-conf.json
 LDAP_HOST="${ldap_elb_name}"
 REDIS_HOST="${redis_address}"
 LDAP_USER="${ldap_bind_user}"
-WHITELISTA="${cidr_block_a_subnet}"
-WHITELISTB="${cidr_block_b_subnet}"
-WHITELISTC="${cidr_block_c_subnet}"
 NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
 EFS_DNS_NAME="${efs_dns_name}"
 EXTERNAL_DOMAIN="${external_domain}"
@@ -63,9 +60,6 @@ export NEXTCLOUD_CONF=nextcloud-conf.json
 export LDAP_HOST="${ldap_elb_name}"
 export REDIS_HOST="${redis_address}"
 export LDAP_USER="${ldap_bind_user}"
-export WHITELISTA="${cidr_block_a_subnet}"
-export WHITELISTB="${cidr_block_b_subnet}"
-export WHITELISTC="${cidr_block_c_subnet}"
 export NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
 export EFS_DNS_NAME="${efs_dns_name}"
 export EXTERNAL_DOMAIN="${external_domain}"
@@ -122,9 +116,6 @@ fileshare_user_base: "ou=Fileshare,ou=Users,dc=moj,dc=com"
 fileshare_base_groups: "ou=Fileshare,ou=Groups,dc=moj,dc=com"
 fs_group_prefix: "RES-FS"
 ldap_user: $LDAP_USER
-whitelist_1: $WHITELISTA
-whitelist_2: $WHITELISTB
-whitelist_3: $WHITELISTC
 web_user: $WEB_USER
 NEXTCLOUD_CONF: $NEXTCLOUD_CONF
 samba_group: "smbgrp"
@@ -159,6 +150,7 @@ base_install_script: /root/base-install.sh
 key_id: "alias/aws/ssm"
 hmpps_stack_name: $HMPPS_STACKNAME
 pwm_url: $PWM_URL
+httpd_conf_file: "/etc/httpd/conf/httpd.conf"
 EOF
 
 cat << EOF > ~/bootstrap.yml
