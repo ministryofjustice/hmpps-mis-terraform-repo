@@ -126,6 +126,19 @@ data "aws_acm_certificate" "nextcloud_cert" {
 }
 
 #-------------------------------------------------------------
+### Getting the PWM details
+#-------------------------------------------------------------
+data "terraform_remote_state" "delius-core-pwm" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "delius-core/pwm/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -198,4 +211,5 @@ locals {
   cidr_block_a_subnet          = "${replace (element(local.public_cidr_block, 0), "/", "\\/")}"
   cidr_block_b_subnet          = "${replace (element(local.public_cidr_block, 1), "/", "\\/")}"
   cidr_block_c_subnet          = "${replace (element(local.public_cidr_block, 2), "/", "\\/")}"
+  pwm_url                      = "${data.terraform_remote_state.delius-core-pwm.public_fqdn_pwm}"
 }

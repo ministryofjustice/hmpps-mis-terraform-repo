@@ -42,6 +42,7 @@ DB_DNS_NAME="${db_dns_name}"
 NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
 LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 LDAP_PORT="${ldap_port}"
+PWM_URL=${pwm_url}
 EOF
 
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
@@ -78,6 +79,7 @@ export NEXTCLOUD_DB_USER="${nextcloud_db_user}"
 export NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
 export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 export LDAP_PORT="${ldap_port}"
+export PWM_URL=${pwm_url}
 
 #Mount EFS
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
@@ -156,6 +158,7 @@ ldap_bind_param: $LDAP_BIND_PASS_PARAM
 base_install_script: /root/base-install.sh
 key_id: "alias/aws/ssm"
 hmpps_stack_name: $HMPPS_STACKNAME
+pwm_url: $PWM_URL
 EOF
 
 cat << EOF > ~/bootstrap.yml
