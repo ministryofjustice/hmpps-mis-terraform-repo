@@ -74,6 +74,7 @@ data "template_file" "nextcloud_user_data" {
     cidr_block_b_subnet          = "${local.cidr_block_b_subnet}"
     cidr_block_c_subnet          = "${local.cidr_block_c_subnet}"
     pwm_url                      = "${local.pwm_url}"
+    environment_type             = "${var.environment_type}"
   }
 }
 
@@ -159,4 +160,30 @@ resource "aws_autoscaling_attachment" "nextcloud_attachment" {
 resource "aws_autoscaling_attachment" "samba_attachment" {
   autoscaling_group_name = "${aws_autoscaling_group.asg.id}"
   elb                    = "${aws_elb.samba_lb.id}"
+}
+
+
+#-------------------------------------------------------------
+### Cloudwatch log group
+#-------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "httpd_access_logs" {
+  name = "/${var.environment_type}/${local.app_name}/access_log"
+  retention_in_days = 14
+  tags = "${var.tags}"
+}
+
+resource "aws_cloudwatch_log_group" "httpd_error_logs" {
+  name = "/${var.environment_type}/${local.app_name}/error_log"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "nextcloud_logs" {
+  name = "/${var.environment_type}/${local.app_name}/nextcloud.log"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "samba_logs" {
+  name = "/${var.environment_type}/${local.app_name}/log.smbd"
+  retention_in_days = 14
 }
