@@ -8,10 +8,12 @@ systemctl stop httpd smb
 HMPPS_ENVIRONMENT=${environment_name}
 HMPPS_ROLE=${app_name}
 NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
+SMTP_FQDN=smtp.${private_domain}
+EXTERNAL_DOMAIN="${external_domain}"
 
 cat << EOF >> /etc/environment
 HMPPS_ROLE=${app_name}
-HMPPS_FQDN=${app_name}.${private_domain}
+SMTP_FQDN="smtp.${private_domain}"
 HMPPS_STACKNAME=${env_identifier}
 HMPPS_STACK="${short_env_identifier}"
 HMPPS_ENVIRONMENT=${environment_name}
@@ -46,7 +48,7 @@ EOF
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
 ## just configured, so lets export them
 export HMPPS_ROLE="${app_name}"
-export HMPPS_FQDN="${app_name}.${private_domain}"
+export SMTP_FQDN="smtp.${private_domain}"
 export HMPPS_STACKNAME="${env_identifier}"
 export HMPPS_STACK="${short_env_identifier}"
 export HMPPS_ENVIRONMENT=${environment_name}
@@ -103,7 +105,6 @@ wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/ma
 ##IMPORT CONFIG
 cat << EOF > ~/vars.yml
 remote_user_filename: "${bastion_inventory}"
-external_domain: $EXTERNAL_DOMAIN
 internal_domain: $HMPPS_DOMAIN
 nextcloud_dir: $NEXT_CLOUD_DIR
 data_dir: $DATA_DIR/
@@ -156,6 +157,9 @@ httpd_conf_file: "/etc/httpd/conf/httpd.conf"
 cw_installer: "/root/awslogs-agent-setup.py"
 cw_conf_template: "/root/cw_conf_template"
 env_type: $ENV_TYPE
+external_domain: $EXTERNAL_DOMAIN
+mail_server: $SMTP_FQDN
+from_address: "no-reply.$HMPPS_ROLE"
 EOF
 
 cat << EOF > ~/bootstrap.yml

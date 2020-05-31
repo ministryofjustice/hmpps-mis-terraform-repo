@@ -96,6 +96,7 @@ resource "aws_launch_configuration" "launch_cfg" {
     "${local.efs_security_groups}",
     "${local.nextcloud_db_sg}",
     "${local.nextcloud_samba_sg}",
+    "${local.sg_smtp_ses}",
   ]
   enable_monitoring    = "true"
   associate_public_ip_address = false
