@@ -43,6 +43,7 @@ LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 LDAP_PORT="${ldap_port}"
 PWM_URL="${pwm_url}"
 ENV_TYPE="${environment_type}"
+region="${region}"
 EOF
 
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
@@ -78,6 +79,7 @@ export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 export LDAP_PORT="${ldap_port}"
 export PWM_URL="${pwm_url}"
 export ENV_TYPE="${environment_type}"
+export region="${region}"
 
 #Mount EFS
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
@@ -160,6 +162,7 @@ env_type: $ENV_TYPE
 external_domain: $EXTERNAL_DOMAIN
 mail_server: $SMTP_FQDN
 from_address: "no-reply.$HMPPS_ROLE"
+region: $region
 EOF
 
 cat << EOF > ~/bootstrap.yml
