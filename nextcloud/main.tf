@@ -146,7 +146,7 @@ data "aws_ami" "amazon_ami" {
 
   filter {
     name   = "name"
-    values = ["HMPPS Nextcloud *"]
+    values = ["HMPPS Nextcloud master *"]
   }
 
   filter {
