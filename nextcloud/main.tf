@@ -126,6 +126,19 @@ data "aws_acm_certificate" "nextcloud_cert" {
 }
 
 #-------------------------------------------------------------
+### Getting the PWM details
+#-------------------------------------------------------------
+data "terraform_remote_state" "delius-core-pwm" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "delius-core/pwm/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -133,7 +146,7 @@ data "aws_ami" "amazon_ami" {
 
   filter {
     name   = "name"
-    values = ["HMPPS Base CentOS *"]
+    values = ["HMPPS Nextcloud *"]
   }
 
   filter {
@@ -186,7 +199,7 @@ locals {
   efs_dns_name                 = "${module.efs_share.efs_dns_name}"
   nextcloud_db_user            = "${local.mis_app_name}${local.app_name}"
   nextcloud_db_sg              = ["${data.terraform_remote_state.security-groups.sg_mis_nextcloud_db}",]
-  nextcloud_samba_sg            = ["${data.terraform_remote_state.security-groups.sg_mis_samba}",]
+  nextcloud_samba_sg           = ["${data.terraform_remote_state.security-groups.sg_mis_samba}",]
   db_dns_name                  = "${aws_route53_record.mariadb_dns_entry.fqdn}"
   ldap_bind_user               = "${data.terraform_remote_state.ldap_elb_name.ldap_bind_user}"
   backup_bucket                = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket}"
@@ -194,4 +207,10 @@ locals {
   installer_user               = "installer_user"
   config_passw                 = "${local.environment_identifier}-${local.app_name}-config-password"
   nextcloud_s3_bucket_arn      = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket_arn}"
+  public_cidr_block            = ["${data.terraform_remote_state.common.public_cidr_block}"]
+  cidr_block_a_subnet          = "${replace (element(local.public_cidr_block, 0), "/", "\\/")}"
+  cidr_block_b_subnet          = "${replace (element(local.public_cidr_block, 1), "/", "\\/")}"
+  cidr_block_c_subnet          = "${replace (element(local.public_cidr_block, 2), "/", "\\/")}"
+  pwm_url                      = "${data.terraform_remote_state.delius-core-pwm.public_fqdn_pwm}"
+  sg_smtp_ses                  = "${data.terraform_remote_state.security-groups.sg_smtp_ses}"
 }

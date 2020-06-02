@@ -83,8 +83,6 @@ module "db_option_group" {
 
 module "db_instance" {
   source = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=pre-shared-vpc//modules//rds//db_instance"
-
-  create            = "${var.create_db_instance}"
   identifier        = "${local.common_name}"
   engine            = "${var.engine}"
   engine_version    = "${var.engine_version}"
@@ -94,7 +92,6 @@ module "db_instance" {
   storage_encrypted = "${var.storage_encrypted}"
   kms_key_id        = "${module.kms_key.kms_arn}"
   license_model     = "${var.license_model}"
-
   name                                = "${local.app_name}"
   username                            = "${local.nextcloud_db_user}"
   password                            = "${aws_ssm_parameter.nextcloud_db_password.value}"
