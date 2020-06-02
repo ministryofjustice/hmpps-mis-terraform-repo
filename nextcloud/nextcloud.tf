@@ -140,7 +140,7 @@ resource "aws_autoscaling_group" "asg" {
     {
       key                 = "Name"
       value               = "${var.environment_type}-${local.app_name}-asg"
-      propagate_at_launch = true
+      propagate_at_launch = "true"
     }
   ]
   lifecycle {
