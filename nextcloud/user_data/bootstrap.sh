@@ -44,6 +44,7 @@ LDAP_PORT="${ldap_port}"
 PWM_URL="${pwm_url}"
 ENV_TYPE="${environment_type}"
 region="${region}"
+MIS_USER_PASS_NAME="${mis_user_pass_name}"
 EOF
 
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
@@ -80,6 +81,7 @@ export LDAP_PORT="${ldap_port}"
 export PWM_URL="${pwm_url}"
 export ENV_TYPE="${environment_type}"
 export region="${region}"
+export MIS_USER_PASS_NAME="${mis_user_pass_name}"
 
 #Mount EFS
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
@@ -100,7 +102,7 @@ cat << EOF > ~/requirements.yml
   src: singleplatform-eng.users
 - name: nextcloud
   src: https://github.com/ministryofjustice/hmpps-nextcloud-installer
-  version: master
+  version: add_mis_admin_user_to_samba
 EOF
 
 wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
@@ -163,6 +165,8 @@ external_domain: $EXTERNAL_DOMAIN
 mail_server: $SMTP_FQDN
 from_address: "no-reply.$HMPPS_ROLE"
 region: $region
+mis_user_pass_name: $MIS_USER_PASS_NAME
+globignore: "CRC:nart:National:NPS"
 EOF
 
 cat << EOF > ~/bootstrap.yml
