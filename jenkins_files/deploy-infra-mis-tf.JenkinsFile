@@ -2,7 +2,7 @@ def project = [:]
 project.config    = 'hmpps-env-configs'
 project.mis       = 'hmpps-mis-terraform-repo'
 project.config_version  = ''
-project.mis_version     = ''
+project.mis_version     = 'add_check_box_for_ha_patches'
 mis_db_high_availability_count = 0
 misboe_db_high_availability_count = 0
 misdsd_db_high_availability_count = 0
@@ -226,7 +226,7 @@ pipeline {
                               userRemoteConfigs:
                                 [[url: 'git@github.com:ministryofjustice/' + project.mis, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a' ]],
                               branches:
-                                [[name: add_check_box_for_ha_patches]]],
+                                [[name: project.mis_version]]],
                               poll: false
                 }
                 debug_env(project.mis, project.mis_version)
