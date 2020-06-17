@@ -3,6 +3,9 @@ project.config    = 'hmpps-env-configs'
 project.mis       = 'hmpps-mis-terraform-repo'
 project.config_version  = ''
 project.mis_version     = ''
+mis_db_high_availability_count = 0
+misboe_db_high_availability_count = 0
+misdsd_db_high_availability_count = 0
 
 // Parameters required for job
 // parameters:
@@ -228,6 +231,15 @@ pipeline {
                 }
                 debug_env(project.mis, project.mis_version)
 
+                script {
+                    mis_db_high_availability_count = get_db_ha_count(project.config, environment_name, "mis")
+                    misboe_db_high_availability_count = get_db_ha_count(project.config, environment_name, "misboe")
+                    misdsd_db_high_availability_count = get_db_ha_count(project.config, environment_name, "misdsd")
+                    echo "MIS DB HIGH AVAILABILITY COUNT is " + mis_db_high_availability_count
+                    echo "MISBOE DB HIGH AVAILABILITY COUNT is " + misboe_db_high_availability_count
+                    echo "MISDSD DB HIGH AVAILABILITY COUNT is " + misdsd_db_high_availability_count
+                }
+
                 prepare_env()
             }
         }
@@ -303,21 +315,21 @@ pipeline {
      stage('Build Database High Availibilty') {
        parallel {
          stage('Build MIS DB HA')    {
-             when { expression { return params.deploy_DATABASE_HA } }
+             when {expression { (mis_db_high_availability_count == 1 || mis_db_high_availability_count == 2) && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MIS",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'db_group', value: "mis"]
          ]}}
          stage('Build MISBOE DB HA') {
-             when { expression { return params.deploy_DATABASE_HA } }
+             when {expression { (misboe_db_high_availability_count == 1 || misboe_db_high_availability_count == 2) && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISBOE",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'db_group', value: "misboe"]
          ]}}
          stage('Build MISDSD DB HA') {
-             when { expression { return params.deploy_DATABASE_HA } }
+             when {expression { (misdsd_db_high_availability_count == 1 || misdsd_db_high_availability_count == 2) && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISDSD",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
@@ -329,7 +341,7 @@ pipeline {
      stage ('Check Oracle Software and Patches on HA') {
      parallel {
         stage('Check Oracle Software Patches on MIS DB HA 1') {
-            when {expression { db_patch_check == "true" }}
+            when {expression { (mis_db_high_availability_count == 1 || mis_db_high_availability_count == 2) && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -342,7 +354,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MIS DB HA 2') {
-            when {expression { db_patch_check == "true" }}
+            when {expression { mis_db_high_availability_count == 2 && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -356,7 +368,7 @@ pipeline {
         }
 
         stage('Check Oracle Software Patches on MISBOE DB HA 1') {
-            when {expression { db_patch_check == "true" }}
+            when {expression { (misboe_db_high_availability_count == 1 || misboe_db_high_availability_count == 2) && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -369,7 +381,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MISBOE DB HA 2') {
-            when {expression { db_patch_check == "true" }}
+            when {expression { misboe_db_high_availability_count == 2 && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -383,7 +395,7 @@ pipeline {
         }
 
         stage('Check Oracle Software Patches on MISDSD DB HA 1') {
-            when {expression { db_patch_check == "true" }}
+            when {expression { (misdsd_db_high_availability_count == 1 || misdsd_db_high_availability_count == 2) && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -396,7 +408,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MISDSD DB HA 2') {
-            when {expression { db_patch_check == "true" }}
+            when {expression { misdsd_db_high_availability_count == 2 && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
