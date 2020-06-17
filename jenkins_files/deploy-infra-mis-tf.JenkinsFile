@@ -248,6 +248,7 @@ pipeline {
      stage('Check Oracle Software Patches on Primary') {
        parallel {
          stage('Delius | Check MIS database_mis') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -260,6 +261,7 @@ pipeline {
             }
          }
          stage('Delius | Check MIS database_misboe') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -273,6 +275,7 @@ pipeline {
             }
          }
          stage('Delius | Check MIS database_misdsd') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
