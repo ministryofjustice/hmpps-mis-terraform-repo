@@ -226,7 +226,7 @@ pipeline {
                               userRemoteConfigs:
                                 [[url: 'git@github.com:ministryofjustice/' + project.mis, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a' ]],
                               branches:
-                                [[name: project.mis_version]]],
+                                [[name: add_check_box_for_ha_patches]]],
                               poll: false
                 }
                 debug_env(project.mis, project.mis_version)
