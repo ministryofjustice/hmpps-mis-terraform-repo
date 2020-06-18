@@ -3,6 +3,9 @@ project.config    = 'hmpps-env-configs'
 project.mis       = 'hmpps-mis-terraform-repo'
 project.config_version  = ''
 project.mis_version     = ''
+mis_db_high_availability_count = 0
+misboe_db_high_availability_count = 0
+misdsd_db_high_availability_count = 0
 
 // Parameters required for job
 // parameters:
@@ -26,6 +29,30 @@ def get_version(env_name, repo_name, override_version) {
   } else {
     return override_version
   }
+}
+
+def get_db_ha_count(git_project_dir, env_name, db_name) {
+    file = "${git_project_dir}/${env_name}/ansible/group_vars/all.yml"
+    item = "database.${db_name}.high_availability_count"
+    db_ha_count = get_yaml_value(file, item)
+
+    echo "db_ha_count - " + db_ha_count
+
+    if (db_ha_count!="") {
+        return db_ha_count
+    } else {
+        return 0
+    }
+}
+
+def get_yaml_value(file, item_name) {
+    item = sh (
+        script: "cat \"${file}\" | shyaml --quiet get-value \"${item_name}\"",
+        returnStdout: true
+    ).trim()
+
+    echo "item - " + item
+    return item
 }
 
 def checkout_version(git_project_dir, git_version) {
@@ -164,13 +191,13 @@ def do_terraform(config_dir, env_name, git_project, component) {
     }
 }
 
-def debug_env() {
-    sh '''
-    #!/usr/env/bin bash
-    pwd
-    ls -al
-    '''
-}
+// def debug_env() {
+//     sh '''
+//     #!/usr/env/bin bash
+//     pwd
+//     ls -al
+//     '''
+// }
 
 pipeline {
 
@@ -180,6 +207,7 @@ pipeline {
       string(name: 'CONFIG_BRANCH', description: 'Target Branch for hmpps-env-configs', defaultValue: 'master')
       string(name: 'MIS_BRANCH',  description: 'Target Branch for hmpps-mis-terraform-repo', defaultValue: 'master')
       booleanParam(name: 'deploy_DATABASE_HA', defaultValue: true, description: 'Deploy/update Database High Availibilty?')
+      booleanParam(name: 'db_patch_check', defaultValue: true, description: 'Check Oracle DB patches?')
     }
 
     stages {
@@ -227,6 +255,15 @@ pipeline {
                 }
                 debug_env(project.mis, project.mis_version)
 
+                script {
+                    mis_db_high_availability_count = get_db_ha_count(project.config, environment_name, "mis")
+                    misboe_db_high_availability_count = get_db_ha_count(project.config, environment_name, "misboe")
+                    misdsd_db_high_availability_count = get_db_ha_count(project.config, environment_name, "misdsd")
+                    echo "MIS DB HIGH AVAILABILITY COUNT is " + mis_db_high_availability_count
+                    echo "MISBOE DB HIGH AVAILABILITY COUNT is " + misboe_db_high_availability_count
+                    echo "MISDSD DB HIGH AVAILABILITY COUNT is " + misdsd_db_high_availability_count
+                }
+
                 prepare_env()
             }
         }
@@ -247,6 +284,7 @@ pipeline {
      stage('Check Oracle Software Patches on Primary') {
        parallel {
          stage('Delius | Check MIS database_mis') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -259,6 +297,7 @@ pipeline {
             }
          }
          stage('Delius | Check MIS database_misboe') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -272,6 +311,7 @@ pipeline {
             }
          }
          stage('Delius | Check MIS database_misdsd') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -299,21 +339,21 @@ pipeline {
      stage('Build Database High Availibilty') {
        parallel {
          stage('Build MIS DB HA')    {
-             when { expression { return params.deploy_DATABASE_HA } }
+             when {expression { (mis_db_high_availability_count == "1" || mis_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MIS",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'db_group', value: "mis"]
          ]}}
          stage('Build MISBOE DB HA') {
-             when { expression { return params.deploy_DATABASE_HA } }
+             when {expression { (misboe_db_high_availability_count == "1" || misboe_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISBOE",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'db_group', value: "misboe"]
          ]}}
          stage('Build MISDSD DB HA') {
-             when { expression { return params.deploy_DATABASE_HA } }
+             when {expression { (misdsd_db_high_availability_count == "1" || misdsd_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISDSD",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
@@ -324,8 +364,8 @@ pipeline {
 
      stage ('Check Oracle Software and Patches on HA') {
      parallel {
-
         stage('Check Oracle Software Patches on MIS DB HA 1') {
+            when {expression { (mis_db_high_availability_count == "1" || mis_db_high_availability_count == "2") && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -338,6 +378,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MIS DB HA 2') {
+            when {expression { mis_db_high_availability_count == "2" && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -351,6 +392,7 @@ pipeline {
         }
 
         stage('Check Oracle Software Patches on MISBOE DB HA 1') {
+            when {expression { (misboe_db_high_availability_count == "1" || misboe_db_high_availability_count == "2") && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -363,6 +405,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MISBOE DB HA 2') {
+            when {expression { misboe_db_high_availability_count == "2" && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -376,6 +419,7 @@ pipeline {
         }
 
         stage('Check Oracle Software Patches on MISDSD DB HA 1') {
+            when {expression { (misdsd_db_high_availability_count == "1" || misdsd_db_high_availability_count == "2") && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
@@ -388,6 +432,7 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MISDSD DB HA 2') {
+            when {expression { misdsd_db_high_availability_count == "2" && db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
