@@ -31,6 +31,30 @@ def get_version(env_name, repo_name, override_version) {
   }
 }
 
+def get_db_ha_count(git_project_dir, env_name, db_name) {
+    file = "${git_project_dir}/${env_name}/ansible/group_vars/all.yml"
+    item = "database.${db_name}.high_availability_count"
+    db_ha_count = get_yaml_value(file, item)
+
+    echo "db_ha_count - " + db_ha_count
+
+    if (db_ha_count!="") {
+        return db_ha_count
+    } else {
+        return 0
+    }
+}
+
+def get_yaml_value(file, item_name) {
+    item = sh (
+        script: "cat \"${file}\" | shyaml --quiet get-value \"${item_name}\"",
+        returnStdout: true
+    ).trim()
+
+    echo "item - " + item
+    return item
+}
+
 def checkout_version(git_project_dir, git_version) {
   sh """
     #!/usr/env/bin bash
@@ -167,13 +191,13 @@ def do_terraform(config_dir, env_name, git_project, component) {
     }
 }
 
-def debug_env() {
-    sh '''
-    #!/usr/env/bin bash
-    pwd
-    ls -al
-    '''
-}
+// def debug_env() {
+//     sh '''
+//     #!/usr/env/bin bash
+//     pwd
+//     ls -al
+//     '''
+// }
 
 pipeline {
 
