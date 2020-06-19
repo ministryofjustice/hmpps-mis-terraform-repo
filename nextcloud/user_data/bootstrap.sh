@@ -45,6 +45,9 @@ PWM_URL="${pwm_url}"
 ENV_TYPE="${environment_type}"
 region="${region}"
 MIS_USER_PASS_NAME="${mis_user_pass_name}"
+CIDR_BLOCK_A="${cidr_block_a_subnet}"
+CIDR_BLOCK_B="${cidr_block_b_subnet}"
+CIDR_BLOCK_C="${cidr_block_c_subnet}"
 EOF
 
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
@@ -82,6 +85,9 @@ export PWM_URL="${pwm_url}"
 export ENV_TYPE="${environment_type}"
 export region="${region}"
 export MIS_USER_PASS_NAME="${mis_user_pass_name}"
+export CIDR_BLOCK_A="${cidr_block_a_subnet}"
+export CIDR_BLOCK_B="${cidr_block_b_subnet}"
+export CIDR_BLOCK_C="${cidr_block_c_subnet}"
 
 #Mount EFS
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
@@ -167,6 +173,9 @@ from_address: "no-reply.$HMPPS_ROLE"
 region: $region
 mis_user_pass_name: $MIS_USER_PASS_NAME
 globignore: "CRC:nart:National:NPS"
+cidr_block_a: $CIDR_BLOCK_A
+cidr_block_b: $CIDR_BLOCK_B
+cidr_block_c: $CIDR_BLOCK_C
 EOF
 
 cat << EOF > ~/bootstrap.yml
