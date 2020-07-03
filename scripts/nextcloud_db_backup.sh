@@ -142,7 +142,7 @@ if [ -z "${JOB_TYPE}" ]
 then
     echo "JOB_TYPE argument not supplied."
     exit 1
-elif [ -z "${TG_ENVIRONMENT_TYPE}"]
+elif [ -z "${TG_ENVIRONMENT_TYPE}" ]
 then
     echo "TG_ENVIRONMENT_TYPE argument not supplied."
     exit 1
