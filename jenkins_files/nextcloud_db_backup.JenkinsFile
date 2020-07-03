@@ -1,6 +1,6 @@
 def project = [:]
 project.mis  = 'hmpps-mis-terraform-repo'
-project.branch = 'ALS_1142'
+project.branch = 'master'
 
 def prepare_env() {
     sh '''
