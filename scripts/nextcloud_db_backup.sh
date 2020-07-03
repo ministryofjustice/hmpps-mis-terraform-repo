@@ -138,15 +138,15 @@ SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
 
 
 ##Check args provided
-if [ -z "${JOB_TYPE}" ]
+if [ -z "${JOB_TYPE}" ];
 then
     echo "JOB_TYPE argument not supplied."
     exit 1
-elif [ -z "${TG_ENVIRONMENT_TYPE}" ]
+elif [ -z "${TG_ENVIRONMENT_TYPE}" ];
 then
     echo "TG_ENVIRONMENT_TYPE argument not supplied."
     exit 1
-elif [${JOB_TYPE} = "db-restore"] && [$ -z "$BACKUP_DATE"]
+elif [ ${JOB_TYPE} = "db-restore"] && [$ -z "$BACKUP_DATE" ];
 then
     echo "JOB_TYPE : db-restore requires date parameter Format: YYYY-MM-DD"
     exit 1
