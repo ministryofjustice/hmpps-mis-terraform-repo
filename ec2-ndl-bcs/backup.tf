@@ -12,7 +12,6 @@ resource "aws_backup_plan" "bcs_ec2_backup_plan" {
     schedule          = "${var.ebs_backup["schedule"]}"
 
     lifecycle = {
-      cold_storage_after = "${var.ebs_backup["cold_storage_after"]}"
       delete_after       = "${var.ebs_backup["delete_after"]}"
     }
   }
