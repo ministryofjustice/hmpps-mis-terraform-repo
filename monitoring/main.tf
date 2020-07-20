@@ -118,7 +118,11 @@ locals {
   log_group_name               = "/mis/application_logs"
   name_space                   = "LogMetrics"
   exclude_log_level            = "-INFORMATION -WARNING"
-  mis_team_action              = "If no OK alarm is recieved in a few minutes, please contact the MIS Team"
+  include_log_level            = "INFORMATION"
+  mis_team_action              = "If no OK alarm is received in a few minutes, please contact the MIS Team"
+  nart_role                    = "${data.terraform_remote_state.common.legacy_environment_name}"
+  nart_prefix                  = "${ substr(local.nart_role, 0, length(local.nart_role)-1) }"
+  started_message              = "has been started"
 }
 
 #dashboard
@@ -176,7 +180,7 @@ resource "aws_lambda_function" "notify-ndmis-slack" {
   role               = "${data.aws_iam_role.lambda_exec_role.arn}"
   handler            = "${local.lambda_name}.handler"
   source_code_hash   = "${base64sha256(file("${data.archive_file.notify-ndmis-slack.output_path}"))}"
-  runtime            = "nodejs8.10"
+  runtime            = "nodejs12.x"
 }
 
 resource "aws_lambda_permission" "with_sns" {

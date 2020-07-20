@@ -12,8 +12,8 @@ variable "nextcloud_instance_type" {}
 
 variable "bastion_inventory" {}
 
-variable "instance_count" {
-  default = "2"
+variable "nextcloud_instance_count" {
+  default = "1"
 }
 
 # LB
@@ -47,12 +47,6 @@ variable "password_length" {
   default = "18"
 }
 
-
-variable depends_on {
-  default = []
-  type    = "list"
-}
-
 variable "create_db_subnet_group" {
   description = "Whether to create a database subnet group"
   default     = false
@@ -60,7 +54,7 @@ variable "create_db_subnet_group" {
 
 variable "create_db_parameter_group" {
   description = "Whether to create a database parameter group"
-  default     = false
+  default     = true
 }
 
 variable "create_db_option_group" {
@@ -68,20 +62,22 @@ variable "create_db_option_group" {
   default     = false
 }
 
-variable "create_db_instance" {
-  description = "Whether to create a database instance"
-  default     = false
-}
-
 # DB parameter group
 variable "family" {
   description = "The family of the DB parameter group"
-  default     = ""
+  default     = "mariadb10.2"
 }
 
 variable "parameters" {
   description = "A list of DB parameters (map) to apply"
-  default     = []
+  type = "list"
+  default = [
+    {
+      name         = "tx_isolation"
+      value        = "READ-COMMITTED"
+      apply_method = "pending-reboot"
+    }
+  ]
 }
 
 variable "engine" {

@@ -29,7 +29,8 @@
             "Sid": "GetParameters",
             "Effect": "Allow",
             "Action": [
-                "ssm:GetParameters"
+                "ssm:GetParameters",
+                "ssm:PutParameter"
             ],
             "Resource": "*"
         },

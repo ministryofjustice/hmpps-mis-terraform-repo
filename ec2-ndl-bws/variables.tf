@@ -64,8 +64,7 @@ variable "ebs_backup" {
 
   default = {
     schedule           = "cron(0 01 * * ? *)"
-    cold_storage_after = 14
-    delete_after       = 120
+    delete_after       = 15
   }
 }
 

@@ -54,9 +54,9 @@ data "template_file" "nextcloud_user_data" {
     short_env_identifier         = "${local.short_environment_identifier}"
     ldap_elb_name                = "${local.ldap_elb_name}"
     ldap_port                    = "${local.ldap_port}"
-	external_domain              = "${local.external_domain}"
-	nextcloud_admin_user         = "${local.nextcloud_admin_user}"
-	nextcloud_admin_pass_param   = "${local.nextcloud_admin_pass_param}"
+	  external_domain              = "${local.external_domain}"
+	  nextcloud_admin_user         = "${local.nextcloud_admin_user}"
+	  nextcloud_admin_pass_param   = "${local.nextcloud_admin_pass_param}"
     nextcloud_db_user_pass_param = "${local.nextcloud_db_user_pass_param}"
     efs_dns_name                 = "${local.efs_dns_name}"
     nextcloud_db_user            = "${local.nextcloud_db_user}"
@@ -70,6 +70,11 @@ data "template_file" "nextcloud_user_data" {
     mis_user                     = "${data.aws_ssm_parameter.user.value}"
     mis_user_pass_name           = "${local.environment_identifier}-${local.mis_app_name}-admin-password"
     reports_pass_name            = "${local.environment_identifier}-reports-admin-password"
+    cidr_block_a_subnet          = "${local.cidr_block_a_subnet}"
+    cidr_block_b_subnet          = "${local.cidr_block_b_subnet}"
+    cidr_block_c_subnet          = "${local.cidr_block_c_subnet}"
+    environment_type             = "${var.environment_type}"
+    region                       = "${var.region}"
   }
 }
 
@@ -80,7 +85,7 @@ data "template_file" "nextcloud_user_data" {
 
 #Launch cfg
 resource "aws_launch_configuration" "launch_cfg" {
-  name_prefix          = "${local.short_environment_identifier}-nextcloud-launch-cfg-"
+  name_prefix          = "${var.environment_type}-nextcloud-launch-cfg-"
   image_id             = "${data.aws_ami.amazon_ami.id}"
   iam_instance_profile = "${module.iam_instance_profile.iam_instance_name}"
   instance_type        = "${var.nextcloud_instance_type}"
@@ -91,6 +96,7 @@ resource "aws_launch_configuration" "launch_cfg" {
     "${local.efs_security_groups}",
     "${local.nextcloud_db_sg}",
     "${local.nextcloud_samba_sg}",
+    "${local.sg_smtp_ses}",
   ]
   enable_monitoring    = "true"
   associate_public_ip_address = false
@@ -117,22 +123,23 @@ data "null_data_source" "tags" {
 
 #ASG
 resource "aws_autoscaling_group" "asg" {
-  name                      = "${local.environment_identifier}-${local.app_name}"
+  name                      = "${var.environment_type}-${local.app_name}"
   vpc_zone_identifier       = ["${list(
     data.terraform_remote_state.vpc.vpc_private-subnet-az1,
-	data.terraform_remote_state.vpc.vpc_private-subnet-az2,
+	  data.terraform_remote_state.vpc.vpc_private-subnet-az2,
     data.terraform_remote_state.vpc.vpc_private-subnet-az3,
   )}"]
   launch_configuration      = "${aws_launch_configuration.launch_cfg.id}"
-  min_size                  = "${var.instance_count}"
-  max_size                  = "${var.instance_count}"
-  desired_capacity          = "${var.instance_count}"
+  min_size                  = "${var.nextcloud_instance_count}"
+  max_size                  = "${var.nextcloud_instance_count}"
+  desired_capacity          = "${var.nextcloud_instance_count}"
+  health_check_type         = "EC2"
   tags = [
     "${data.null_data_source.tags.*.outputs}",
     {
       key                 = "Name"
-      value               = "${local.environment_identifier}-${local.app_name}"
-      propagate_at_launch = true
+      value               = "${var.environment_type}-${local.app_name}-asg"
+      propagate_at_launch = "true"
     }
   ]
   lifecycle {
@@ -154,4 +161,30 @@ resource "aws_autoscaling_attachment" "nextcloud_attachment" {
 resource "aws_autoscaling_attachment" "samba_attachment" {
   autoscaling_group_name = "${aws_autoscaling_group.asg.id}"
   elb                    = "${aws_elb.samba_lb.id}"
+}
+
+
+#-------------------------------------------------------------
+### Cloudwatch log group
+#-------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "httpd_access_logs" {
+  name = "/${var.environment_type}/${local.app_name}/access_log"
+  retention_in_days = 14
+  tags = "${var.tags}"
+}
+
+resource "aws_cloudwatch_log_group" "httpd_error_logs" {
+  name = "/${var.environment_type}/${local.app_name}/error_log"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "nextcloud_logs" {
+  name = "/${var.environment_type}/${local.app_name}/nextcloud.log"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "samba_logs" {
+  name = "/${var.environment_type}/${local.app_name}/log.smbd"
+  retention_in_days = 14
 }

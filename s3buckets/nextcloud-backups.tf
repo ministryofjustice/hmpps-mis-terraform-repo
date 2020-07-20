@@ -14,7 +14,7 @@ resource "aws_s3_bucket" "backups" {
   acl    = "private"
 
   versioning {
-    enabled = false
+    enabled = true
   }
 
   lifecycle {

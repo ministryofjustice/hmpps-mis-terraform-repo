@@ -1,13 +1,82 @@
 def project = [:]
 project.config    = 'hmpps-env-configs'
 project.mis       = 'hmpps-mis-terraform-repo'
+project.config_version  = ''
+project.mis_version     = ''
+mis_db_high_availability_count = 0
+misboe_db_high_availability_count = 0
+misdsd_db_high_availability_count = 0
 
+// Parameters required for job
+// parameters:
+//     choice:
+//       name: 'environment_name'
+//       description: 'Environment name.'
+//     booleanParam:
+//       name: 'confirmation'
+//       description: 'Whether to require manual confirmation of terraform plans.'
+def get_version(env_name, repo_name, override_version) {
+  ssm_param_version = sh (
+    script: "aws ssm get-parameters --region eu-west-2 --name \"/versions/mis/repo/${repo_name}/${env_name}\" --query Parameters | jq '.[] | select(.Name | test(\"${env_name}\")) | .Value' --raw-output",
+    returnStdout: true
+  ).trim()
 
-parameters {
-  booleanParam(name: 'deploy_DatabaseStandBy1', defaultValue: true, description: 'Deploy/update Database StandBy 1?')
-  booleanParam(name: 'deploy_DatabaseStandBy2', defaultValue: true, description: 'Deploy/update Database StandBy 2?')
-}      
+  echo "ssm_param_version - " + ssm_param_version
+  echo "override_version - " + override_version
 
+  if (ssm_param_version!="" && override_version=="master") {
+    return ":refs/tags/" + ssm_param_version
+  } else {
+    return override_version
+  }
+}
+
+def get_db_ha_count(git_project_dir, env_name, db_name) {
+    file = "${git_project_dir}/${env_name}/ansible/group_vars/all.yml"
+    item = "database.${db_name}.high_availability_count"
+    db_ha_count = get_yaml_value(file, item)
+
+    echo "db_ha_count - " + db_ha_count
+
+    if (db_ha_count!="") {
+        return db_ha_count
+    } else {
+        return 0
+    }
+}
+
+def get_yaml_value(file, item_name) {
+    item = sh (
+        script: "cat \"${file}\" | shyaml --quiet get-value \"${item_name}\"",
+        returnStdout: true
+    ).trim()
+
+    echo "item - " + item
+    return item
+}
+
+def checkout_version(git_project_dir, git_version) {
+  sh """
+    #!/usr/env/bin bash
+    set +e
+    pushd "${git_project_dir}"
+    git checkout "${git_version}"
+    echo `git symbolic-ref -q --short HEAD || git describe --tags --exact-match`
+    popd
+  """
+}
+
+def debug_env(git_project_dir, git_version) {
+  sh """
+    #!/usr/env/bin bash
+    set +e
+    pushd "${git_project_dir}"
+    git branch
+    git describe --tags
+    echo `git symbolic-ref -q --short HEAD || git describe --tags --exact-match`
+    popd
+  """
+}
 
 def prepare_env() {
     sh '''
@@ -122,33 +191,77 @@ def do_terraform(config_dir, env_name, git_project, component) {
     }
 }
 
-def debug_env() {
-    sh '''
-    #!/usr/env/bin bash
-    pwd
-    ls -al
-    '''
-}
+// def debug_env() {
+//     sh '''
+//     #!/usr/env/bin bash
+//     pwd
+//     ls -al
+//     '''
+// }
 
 pipeline {
 
-    agent { label "jenkins_slave" }
+    agent { label "jenkins_agent" }
 
     parameters {
-         booleanParam(name: 'deploy_DATABASE_HA', defaultValue: true, description: 'Deploy/update Database High Availibilty?')
+      string(name: 'CONFIG_BRANCH', description: 'Target Branch for hmpps-env-configs', defaultValue: 'master')
+      string(name: 'MIS_BRANCH',  description: 'Target Branch for hmpps-mis-terraform-repo', defaultValue: 'master')
+      booleanParam(name: 'deploy_DATABASE_HA', defaultValue: true, description: 'Deploy/update Database High Availibilty?')
+      booleanParam(name: 'db_patch_check', defaultValue: true, description: 'Check Oracle DB patches?')
     }
 
     stages {
 
         stage('setup') {
             steps {
-                slackSend(message: "\"Apply\" started on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL.replace(':8080','')}|Open>)")
+                script {
+                  def starttime = new Date()
+                  println ("Started on " + starttime)
+
+                  project.config_version = get_version(environment_name, project.config, env.CONFIG_BRANCH)
+                  println("Version from function (project.config_version) -- " + project.config_version)
+
+                  project.mis_version  = get_version(environment_name, project.mis, env.MIS_BRANCH)
+                  println("Version from function (project.mis_version) -- " + project.mis_version)
+
+                  def information = """
+                  Started on ${starttime}
+                  project.config_version -- ${project.config_version}
+                  project.mis_version  -- ${project.mis_version}
+                  """
+
+                  println information
+                }
+                slackSend(message: "\"Apply\" of \"${project.mis_version}\" started on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL.replace(':8080','')}|Open>)")
+
+                dir( project.config ) {
+                  checkout scm: [$class: 'GitSCM',
+                              userRemoteConfigs:
+                                [[url: 'git@github.com:ministryofjustice/' + project.config, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a' ]],
+                              branches:
+                                [[name: project.config_version]]],
+                              poll: false
+                }
+                debug_env(project.config, project.config_version)
+
 
                 dir( project.mis ) {
-                  git url: 'git@github.com:ministryofjustice/' + project.mis, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                  checkout scm: [$class: 'GitSCM',
+                              userRemoteConfigs:
+                                [[url: 'git@github.com:ministryofjustice/' + project.mis, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a' ]],
+                              branches:
+                                [[name: project.mis_version]]],
+                              poll: false
                 }
-                dir( project.config ) {
-                  git url: 'git@github.com:ministryofjustice/' + project.config, branch: 'master', credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a'
+                debug_env(project.mis, project.mis_version)
+
+                script {
+                    mis_db_high_availability_count = get_db_ha_count(project.config, environment_name, "mis")
+                    misboe_db_high_availability_count = get_db_ha_count(project.config, environment_name, "misboe")
+                    misdsd_db_high_availability_count = get_db_ha_count(project.config, environment_name, "misdsd")
+                    echo "MIS DB HIGH AVAILABILITY COUNT is " + mis_db_high_availability_count
+                    echo "MISBOE DB HIGH AVAILABILITY COUNT is " + misboe_db_high_availability_count
+                    echo "MISDSD DB HIGH AVAILABILITY COUNT is " + misdsd_db_high_availability_count
                 }
 
                 prepare_env()
@@ -161,20 +274,20 @@ pipeline {
      stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam')}}}
      stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups')}}}
      stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud')}}}
-     
+
      stage('Provision Databases - Primaries') {
        parallel {
-         stage('Delius | MIS database_mis_primary')     { 
+         stage('Delius | MIS database_mis_primary')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_mis/server-mis-db-1') }
             }
          }
 
-         stage('Delius | MIS database_misboe_primary')     { 
+         stage('Delius | MIS database_misboe_primary')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misboe/server-misboe-db-1') }
             }
          }
 
-         stage('Delius | MIS database_misdsd_primary')     { 
+         stage('Delius | MIS database_misdsd_primary')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misdsd/server-misdsd-db-1') }
             }
          }
@@ -182,19 +295,19 @@ pipeline {
      }
 
      stage('Provision Databases - Standby 1') {
-       when { expression { return (params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1) } }  
+       when { expression { return (params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1) } }
        parallel {
-         stage('Delius | MIS database_mis_standby1')     { 
+         stage('Delius | MIS database_mis_standby1')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_mis/server-mis-db-2') }
             }
          }
 
-         stage('Delius | MIS database_misboe_standby1')     { 
+         stage('Delius | MIS database_misboe_standby1')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misboe/server-misboe-db-2') }
             }
          }
 
-         stage('Delius | MIS database_misdsd_standby1')     { 
+         stage('Delius | MIS database_misdsd_standby1')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misdsd/server-misdsd-db-2') }
             }
          }
@@ -202,19 +315,19 @@ pipeline {
      }
 
      stage('Provision Databases - Standby 2') {
-       when { expression { return (params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2) } }  
+       when { expression { return (params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2) } }
        parallel {
-         stage('Delius | MIS database_mis_standby2')     { 
+         stage('Delius | MIS database_mis_standby2')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_mis/server-mis-db-3') }
             }
          }
 
-         stage('Delius | MIS database_misboe_standby2')     { 
+         stage('Delius | MIS database_misboe_standby2')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misboe/server-misboe-db-3') }
             }
          }
 
-         stage('Delius | MIS database_misdsd_standby2')     { 
+         stage('Delius | MIS database_misdsd_standby2')     {
             steps { script { do_terraform(project.config, environment_name, project.mis, 'database_misdsd/server-misdsd-db-3') }
             }
          }
@@ -224,9 +337,10 @@ pipeline {
      stage('Check Oracle Software Patches on Primary') {
        parallel {
          stage('Delius | Check MIS database_mis') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                     parameters: [
                        [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                        [$class: 'StringParameterValue', name: 'target_host', value: 'mis_primarydb'],
@@ -234,11 +348,12 @@ pipeline {
                        [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
                     ]}
             }
-         } 
+         }
          stage('Delius | Check MIS database_misboe') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                     parameters: [
                        [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                        [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_primarydb'],
@@ -249,9 +364,10 @@ pipeline {
             }
          }
          stage('Delius | Check MIS database_misdsd') {
+            when {expression { db_patch_check == "true" }}
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                     parameters: [
                        [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                        [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_primarydb'],
@@ -275,22 +391,22 @@ pipeline {
      }
      stage('Build Database High Availability') {
        parallel {
-         stage('Build MIS DB HA')    { 
-             when { expression { return params.deploy_DATABASE_HA } }
+         stage('Build MIS DB HA')    {
+             when {expression { (mis_db_high_availability_count == "1" || mis_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MIS",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'db_group', value: "mis"]
          ]}}
-         stage('Build MISBOE DB HA') { 
-             when { expression { return params.deploy_DATABASE_HA } }
+         stage('Build MISBOE DB HA') {
+             when {expression { (misboe_db_high_availability_count == "1" || misboe_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISBOE",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'db_group', value: "misboe"]
          ]}}
-         stage('Build MISDSD DB HA') { 
-             when { expression { return params.deploy_DATABASE_HA } }
+         stage('Build MISDSD DB HA') {
+             when {expression { (misdsd_db_high_availability_count == "1" || misdsd_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
              steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISDSD",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
@@ -301,12 +417,15 @@ pipeline {
 
      stage ('Check Oracle Software and Patches on HA') {
      parallel {
-
         stage('Check Oracle Software Patches on MIS DB HA 1') {
-            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } } 
+<<<<<<< HEAD
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } }
+=======
+            when {expression { (mis_db_high_availability_count == "1" || mis_db_high_availability_count == "2") && db_patch_check == "true" }}
+>>>>>>> master
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'target_host', value: 'mis_standbydb1'],
@@ -316,10 +435,14 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MIS DB HA 2') {
-            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } } 
+<<<<<<< HEAD
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } }
+=======
+            when {expression { mis_db_high_availability_count == "2" && db_patch_check == "true" }}
+>>>>>>> master
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'target_host', value: 'mis_standbydb2'],
@@ -328,12 +451,16 @@ pipeline {
                 }
             }
         }
- 
+
         stage('Check Oracle Software Patches on MISBOE DB HA 1') {
-            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } } 
+<<<<<<< HEAD
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } }
+=======
+            when {expression { (misboe_db_high_availability_count == "1" || misboe_db_high_availability_count == "2") && db_patch_check == "true" }}
+>>>>>>> master
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_standbydb1'],
@@ -343,10 +470,14 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MISBOE DB HA 2') {
-            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } } 
+<<<<<<< HEAD
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } }
+=======
+            when {expression { misboe_db_high_availability_count == "2" && db_patch_check == "true" }}
+>>>>>>> master
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_standbydb2'],
@@ -357,10 +488,14 @@ pipeline {
         }
 
         stage('Check Oracle Software Patches on MISDSD DB HA 1') {
-            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } } 
+<<<<<<< HEAD
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy1 } }
+=======
+            when {expression { (misdsd_db_high_availability_count == "1" || misdsd_db_high_availability_count == "2") && db_patch_check == "true" }}
+>>>>>>> master
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_standbydb1'],
@@ -370,10 +505,14 @@ pipeline {
             }
         }
         stage('Check Oracle Software Patches on MISDSD DB HA 2') {
-            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } } 
+<<<<<<< HEAD
+            when { expression { return params.deploy_DATABASE_HA && params.deploy_DatabaseStandBy2 } }
+=======
+            when {expression { misdsd_db_high_availability_count == "2" && db_patch_check == "true" }}
+>>>>>>> master
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                build job: "Ops/Oracle_Operations/Patch_Oracle_Software", 
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
                 parameters: [
                     [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
                     [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_standbydb2'],
@@ -394,10 +533,10 @@ pipeline {
             deleteDir()
         }
         success {
-            slackSend(message: "\"Apply\" completed on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} ", color: 'good')
+            slackSend(message: "\"Apply\" of \"${project.mis_version}\" completed on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} ", color: 'good')
         }
         failure {
-            slackSend(message: "\"Apply\" failed on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} ", color: 'danger')
+            slackSend(message: "\"Apply\" of \"${project.mis_version}\" failed on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} ", color: 'danger')
         }
     }
 

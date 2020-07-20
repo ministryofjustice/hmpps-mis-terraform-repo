@@ -2,67 +2,96 @@
 
 set -x
 exec > >(tee /var/log/user-data.log|logger -t user-data ) 2>&1
-
 yum install -y python-pip git wget unzip
+systemctl stop httpd smb
+
+HMPPS_ENVIRONMENT=${environment_name}
+HMPPS_ROLE=${app_name}
+NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
+SMTP_FQDN=smtp.${private_domain}
+EXTERNAL_DOMAIN="${external_domain}"
 
 cat << EOF >> /etc/environment
 HMPPS_ROLE=${app_name}
-HMPPS_FQDN=${app_name}.${private_domain}
+SMTP_FQDN="smtp.${private_domain}"
 HMPPS_STACKNAME=${env_identifier}
 HMPPS_STACK="${short_env_identifier}"
 HMPPS_ENVIRONMENT=${environment_name}
 HMPPS_ACCOUNT_ID="${account_id}"
 HMPPS_DOMAIN="${private_domain}"
-INT_ZONE_ID="${private_zone_id}"
-LDAP_PORT="${ldap_port}"
+NEXT_CLOUD_DIR="/var/www/html/nextcloud"
+DATA_DIR="/var/nextcloud/data"
+WEB_USER="apache"
+OCC_CMD="/var/www/html/nextcloud/occ"
+WEB_USER_HOME="/usr/share/httpd"
+NEXTCLOUD_CONF=nextcloud-conf.json
 LDAP_HOST="${ldap_elb_name}"
-EXTERNAL_DOMAIN="${external_domain}"
-NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
-NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
+REDIS_HOST="${redis_address}"
+LDAP_USER="${ldap_bind_user}"
+NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
 EFS_DNS_NAME="${efs_dns_name}"
+EXTERNAL_DOMAIN="${external_domain}"
+REPORTS_PASS_NAME="${reports_pass_name}"
+NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
 NEXTCLOUD_DB_USER="${nextcloud_db_user}"
 DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
-DB_DNS_NAME="${db_dns_name}"
-LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
-LDAP_USER="${ldap_bind_user}"
-BACKUP_BUCKET="${backup_bucket}"
-REDIS_ADDRESS="${redis_address}"
 INSTALLER_USER="${installer_user}"
 CONFIG_PASSW="${config_passw}"
-SAMBA_USER="${mis_user}"
+DB_DNS_NAME="${db_dns_name}"
+NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
+LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
+LDAP_PORT="${ldap_port}"
+PWM_URL="password-reset.$EXTERNAL_DOMAIN"
+ENV_TYPE="${environment_type}"
+region="${region}"
 MIS_USER_PASS_NAME="${mis_user_pass_name}"
-REPORTS_PASS_NAME="${reports_pass_name}"
-
+CIDR_BLOCK_A="${cidr_block_a_subnet}"
+CIDR_BLOCK_B="${cidr_block_b_subnet}"
+CIDR_BLOCK_C="${cidr_block_c_subnet}"
 EOF
+
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
 ## just configured, so lets export them
 export HMPPS_ROLE="${app_name}"
-export HMPPS_FQDN="${app_name}.${private_domain}"
+export SMTP_FQDN="smtp.${private_domain}"
 export HMPPS_STACKNAME="${env_identifier}"
 export HMPPS_STACK="${short_env_identifier}"
 export HMPPS_ENVIRONMENT=${environment_name}
 export HMPPS_ACCOUNT_ID="${account_id}"
 export HMPPS_DOMAIN="${private_domain}"
-export INT_ZONE_ID="${private_zone_id}"
-export LDAP_PORT="${ldap_port}"
+export NEXT_CLOUD_DIR="/var/www/html/nextcloud"
+export DATA_DIR="/var/nextcloud/data"
+export WEB_USER="apache"
+export OCC_CMD="/var/www/html/nextcloud/occ"
+export WEB_USER_HOME="/usr/share/httpd"
+export NEXTCLOUD_CONF=nextcloud-conf.json
 export LDAP_HOST="${ldap_elb_name}"
-export EXTERNAL_DOMAIN="${external_domain}"
-export NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
-export NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
-export EFS_DNS_NAME="${efs_dns_name}"
-export NEXTCLOUD_DB_USER="${nextcloud_db_user}"
-export DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
-export DB_DNS_NAME="${db_dns_name}"
-export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
+export REDIS_HOST="${redis_address}"
 export LDAP_USER="${ldap_bind_user}"
-export BACKUP_BUCKET="${backup_bucket}"
-export REDIS_ADDRESS="${redis_address}"
+export NEXTCLOUD_SSM_PATH="/$HMPPS_ENVIRONMENT/delius/$HMPPS_ROLE/$HMPPS_ROLE"
+export EFS_DNS_NAME="${efs_dns_name}"
+export EXTERNAL_DOMAIN="${external_domain}"
+export REPORTS_PASS_NAME="${reports_pass_name}"
+export NEXTCLOUD_ADMIN="${nextcloud_admin_user}"
+export DB_DNS_NAME="${db_dns_name}"
+export DB_PASS_PARAM="${nextcloud_db_user_pass_param}"
 export INSTALLER_USER="${installer_user}"
 export CONFIG_PASSW="${config_passw}"
-export SAMBA_USER="${mis_user}"
+export NEXTCLOUD_DB_USER="${nextcloud_db_user}"
+export NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
+export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
+export LDAP_PORT="${ldap_port}"
+export PWM_URL="password-reset.$EXTERNAL_DOMAIN"
+export ENV_TYPE="${environment_type}"
+export region="${region}"
 export MIS_USER_PASS_NAME="${mis_user_pass_name}"
-export REPORTS_PASS_NAME="${reports_pass_name}"
+export CIDR_BLOCK_A="${cidr_block_a_subnet}"
+export CIDR_BLOCK_B="${cidr_block_b_subnet}"
+export CIDR_BLOCK_C="${cidr_block_c_subnet}"
 
+#Mount EFS
+echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
+mount -a
 
 cd ~
 pip install ansible
@@ -77,13 +106,76 @@ cat << EOF > ~/requirements.yml
   src: https://github.com/ministryofjustice/hmpps-beats-monitoring
 - name: users
   src: singleplatform-eng.users
+- name: nextcloud
+  src: https://github.com/ministryofjustice/hmpps-nextcloud-installer
+  version: master
 EOF
 
 wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
-
+##IMPORT CONFIG
 cat << EOF > ~/vars.yml
-# For user_update cron
 remote_user_filename: "${bastion_inventory}"
+internal_domain: $HMPPS_DOMAIN
+nextcloud_dir: $NEXT_CLOUD_DIR
+data_dir: $DATA_DIR/
+nextcloud_admin: $NEXTCLOUD_ADMIN
+nextcloud_user_param: $NEXTCLOUD_ADMIN_PASS_PARAM
+app_name: $HMPPS_ROLE
+ldap_host: $LDAP_HOST
+redis_host: $REDIS_HOST
+redis_port: "6379"
+standard_user_base: "ou=Users,dc=moj,dc=com"
+fileshare_user_base: "ou=Fileshare,ou=Users,dc=moj,dc=com"
+fileshare_base_groups: "ou=Fileshare,ou=Groups,dc=moj,dc=com"
+fs_group_prefix: "RES-FS"
+ldap_user: $LDAP_USER
+web_user: $WEB_USER
+NEXTCLOUD_CONF: $NEXTCLOUD_CONF
+samba_group: "smbgrp"
+samba_group_gid: "10667"
+web_group: "apache"
+nc_conf_destination: "/etc/httpd/conf.d/nextcloud.conf"
+config_sh_script: "/root/import-config.sh"
+share_files_root: "files/shared_files"
+reports_pass_name: $REPORTS_PASS_NAME
+samba_pass_sh_script: "/root/samba-pass.sh"
+dfree_value: "8000000000 8000000000"
+dfree_destination: "/etc/samba/samba-dfree"
+smb_conf_file: "/etc/samba/smb.conf"
+passdb_backend: "tdbsam"
+import_config_file: "/usr/share/httpd/nextcloud-conf.json"
+config_passw: $CONFIG_PASSW
+backup_sh_script: "/root/backup.sh"
+fileowner_sh_script: "/root/file-owner.sh"
+OCS_API: "ocs/v2.php/apps/files_sharing/api/v1"
+local_url: "http://localhost"
+shares_script: "/root/configure-shares.sh"
+input_file: "/root/input_file"
+ocs_share_root: "/shared_files"
+nextcloud_ssm_path: $NEXTCLOUD_SSM_PATH
+installer_user: $INSTALLER_USER
+db_dns_name: $DB_DNS_NAME
+nextcloud_rds_db_user: $NEXTCLOUD_DB_USER
+nextcloud_rds_db_param: $DB_PASS_PARAM
+ldap_port: $LDAP_PORT
+ldap_bind_param: $LDAP_BIND_PASS_PARAM
+base_install_script: /root/base-install.sh
+key_id: "alias/aws/ssm"
+hmpps_stack_name: $HMPPS_STACKNAME
+pwm_url: $PWM_URL
+httpd_conf_file: "/etc/httpd/conf/httpd.conf"
+cw_installer: "/root/awslogs-agent-setup.py"
+cw_conf_template: "/root/cw_conf_template"
+env_type: $ENV_TYPE
+external_domain: $EXTERNAL_DOMAIN
+mail_server: $SMTP_FQDN
+from_address: "no-reply.$HMPPS_ROLE"
+region: $region
+mis_user_pass_name: $MIS_USER_PASS_NAME
+globignore: "CRC:nart:National:NPS"
+cidr_block_a: $CIDR_BLOCK_A
+cidr_block_b: $CIDR_BLOCK_B
+cidr_block_c: $CIDR_BLOCK_C
 EOF
 
 cat << EOF > ~/bootstrap.yml
@@ -96,296 +188,8 @@ cat << EOF > ~/bootstrap.yml
      - bootstrap
      - rsyslog
      - users
+     - nextcloud
 EOF
 
 ansible-galaxy install -f -r ~/requirements.yml
 ansible-playbook ~/bootstrap.yml
-
-#vars
-web_user="apache"
-web_user_home="/usr/share/httpd"
-occ_cmd="/var/www/html/nextcloud/occ"
-NEXTCLOUD_ADMIN_PASSWORD=$(aws ssm get-parameters --with-decryption --names $NEXTCLOUD_ADMIN_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-NEXTCLOUD_DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-LDAP_USER_PASS=$(aws ssm get-parameters --with-decryption --names $LDAP_BIND_PASS_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-CONFIG_PASS=$(aws ssm get-parameters --with-decryption --names $CONFIG_PASSW --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-DATA_DIR="/var/nextcloud/data"
-sudo_cmd="/usr/bin/sudo"
-BASE_DN="cn=Users,dc=moj,dc=com"
-AZ=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | cut -f3 -d"-")
-CONFIG_DIR="/var/www/html/nextcloud/config"
-PREFIX_DATE=$(date +%F)
-CONFIG_EXPORT_FILE="$PREFIX_DATE-nextcloud-config.json.zip"
-UNZIPPED_CONF_FILE="$PREFIX_DATE-nextcloud-config.json"
-NEXT_CLOUD_DIR="/var/www/html/nextcloud"
-INSTALLER_URL="https://download.nextcloud.com/server/releases/nextcloud-16.0.3.zip"
-ZIPPED_INSTALLER="nextcloud-16.0.3.zip"
-
-#Nextcloud install
-yum -y install epel-release yum-utils
-yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
-yum -y install unzip
-
-#Enable PHP 7.3
-yum-config-manager --disable remi-php54
-yum-config-manager --enable remi-php73
-
-#install Apache and PHP packages
-yum -y install httpd php php-cli php-mysqlnd php-zip php-devel php-gd php-mcrypt php-mbstring php-curl php-xml php-pear php-bcmath php-json php-pdo php-pecl-apcu php-pecl-apcu-devel php-intl php71-php-pecl-imagick php-ldap redis php-pecl-redis zip mariadb
-systemctl enable httpd
-
-#Download and install nextcloud
-aws s3 cp s3://$BACKUP_BUCKET/installer/$ZIPPED_INSTALLER . || curl $INSTALLER_URL --output $ZIPPED_INSTALLER
-unzip $ZIPPED_INSTALLER
-rm -f *.zip
-
-#move nextcloud folder to /var/www/html
-mv nextcloud/ /var/www/html/
-
-#Create directory Store
-mkdir -p $DATA_DIR
-
-#Mount efs
-yum -y install nfs-utils
-echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
-mount -a
-chown -R $web_user:$web_user $NEXT_CLOUD_DIR
-
-
-#Configure Apache VirtualHost
-cat << EOF > /etc/httpd/conf.d/nextcloud.conf
-<VirtualHost *:80>
-  ServerName nextcloud.$EXTERNAL_DOMAIN
-  ServerAdmin admin@$EXTERNAL_DOMAIN
-  DocumentRoot /var/www/html/nextcloud
-  <directory /var/www/html/nextcloud>
-    Require all granted
-    AllowOverride All
-    Options FollowSymLinks MultiViews
-    SetEnv HOME /var/www/html/nextcloud
-    SetEnv HTTP_HOME /var/www/html/nextcloud
-  </directory>
-</VirtualHost>
-EOF
-
-#Start REDIS
-systemctl start redis
-
-chown -R $web_user:$web_user $DATA_DIR
-
-fresh_next_cloud_install ()
-{
-#Install and configure nextcloud
-echo "commencing -fresh_next_cloud_install"
-cd $NEXT_CLOUD_DIR
-$sudo_cmd -u $web_user php $occ_cmd maintenance:install --database "mysql" \
-    --database-host "$DB_DNS_NAME"  \
-    --database-name "nextcloud"  --database-user "$NEXTCLOUD_DB_USER" --database-pass "$NEXTCLOUD_DB_PASS" \
-        --admin-user "$NEXTCLOUD_ADMIN" --admin-pass "$NEXTCLOUD_ADMIN_PASSWORD"   --data-dir "$DATA_DIR"
-
-$sudo_cmd -u $web_user php $occ_cmd config:system:set trusted_domains 0 --value=nextcloud.$EXTERNAL_DOMAIN
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwritehost --value=nextcloud.$EXTERNAL_DOMAIN
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwriteprotocol --value=https
-$sudo_cmd -u $web_user php $occ_cmd config:system:set overwrite.cli.url --value=https://$EXTERNAL_DOMAIN
-$sudo_cmd -u $web_user php $occ_cmd config:system:set filesystem_check_changes --value="1"
-
-$sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp                                                       #Enable 2f app
-$sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap                                                            #Enable Ldap App
-$sudo_cmd -u $web_user php $occ_cmd config:app:set files default_quota --value="5 GB"                               #Set default disk qouata
-
-#Configure ldap authentication
-$sudo_cmd -u $web_user php $occ_cmd ldap:delete-config s01
-$sudo_cmd -u $web_user php $occ_cmd ldap:create-empty-config
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapHost "$LDAP_HOST"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapPort "$LDAP_PORT"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentName "$LDAP_USER"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapAgentPassword "$LDAP_USER_PASS"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBase "ou=Users,dc=moj,dc=com"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapUserFilter "(&(|(objectclass=inetOrgPerson)))"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapLoginFilter "(&(&(|(objectclass=inetOrgPerson)))(|(mailPrimaryAddress=%uid)(mail=%uid)))"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseGroups  "ou=Fileshare,ou=Groups,dc=moj,dc=com"
-$sudo_cmd -u $web_user php $occ_cmd ldap:set-config s01 ldapBaseUsers  "ou=Users,dc=moj,dc=com"
-
-
-#Configure Redis
-$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.distributed --value="\\OC\\Memcache\\Redis"
-$sudo_cmd -u $web_user php $occ_cmd config:system:set memcache.locking --value="\\OC\\Memcache\\Redis"
-$sudo_cmd -u $web_user php $occ_cmd config:system:set filelocking.enabled --value="true"
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis host --value="$REDIS_ADDRESS"
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis port --value="6379"
-$sudo_cmd -u $web_user php $occ_cmd config:system:set redis timeout --value=1.5
-
-$sudo_cmd -u $web_user php $occ_cmd config:system:set csrf.disabled --value="true"
-echo "completed -fresh_next_cloud_install"
-}
-
-nextcloud_install_from_config ()
-{
-echo "commencing -nextcloud_install_from_config"
-#Generate temp default config.php to allow import of config from s3
-#Will be overwritten by config import
-temp_data_dir="/var/tmp/nextcloud/data"
-mkdir -p $temp_data_dir
-chown $web_user:$web_user $temp_data_dir
-cd $NEXT_CLOUD_DIR
-$sudo_cmd -u $web_user php $occ_cmd maintenance:install --database "sqlite" --admin-user "$INSTALLER_USER" --admin-pass "$INSTALLER_USER" --data-dir "/var/tmp/nextcloud/data"
-
-$sudo_cmd -u $web_user php $occ_cmd app:enable twofactor_totp  #Enable 2f app
-$sudo_cmd -u $web_user php $occ_cmd app:enable user_ldap         #Enable Ldap App
-echo "completed -nextcloud_install_from_config"
-}
-
-pull_config ()
-{
-echo "commencing -pull_config"
-#Pull and import latest config from backup
-cd $web_user_home
-aws s3 cp s3://$BACKUP_BUCKET/nextcloud_config_backups/$CONFIG_EXPORT_FILE $web_user_home/
-unzip -P "$CONFIG_PASS" $CONFIG_EXPORT_FILE
-chown $web_user:$web_user $UNZIPPED_CONF_FILE
-cd $NEXT_CLOUD_DIR
-$sudo_cmd -u $web_user php $occ_cmd config:import $web_user_home/$UNZIPPED_CONF_FILE
-
-#Reset admin user pass in case it is differennt to the one in the db
-export OC_PASS="$NEXTCLOUD_ADMIN_PASSWORD"
-su -s /bin/sh apache -c "php occ user:resetpassword --password-from-env $NEXTCLOUD_ADMIN"
-echo "completed -pull_config"
-}
-
-#Install Nextcloud and import config
-fresh_next_cloud_install
-nextcloud_install_from_config
-pull_config
-
-#stop Redis
-systemctl stop redis
-
-#Configure php memory limit
-sed -i 's/memory_limit = 128M/memory_limit = 513M/' /etc/php.ini
-
-#create crontab for config backup
-config_backup_script="/root/config_backup_script"
-
-#create cron scripts
-cat << 'EOF' > /root/config_backup_script
-#!/bin/bash
-
-#Vars
-PREFIX_DATE=$(date +%F)
-LOG_FILE="/var/log/config_backup.log"
-BACKUP_BUCKET=
-CONFIG_EXPORT_FILE="$PREFIX_DATE-nextcloud-config.json"
-CONFIG_DIR="/root"
-NEXTCLOUD_CONFIGS_DIR="nextcloud_config_backups"
-CONFIG_PASSW=
-CONFIG_PASS=$(aws ssm get-parameters --with-decryption --names $CONFIG_PASSW --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-
-#Create log file
-test -f $LOG_FILE || touch $LOG_FILE
-
-#Backup config
-echo "Backing up Nextcloud config"
-cd /var/www/html/nextcloud
-sudo -u apache php occ config:list --private > $CONFIG_DIR/$CONFIG_EXPORT_FILE
-cd $CONFIG_DIR
-zip --encrypt -P "$CONFIG_PASS" $CONFIG_EXPORT_FILE.zip $CONFIG_EXPORT_FILE
-aws s3 cp $CONFIG_EXPORT_FILE.zip s3://$BACKUP_BUCKET/$NEXTCLOUD_CONFIGS_DIR/  && echo "$(date) : Config Backup Success" >> $LOG_FILE || echo "$(date) : Config Backup Failure" >> $LOG_FILE
-rm -f $CONFIG_DIR/$CONFIG_EXPORT_FILE $CONFIG_DIR/$CONFIG_EXPORT_FILE.zip
-EOF
-
-#Add s3 bucket_name
-grep -q "BACKUP_BUCKET=$BACKUP_BUCKET" $config_backup_script || sed -i "s/BACKUP_BUCKET=/BACKUP_BUCKET=$BACKUP_BUCKET/" $config_backup_script
-grep -q "CONFIG_PASSW=$CONFIG_PASSW"   $config_backup_script || sed -i "s/CONFIG_PASSW=/CONFIG_PASSW=$CONFIG_PASSW/"    $config_backup_script
-chmod +x $config_backup_script
-
-#Place cron job to backup config
-temp_cron_file="/tmp/temp_cron_file"
-crontab -l > $temp_cron_file
-grep -q "$config_backup_script" $temp_cron_file || echo "00 01 * * * /usr/bin/sh $config_backup_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
-rm -f $temp_cron_file
-
-#Create DIRS if not present
-folder_file="shared_files.txt"
-aws s3 cp s3://$BACKUP_BUCKET/$folder_file /tmp/
-##Create Folders
-SAMBA_DIR="$DATA_DIR/$NEXTCLOUD_ADMIN/files/shared_files"
-for folder in $(cat /tmp/$folder_file) ;
-    do top_dir=$(echo $folder | cut -f1 -d:) ;
-    low_dir=$(echo $folder | cut -f2 -d:) ;
-    test -d $SAMBA_DIR/$top_dir/$low_dir || mkdir -p $SAMBA_DIR/$top_dir/$low_dir ;
-done
-
-
-
-##Samba share
-SAMBA_USER_PASS=$(aws ssm get-parameters --with-decryption --names $MIS_USER_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-REPORT_USER=$(aws ssm get-parameters --names $HMPPS_STACKNAME-reports-admin-user --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-REPORT_USER_PASSWD="$(aws ssm get-parameters --with-decryption --names $REPORTS_PASS_NAME --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')"
-
-yum install samba samba-client samba-common -y
-groupadd smbgrp
-useradd $SAMBA_USER
-useradd $REPORT_USER
-usermod -a -G smbgrp $SAMBA_USER
-usermod -a -G apache $SAMBA_USER
-usermod -a -G smbgrp $web_user
-usermod -a -G apache $web_user
-usermod -a -G smbgrp $REPORT_USER
-usermod -a -G apache $REPORT_USER
-
-#configure samba pass
-echo -ne "$SAMBA_USER_PASS\n$SAMBA_USER_PASS\n" | smbpasswd -a -s $SAMBA_USER
-echo -ne "$REPORT_USER_PASSWD\n$REPORT_USER_PASSWD\n" | smbpasswd -a -s $REPORT_USER
-
-chmod -R 0770  $SAMBA_DIR
-
-cat << EOF > /etc/samba/samba-dfree
-#!/bin/bash
-echo "8000000000 8000000000"
-EOF
-
-chmod +x /etc/samba/samba-dfree
-
-###Configure samba
-cat << EOF > /etc/samba/smb.conf
-[global]
-        workgroup = WORKGROUP
-        netbios name = mis-samba
-        security = user
-        passdb backend = tdbsam
-        printing = cups
-        printcap name = cups
-        load printers = yes
-        cups options = raw
-        dfree command = /etc/samba/samba-dfree
-        dfree cache time = 60
-[Secure]
-        comment = Secure File Server Share
-        path =   $SAMBA_DIR
-        valid users = @smbgrp
-        guest ok = no
-        writable = yes
-        browsable = yes
-EOF
-
-#Cron job to change shared files ownership to apache every 5 mins in case of new files delivered out side of nextcloud
-apache_ownership_script="/root/apache_ownership_script"
-cat << EOF > /root/apache_ownership_script
-#!/bin/bash
-chown -R $web_user:$web_user $SAMBA_DIR
-chmod -R 0770  $SAMBA_DIR
-$sudo_cmd -u $web_user php $occ_cmd  files:scan $NEXTCLOUD_ADMIN
-EOF
-
-chmod +x $apache_ownership_script
-
-#Place cron job to chown shared folders
-temp_cron_file="/tmp/temp_cron_file"
-crontab -l > $temp_cron_file
-grep -q "$apache_ownership_script" $temp_cron_file || echo "*/5 * * * * /usr/bin/sh $apache_ownership_script > /dev/null 2>&1" >> $temp_cron_file && crontab $temp_cron_file
-rm -f $temp_cron_file
-
-#Start and enable  samba
-systemctl start smb.service
-systemctl enable smb.service
-systemctl start httpd
