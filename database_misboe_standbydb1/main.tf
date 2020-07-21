@@ -90,7 +90,7 @@ data "terraform_remote_state" "security-groups" {
 }
 
 #-------------------------------------------------------------
-### Getting the mis-db-1 data
+### Getting the misboe-db-1 data
 #-------------------------------------------------------------
 data "terraform_remote_state" "misboe-db-1" {
   backend = "s3"
