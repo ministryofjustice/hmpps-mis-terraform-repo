@@ -25,7 +25,7 @@ module "misdsd_db_3" {
   environment_type = "${var.environment_type}"
   region           = "${var.region}"
 
-  kms_key_id      = "${module.kms_key_misdsd_db.kms_arn}"
+  kms_key_id      = "${data.terraform_remote_state.misdsd-db-1.kms_arn}"
   public_zone_id  = "${data.terraform_remote_state.vpc.public_zone_id}"
   private_zone_id = "${data.terraform_remote_state.vpc.private_zone_id}"
   private_domain  = "${data.terraform_remote_state.vpc.private_zone_name}"
