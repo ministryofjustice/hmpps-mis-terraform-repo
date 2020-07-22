@@ -13,16 +13,19 @@ databases="${dbtype}_db_2 ${dbtype}_db_3"
 
 scratch_path="/home/scratch/${TG_ENVIRONMENT_NAME}_SOURCE/${dbtype}"
 
+
+
 if [[ ! -d "${scratch_path}" ]];
 then
   echo "Create dir ${scratch_path}"
-  mkdir "${scratch_path}"
+  mkdir -p "${scratch_path}"
 fi
 
 echo
 echo "Environment name is :: ${TG_ENVIRONMENT_NAME}"
 echo "We need to get the details for the two HA DBs"
-echo "${databases}"
+echo "dbtype: ${dbtype}"
+echo "databases: ${databases}"
 
 
 for database in ${databases};
