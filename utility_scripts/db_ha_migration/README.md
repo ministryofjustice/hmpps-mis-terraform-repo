@@ -43,14 +43,14 @@ git clone git@github.com:ministryofjustice/hmpps-delius-core-terraform.git split
 3: Change dir to current in 1st then git checkout "add_utils_dir_for_DB_HA", run TF script for container in "database_failover"
 ```
 cd current
-git checkout add_utils_dir_for_DB_HA
+git checkout ALS-68_add_utilities_scripts
 tfrun_c hmpps_token <env_name> container database_failover
 ```
 
-4: Change dir to split in 2nd then git checkout "issue/305/ALS-68_reduce_ha", run TF script for container in "database_standbydb1"
+4: Change dir to split in 2nd then git checkout "ALS-68_0.8.0", run TF script for container in "database_standbydb1"
 ```
 cd split
-git checkout issue/305/ALS-68_reduce_ha
+git checkout ALS-68_add_utilities_scripts
 tfrun_c hmpps_token <env_name> container database_standbydb1
 ```
 
@@ -67,20 +67,20 @@ tfrun_c hmpps_token <env_name> container database_standbydb2
 pwd
 /home/tools/data/utility_scripts/db_ha_migration/write_source_module_details.sh
 # check
-ls -al /home/scratch/delius-core-dev_SOURCE/
-cat /home/scratch/delius-core-dev_SOURCE/delius-core-dev_delius_db_2_module_list.txt
-cat /home/scratch/delius-core-dev_SOURCE/delius-core-dev_delius_db_2_module_ids.txt
-cat /home/scratch/delius-core-dev_SOURCE/delius-core-dev_delius_db_3_module_list.txt
-cat /home/scratch/delius-core-dev_SOURCE/delius-core-dev_delius_db_3_module_ids.txt
+ls -al /home/scratch/delius-mis-dev_SOURCE/
+cat /home/scratch/delius-mis-dev_SOURCE/delius-mis-dev_mis(boe|dsd)_db_2_module_list.txt
+cat /home/scratch/delius-mis-dev_SOURCE/delius-mis-dev_mis(boe|dsd)_db_2_module_ids.txt
+cat /home/scratch/delius-mis-dev_SOURCE/delius-mis-dev_mis(boe|dsd)_db_3_module_list.txt
+cat /home/scratch/delius-mis-dev_SOURCE/delius-mis-dev_mis(boe|dsd)_db_3_module_ids.txt
 ```
 
 8: In Terminal-2  - check the files can alse be read then run script
 ```
 pwd
 # check
-ls -al /home/scratch/delius-core-dev_SOURCE/
-cat /home/scratch/delius-core-dev_SOURCE/delius-core-dev_delius_db_2_module_list.txt
-cat /home/scratch/delius-core-dev_SOURCE/delius-core-dev_delius_db_2_module_ids.txt
+ls -al /home/scratch/delius-mis-dev_SOURCE/
+cat /home/scratch/delius-mis-dev_SOURCE/delius-mis-dev_mis(boe|dsd)_db_2_module_list.txt
+cat /home/scratch/delius-mis-dev_SOURCE/delius-mis-dev_mis(boe|dsd)_db_2_module_ids.txt
 # check the script is there
 cat /home/tools/data/utility_scripts/db_ha_migration/import_source_modules_to_new_state.sh
 # run it
@@ -100,9 +100,9 @@ That is the first standby imported.
 ```
 pwd
 # check
-ls -al /home/scratch/delius-core-dev_SOURCE/
-cat /home/scratch/delius-core-dev_SOURCE/delius-core-dev_delius_db_3_module_list.txt
-cat /home/scratch/delius-core-dev_SOURCE/delius-core-dev_delius_db_3_module_ids.txt
+ls -al /home/scratch/delius-mis-dev_SOURCE/
+cat /home/scratch/delius-mis-dev_SOURCE/delius-mis-dev_mis(boe|dsd)_db_3_module_list.txt
+cat /home/scratch/delius-mis-dev_SOURCE/delius-mis-dev_mis(boe|dsd)_db_3_module_ids.txt
 # check the script is there
 cat /home/tools/data/utility_scripts/db_ha_migration/import_source_modules_to_new_state.sh
 # run it
@@ -123,4 +123,4 @@ That is the second standby imported.
 /home/tools/data/utility_scripts/db_ha_migration/remove_source_modules_from_source_state.sh
 ```
 
-11: Update the Jenkins Job to use the branch "issue/305/ALS-68_reduce_ha"
+11: Update the Jenkins Job to use the branch "ALS-68_0.8.0"
