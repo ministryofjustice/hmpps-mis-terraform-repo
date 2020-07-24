@@ -211,5 +211,6 @@ locals {
   cidr_block_a_subnet          = "${replace (element(local.public_cidr_block, 0), "/", "\\/")}"
   cidr_block_b_subnet          = "${replace (element(local.public_cidr_block, 1), "/", "\\/")}"
   cidr_block_c_subnet          = "${replace (element(local.public_cidr_block, 2), "/", "\\/")}"
+  pwm_url                      = "${data.terraform_remote_state.delius-core-pwm.public_fqdn_pwm}"
   sg_smtp_ses                  = "${data.terraform_remote_state.security-groups.sg_smtp_ses}"
 }

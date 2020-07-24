@@ -90,6 +90,19 @@ data "terraform_remote_state" "security-groups" {
 }
 
 #-------------------------------------------------------------
+### Getting the misboe-db-1 data
+#-------------------------------------------------------------
+data "terraform_remote_state" "misboe-db-1" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.remote_state_bucket_name}"
+    key    = "${var.environment_type}/database_misboe/terraform.tfstate"
+    region = "${var.region}"
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 
