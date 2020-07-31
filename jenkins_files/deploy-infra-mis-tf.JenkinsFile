@@ -96,7 +96,7 @@ def prepare_env() {
     '''
 }
 
-def plan_submodule(config_dir, env_name, git_project_dir, submodule_name) {
+def plan_submodule(config_dir, env_name, git_project_dir, submodule_name, db_high_availability_count) {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
         sh """
         #!/usr/env/bin bash
@@ -104,9 +104,12 @@ def plan_submodule(config_dir, env_name, git_project_dir, submodule_name) {
         set +e
         cp -R -n "${config_dir}" "${git_project_dir}/env_configs"
         cd "${git_project_dir}"
+        export TF_VAR_high_availability_count=${db_high_availability_count}
         docker run --rm \
         -v `pwd`:/home/tools/data \
-        -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
+        -v ~/.aws:/home/tools/.aws \
+        --env TF_VAR_high_availability_count \
+        mojdigitalstudio/hmpps-terraform-builder  \
         bash -c "\
             source env_configs/${env_name}/${env_name}.properties; \
             cd ${submodule_name}; \
@@ -116,12 +119,9 @@ def plan_submodule(config_dir, env_name, git_project_dir, submodule_name) {
             terragrunt init; \
             terragrunt plan -detailed-exitcode --out ${env_name}.plan > tf.plan.out; \
             exitcode=\\\"\\\$?\\\"; \
+            echo \\\"\\\$exitcode\\\" > plan_ret; \
             cat tf.plan.out; \
             if [ \\\"\\\$exitcode\\\" == '1' ]; then exit 1; fi; \
-            if [ \\\"\\\$exitcode\\\" == '2' ]; then \
-                    parse-terraform-plan -i tf.plan.out | jq '.changedResources[] | (.action != \\\"update\\\") or (.changedAttributes | to_entries | map(.key != \\\"tags.source-hash\\\") | reduce .[] as \\\$item (false; . or \\\$item))' | jq -e -s 'reduce .[] as \\\$item (false; . or \\\$item) == false'; \
-                    if [ \\\"\\\$?\\\" == '1' ]; then exitcode=2 ; else exitcode=3; fi; \
-            fi; \
             echo \\\"\\\$exitcode\\\" > plan_ret;" \
             || exitcode="\$?"; \
             if [ "\$exitcode" == '1' ]; then exit 1; else exit 0; fi
@@ -131,7 +131,7 @@ def plan_submodule(config_dir, env_name, git_project_dir, submodule_name) {
     }
 }
 
-def apply_submodule(config_dir, env_name, git_project_dir, submodule_name) {
+def apply_submodule(config_dir, env_name, git_project_dir, submodule_name, db_high_availability_count) {
     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
         sh """
         #!/usr/env/bin bash
@@ -139,10 +139,13 @@ def apply_submodule(config_dir, env_name, git_project_dir, submodule_name) {
         set +e
         cp -R -n "${config_dir}" "${git_project_dir}/env_configs"
         cd "${git_project_dir}"
+        export TF_VAR_high_availability_count=${db_high_availability_count}
         docker run --rm \
           -v `pwd`:/home/tools/data \
-          -v ~/.aws:/home/tools/.aws mojdigitalstudio/hmpps-terraform-builder \
-          bash -c " \
+          -v ~/.aws:/home/tools/.aws \
+          --env TF_VAR_high_availability_count \
+          mojdigitalstudio/hmpps-terraform-builder  \
+          bash -c "\
               source env_configs/${env_name}/${env_name}.properties; \
               cd ${submodule_name}; \
               [[ -e ssm.properties ]] && source ssm.properties; \
@@ -185,8 +188,8 @@ def confirm() {
     }
 }
 
-def do_terraform(config_dir, env_name, git_project, component) {
-    plancode = plan_submodule(config_dir, env_name, git_project, component)
+def do_terraform(config_dir, env_name, git_project, component, db_high_availability_count) {
+    plancode = plan_submodule(config_dir, env_name, git_project, component, db_high_availability_count)
     if (plancode == "2") {
         if ("${confirmation}" == "true") {
            confirm()
@@ -194,12 +197,8 @@ def do_terraform(config_dir, env_name, git_project, component) {
             env.Continue = true
         }
         if (env.Continue == "true") {
-           apply_submodule(config_dir, env_name, git_project, component)
+           apply_submodule(config_dir, env_name, git_project, component, db_high_availability_count)
         }
-    }
-    else if (plancode == "3") {
-        apply_submodule(config_dir, env_name, git_project, component)
-        env.Continue = true
     }
     else {
         env.Continue = true
@@ -297,19 +296,19 @@ pipeline {
             }
         }
 
-     stage('Delius | MIS Common')          { steps { script {do_terraform(project.config, environment_name, project.mis, 'common')}}}
-     stage('Delius | MIS Certs')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'certs')}}}
-     stage('Delius | MIS s3buckets')       { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets')}}}
-     stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam')}}}
-     stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups')}}}
-     stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud')}}}
+     stage('Delius | MIS Common')          { steps { script {do_terraform(project.config, environment_name, project.mis, 'common', mis_db_high_availability_count)}}}
+     stage('Delius | MIS Certs')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'certs', mis_db_high_availability_count)}}}
+     stage('Delius | MIS s3buckets')       { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets', mis_db_high_availability_count)}}}
+     stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam', mis_db_high_availability_count)}}}
+     stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups', mis_db_high_availability_count)}}}
+     stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud', mis_db_high_availability_count)}}}
      stage('Provision Databases MIS') {
        parallel {
          stage('Delius | MIS database_mis') {
            steps {
              script {
                println("terraform database_mis")
-               do_terraform(project.config, environment_name, project.mis, 'database_mis')
+               do_terraform(project.config, environment_name, project.mis, 'database_mis', mis_db_high_availability_count)
              }
            }
          }
@@ -319,7 +318,7 @@ pipeline {
              steps {
                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
                      println("terraform database_mis_standbydb1")
-                     do_terraform(project.config, environment_name, project.mis, 'database_mis_standbydb1')
+                     do_terraform(project.config, environment_name, project.mis, 'database_mis_standbydb1', mis_db_high_availability_count)
                  }
              }
          }
@@ -329,7 +328,7 @@ pipeline {
              steps {
                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
                      println("terraform database_mis_standbydb2")
-                     do_terraform(project.config, environment_name, project.mis, 'database_mis_standbydb2')
+                     do_terraform(project.config, environment_name, project.mis, 'database_mis_standbydb2', mis_db_high_availability_count)
                  }
              }
          }
@@ -342,7 +341,7 @@ pipeline {
            steps {
              script {
                println("terraform database_misboe")
-               do_terraform(project.config, environment_name, project.mis, 'database_misboe')
+               do_terraform(project.config, environment_name, project.mis, 'database_misboe', misboe_db_high_availability_count)
              }
            }
          }
@@ -352,7 +351,7 @@ pipeline {
              steps {
                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
                      println("terraform database_misboe_standbydb1")
-                     do_terraform(project.config, environment_name, project.mis, 'database_misboe_standbydb1')
+                     do_terraform(project.config, environment_name, project.mis, 'database_misboe_standbydb1', misboe_db_high_availability_count)
                  }
              }
          }
@@ -362,7 +361,7 @@ pipeline {
              steps {
                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
                      println("terraform database_misboe_standbydb2")
-                     do_terraform(project.config, environment_name, project.mis, 'database_misboe_standbydb2')
+                     do_terraform(project.config, environment_name, project.mis, 'database_misboe_standbydb2', misboe_db_high_availability_count)
                  }
              }
          }
@@ -375,7 +374,7 @@ pipeline {
            steps {
              script {
                println("terraform database_misdsd")
-               do_terraform(project.config, environment_name, project.mis, 'database_misdsd')
+               do_terraform(project.config, environment_name, project.mis, 'database_misdsd', misdsd_db_high_availability_count)
              }
            }
          }
@@ -385,7 +384,7 @@ pipeline {
              steps {
                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
                      println("terraform database_misdsd_standbydb1")
-                     do_terraform(project.config, environment_name, project.mis, 'database_misdsd_standbydb1')
+                     do_terraform(project.config, environment_name, project.mis, 'database_misdsd_standbydb1', misdsd_db_high_availability_count)
                  }
              }
          }
@@ -395,7 +394,7 @@ pipeline {
              steps {
                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
                      println("terraform database_misdsd_standbydb2")
-                     do_terraform(project.config, environment_name, project.mis, 'database_misdsd_standbydb2')
+                     do_terraform(project.config, environment_name, project.mis, 'database_misdsd_standbydb2', misdsd_db_high_availability_count)
                  }
              }
          }
@@ -450,11 +449,11 @@ pipeline {
 
      stage('Provision Servers') {
        parallel {
-         stage('Delius | MIS ec2-ndl-dis') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis')}}}
-         stage('Delius | MIS ec2-ndl-bcs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs')}}}
-         stage('Delius | MIS ec2-ndl-bfs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs')}}}
-         stage('Delius | MIS ec2-ndl-bps') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps')}}}
-         stage('Delius | MIS ec2-ndl-bws') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws')}}}
+         stage('Delius | MIS ec2-ndl-dis') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis', mis_db_high_availability_count)}}}
+         stage('Delius | MIS ec2-ndl-bcs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs', mis_db_high_availability_count)}}}
+         stage('Delius | MIS ec2-ndl-bfs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs', mis_db_high_availability_count)}}}
+         stage('Delius | MIS ec2-ndl-bps') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps', mis_db_high_availability_count)}}}
+         stage('Delius | MIS ec2-ndl-bws') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws', mis_db_high_availability_count)}}}
        }
      }
      stage('Build Database High Availibilty') {
@@ -568,7 +567,7 @@ pipeline {
       }
     }
 
-     stage('Delius | MIS monitoring')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'monitoring')}}}
+     stage('Delius | MIS monitoring')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'monitoring', mis_db_high_availability_count)}}}
      stage('Smoke test') { steps { build job: "DAMS/Environments/${environment_name}/MIS/Smoke_test", parameters: [[$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"]]}}
     }
 
