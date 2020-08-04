@@ -3,7 +3,7 @@
 #-------------------------------------------------------------
 
 resource "aws_elasticache_subnet_group" "nextcloud" {
-  name       = "${local.short_environment_identifier}-nextcloud-cache-subnet"
+  name        = "${local.short_environment_identifier}-nextcloud-cache-subnet"
   description = "${local.short_environment_identifier}-nextcloud-cache-subnet"
   subnet_ids = ["${list(
     data.terraform_remote_state.vpc.vpc_private-subnet-az1,
