@@ -32,7 +32,7 @@ resource "aws_elasticache_replication_group" "nextcloud_cache" {
 }
 
 resource "aws_route53_record" "nextcloud_cache_dns" {
-  zone_id = "${data.aws_route53_zone.private.id}"
+  zone_id = "${local.private_zone_id}"
   name    = "${local.app_name}-cache"
   type    = "CNAME"
   ttl     = 300
