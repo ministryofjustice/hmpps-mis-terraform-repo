@@ -233,3 +233,15 @@ variable "ebs_backup" {
     delete_after       = 120
   }
 }
+
+variable "nextcloud_redis_node_type" {
+  default = "cache.m4.large"
+}
+
+variable "nextcloud_num_node_groups" {
+  default = "1"
+}
+
+variable "nextcloud_replicas_per_node_group" {
+  default = "2"
+}

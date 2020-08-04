@@ -203,7 +203,7 @@ locals {
   db_dns_name                  = "${aws_route53_record.mariadb_dns_entry.fqdn}"
   ldap_bind_user               = "${data.terraform_remote_state.ldap_elb_name.ldap_bind_user}"
   backup_bucket                = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket}"
-  redis_address                = "${aws_elasticache_cluster.nextcloud_cache.cache_nodes.0.address}"
+  redis_address                = "${aws_route53_record.nextcloud_cache_dns.fqdn}"
   installer_user               = "installer_user"
   config_passw                 = "${local.environment_identifier}-${local.app_name}-config-password"
   nextcloud_s3_bucket_arn      = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket_arn}"
