@@ -25,6 +25,13 @@ resource "aws_elasticache_replication_group" "nextcloud_cache" {
   at_rest_encryption_enabled    = true
   apply_immediately             = true
   tags                          = "${var.tags}"
+
+  availability_zones = ["${list(
+    data.terraform_remote_state.vpc.vpc_private-subnet-az1-availability_zone,
+    data.terraform_remote_state.vpc.vpc_private-subnet-az2-availability_zone,
+    data.terraform_remote_state.vpc.vpc_private-subnet-az3-availability_zone,
+  )}"]
+
   cluster_mode {
     num_node_groups         = "${var.nextcloud_num_node_groups}"
     replicas_per_node_group = "${var.nextcloud_replicas_per_node_group}"
@@ -36,5 +43,5 @@ resource "aws_route53_record" "nextcloud_cache_dns" {
   name    = "${local.app_name}-cache"
   type    = "CNAME"
   ttl     = 300
-  records = ["${aws_elasticache_replication_group.nextcloud_cache.configuration_endpoint_address}"]
+  records = ["${aws_elasticache_replication_group.nextcloud_cache.primary_endpoint_address}"]
 }
