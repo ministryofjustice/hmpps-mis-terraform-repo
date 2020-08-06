@@ -35,25 +35,6 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_critical" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "bws_lb_latency" {
-  alarm_name                = "${local.environment_name}__Latency__alert__BWS__${local.bws_lb_name}-lb"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "1"
-  metric_name               = "Latency"
-  namespace                 = "AWS/ELB"
-  period                    = "300"
-  statistic                 = "Average"
-  threshold                 = "5"
-  alarm_description         = "The BWS loadbalancer ${local.bws_lb_name} is averaging on high latency. Please contact the MIS AWS Support contact."
-  #alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  #ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  treat_missing_data        = "notBreaching"
-
-  dimensions {
-              LoadBalancerName  = "${local.bws_lb_name}"
-  }
-}
-
 resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
   alarm_name                = "${local.environment_name}__SpilloverCount__severe__BWS__${local.bws_lb_name}-lb"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
@@ -106,26 +87,6 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts_critical" {
   alarm_description         = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} has 2 Unhealthy hosts. Please contact the MIS AWS Support contact"
   alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
   ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
-
-  dimensions {
-              LoadBalancerName  = "${local.nextcloud_lb_name}"
-  }
-}
-
-
-resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_latency" {
-  alarm_name                = "${local.environment_name}__Latency__alert__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "1"
-  metric_name               = "Latency"
-  namespace                 = "AWS/ELB"
-  period                    = "300"
-  statistic                 = "Average"
-  threshold                 = "5"
-  alarm_description         = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} is averaging on high latency. Please contact the MIS Team or the MIS AWS Support contact."
-  alarm_actions             = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  ok_actions                = [ "${aws_sns_topic.alarm_notification.arn}" ]
-  treat_missing_data        = "notBreaching"
 
   dimensions {
               LoadBalancerName  = "${local.nextcloud_lb_name}"

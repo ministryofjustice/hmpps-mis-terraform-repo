@@ -239,9 +239,9 @@ variable "nextcloud_redis_node_type" {
 }
 
 variable "nextcloud_num_node_groups" {
-  default = "1"
+  default = "2"
 }
 
 variable "nextcloud_replicas_per_node_group" {
-  default = "2"
+  default = "1"
 }
