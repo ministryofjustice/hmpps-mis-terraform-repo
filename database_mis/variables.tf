@@ -45,3 +45,7 @@ variable "high_availability_count" {
   description = "number of standby databases"
   default     = 2
 }
+
+variable "environment_name" {
+  type = "string"
+}
