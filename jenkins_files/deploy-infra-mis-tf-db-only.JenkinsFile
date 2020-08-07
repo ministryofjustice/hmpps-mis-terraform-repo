@@ -1,0 +1,587 @@
+def project = [:]
+project.config    = 'hmpps-env-configs'
+project.mis       = 'hmpps-mis-terraform-repo'
+project.config_version  = ''
+project.mis_version     = ''
+mis_db_high_availability_count = 0
+misboe_db_high_availability_count = 0
+misdsd_db_high_availability_count = 0
+
+// Parameters required for job
+// parameters:
+//     choice:
+//       name: 'environment_name'
+//       description: 'Environment name.'
+//     booleanParam:
+//       name: 'confirmation'
+//       description: 'Whether to require manual confirmation of terraform plans.'
+def get_db_ami_version(env_name, db_type) {
+  ssm_param_db_version = sh (
+    script: "aws ssm get-parameters --region eu-west-2 --name \"/versions/mis/ami/${db_type}-db-ami/${env_name}\" --query Parameters | jq '.[] | .Value' --raw-output",
+    returnStdout: true
+  ).trim()
+
+  echo "${db_type} - db_ami_version - " + ssm_param_db_version
+
+  return ssm_param_db_version
+}
+
+def get_version(env_name, repo_name, override_version) {
+  ssm_param_version = sh (
+    script: "aws ssm get-parameters --region eu-west-2 --name \"/versions/mis/repo/${repo_name}/${env_name}\" --query Parameters | jq '.[] | select(.Name | test(\"${env_name}\")) | .Value' --raw-output",
+    returnStdout: true
+  ).trim()
+
+  echo "ssm_param_version - " + ssm_param_version
+  echo "override_version - " + override_version
+
+  if (ssm_param_version!="" && override_version=="master") {
+    return ":refs/tags/" + ssm_param_version
+  } else {
+    return override_version
+  }
+}
+
+def get_db_ha_count(git_project_dir, env_name, db_name) {
+    file = "${git_project_dir}/${env_name}/ansible/group_vars/all.yml"
+    item = "database.${db_name}.high_availability_count"
+    db_ha_count = get_yaml_value(file, item)
+
+    echo "${db_name} - db_ha_count - " + db_ha_count
+
+    if (db_ha_count!="") {
+        return db_ha_count
+    } else {
+        return 0
+    }
+}
+
+def get_yaml_value(file, item_name) {
+    item = sh (
+        script: "cat \"${file}\" | shyaml --quiet get-value \"${item_name}\"",
+        returnStdout: true
+    ).trim()
+
+    echo "item - " + item
+    return item
+}
+
+def checkout_version(git_project_dir, git_version) {
+  sh """
+    #!/usr/env/bin bash
+    set +e
+    pushd "${git_project_dir}"
+    git checkout "${git_version}"
+    echo `git symbolic-ref -q --short HEAD || git describe --tags --exact-match`
+    popd
+  """
+}
+
+def debug_env(git_project_dir, git_version) {
+  sh """
+    #!/usr/env/bin bash
+    set +e
+    pushd "${git_project_dir}"
+    git branch
+    git describe --tags
+    echo `git symbolic-ref -q --short HEAD || git describe --tags --exact-match`
+    popd
+  """
+}
+
+def prepare_env() {
+    sh '''
+    #!/usr/env/bin bash
+    docker pull mojdigitalstudio/hmpps-terraform-builder:latest
+    '''
+}
+
+def plan_submodule(config_dir, env_name, git_project_dir, submodule_name, db_high_availability_count) {
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+        sh """
+        #!/usr/env/bin bash
+        echo "TF PLAN for ${env_name} | ${submodule_name} - component from git project ${git_project_dir}"
+        set +e
+        cp -R -n "${config_dir}" "${git_project_dir}/env_configs"
+        cd "${git_project_dir}"
+        export TF_VAR_high_availability_count=${db_high_availability_count}
+        docker run --rm \
+        -v `pwd`:/home/tools/data \
+        -v ~/.aws:/home/tools/.aws \
+        --env TF_VAR_high_availability_count \
+        mojdigitalstudio/hmpps-terraform-builder  \
+        bash -c "\
+            source env_configs/${env_name}/${env_name}.properties; \
+            cd ${submodule_name}; \
+            [[ -e ssm.properties ]] && source ssm.properties; \
+            echo && echo && env | sort && echo; \
+            if [ -d .terraform ]; then rm -rf .terraform; fi; sleep 5; \
+            terragrunt init; \
+            terragrunt refresh; \
+            terragrunt plan -detailed-exitcode --out ${env_name}.plan > tf.plan.out; \
+            exitcode=\\\"\\\$?\\\"; \
+            echo \\\"\\\$exitcode\\\" > plan_ret; \
+            cat tf.plan.out; \
+            if [ \\\"\\\$exitcode\\\" == '1' ]; then exit 1; fi; \
+            echo \\\"\\\$exitcode\\\" > plan_ret;" \
+            || exitcode="\$?"; \
+            if [ "\$exitcode" == '1' ]; then exit 1; else exit 0; fi
+        set -e
+        """
+        return readFile("${git_project_dir}/${submodule_name}/plan_ret").trim()
+    }
+}
+
+def apply_submodule(config_dir, env_name, git_project_dir, submodule_name, db_high_availability_count) {
+    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
+        sh """
+        #!/usr/env/bin bash
+        echo "TF APPLY for ${env_name} | ${submodule_name} - component from git project ${git_project_dir}"
+        set +e
+        cp -R -n "${config_dir}" "${git_project_dir}/env_configs"
+        cd "${git_project_dir}"
+        export TF_VAR_high_availability_count=${db_high_availability_count}
+        docker run --rm \
+          -v `pwd`:/home/tools/data \
+          -v ~/.aws:/home/tools/.aws \
+          --env TF_VAR_high_availability_count \
+          mojdigitalstudio/hmpps-terraform-builder  \
+          bash -c "\
+              source env_configs/${env_name}/${env_name}.properties; \
+              cd ${submodule_name}; \
+              [[ -e ssm.properties ]] && source ssm.properties; \
+              echo && echo && env | sort && echo; \
+              terragrunt apply ${env_name}.plan; \
+              tgexitcode=\\\$?; \
+              echo \\\"TG exited with code \\\$tgexitcode\\\"; \
+              if [ \\\$tgexitcode -ne 0 ]; then \
+                exit  \\\$tgexitcode; \
+              else \
+                exit 0; \
+              fi;"; \
+        dockerexitcode=\$?; \
+        echo "Docker step exited with code \$dockerexitcode"; \
+        if [ \$dockerexitcode -ne 0 ]; then exit \$dockerexitcode; else exit 0; fi;
+        set -e
+        """
+    }
+}
+
+def confirm() {
+    try {
+        timeout(time: 15, unit: 'MINUTES') {
+
+            env.Continue = input(
+                id: 'Proceed1', message: 'Apply plan?', parameters: [
+                    [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Apply Terraform']
+                ]
+            )
+        }
+    } catch(err) { // timeout reached or input false
+        def user = err.getCauses()[0].getUser()
+        env.Continue = false
+        if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
+            echo "Timeout"
+            error("Build failed because confirmation timed out")
+        } else {
+            echo "Aborted by: [${user}]"
+        }
+    }
+}
+
+def do_terraform(config_dir, env_name, git_project, component, db_high_availability_count) {
+    plancode = plan_submodule(config_dir, env_name, git_project, component, db_high_availability_count)
+    if (plancode == "2") {
+        if ("${confirmation}" == "true") {
+           confirm()
+        } else {
+            env.Continue = true
+        }
+        if (env.Continue == "true") {
+           apply_submodule(config_dir, env_name, git_project, component, db_high_availability_count)
+        }
+    }
+    else {
+        env.Continue = true
+    }
+}
+
+// def debug_env() {
+//     sh '''
+//     #!/usr/env/bin bash
+//     pwd
+//     ls -al
+//     '''
+// }
+
+pipeline {
+
+    agent { label "jenkins_agent" }
+
+    parameters {
+      string(name: 'CONFIG_BRANCH', description: 'Target Branch for hmpps-env-configs', defaultValue: 'master')
+      string(name: 'MIS_BRANCH',  description: 'Target Branch for hmpps-mis-terraform-repo', defaultValue: 'master')
+      booleanParam(name: 'deploy_DATABASE_HA', defaultValue: true, description: 'Deploy/update Database High Availibilty?')
+      booleanParam(name: 'db_patch_check', defaultValue: true, description: 'Check Oracle DB patches?')
+    }
+
+    stages {
+
+        stage('setup') {
+            steps {
+                script {
+                  def starttime = new Date()
+                  println ("Started on " + starttime)
+
+                  project.config_version = get_version(environment_name, project.config, env.CONFIG_BRANCH)
+                  println("Version from function (project.config_version) -- " + project.config_version)
+
+                  project.mis_version  = get_version(environment_name, project.mis, env.MIS_BRANCH)
+                  println("Version from function (project.mis_version) -- " + project.mis_version)
+
+                  mis_db_ami_version = get_db_ami_version(environment_name, "mis")
+                  println("MIS DB AMI Version from function (mis_db_ami_version) -- " + mis_db_ami_version)
+
+                  misboe_db_ami_version = get_db_ami_version(environment_name, "misboe")
+                  println("MISBOE DB AMI Version from function (misboe_db_ami_version) -- " + misboe_db_ami_version)
+
+                  misdsd_db_ami_version = get_db_ami_version(environment_name, "misdsd")
+                  println("MISDSD DB AMI Version from function (misdsd_db_ami_version) -- " + misdsd_db_ami_version)
+
+                  def information = """
+                  Started on ${starttime}
+                  project.config_version -- ${project.config_version}
+                  project.mis_version    -- ${project.mis_version}
+                  mis_db_ami_version     -- ${mis_db_ami_version}
+                  misboe_db_ami_version  -- ${misboe_db_ami_version}
+                  misdsd_db_ami_version  -- ${misdsd_db_ami_version}
+                  deploy_DATABASE_HA     -- ${env.deploy_DATABASE_HA}
+                  db_patch_check         -- ${env.db_patch_check}
+                  """
+
+                  println information
+                }
+                slackSend(message: "\"Apply\" of \"${project.mis_version}\" started on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL.replace(':8080','')}|Open>)")
+
+                dir( project.config ) {
+                  checkout scm: [$class: 'GitSCM',
+                              userRemoteConfigs:
+                                [[url: 'git@github.com:ministryofjustice/' + project.config, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a' ]],
+                              branches:
+                                [[name: project.config_version]]],
+                              poll: false
+                }
+                debug_env(project.config, project.config_version)
+
+
+                dir( project.mis ) {
+                  checkout scm: [$class: 'GitSCM',
+                              userRemoteConfigs:
+                                [[url: 'git@github.com:ministryofjustice/' + project.mis, credentialsId: 'f44bc5f1-30bd-4ab9-ad61-cc32caf1562a' ]],
+                              branches:
+                                [[name: project.mis_version]]],
+                              poll: false
+                }
+                debug_env(project.mis, project.mis_version)
+
+                script {
+                    mis_db_high_availability_count = get_db_ha_count(project.config, environment_name, "mis")
+                    misboe_db_high_availability_count = get_db_ha_count(project.config, environment_name, "misboe")
+                    misdsd_db_high_availability_count = get_db_ha_count(project.config, environment_name, "misdsd")
+                    echo "MIS DB HIGH AVAILABILITY COUNT is " + mis_db_high_availability_count
+                    echo "MISBOE DB HIGH AVAILABILITY COUNT is " + misboe_db_high_availability_count
+                    echo "MISDSD DB HIGH AVAILABILITY COUNT is " + misdsd_db_high_availability_count
+                }
+
+                prepare_env()
+            }
+        }
+
+     // stage('Delius | MIS Common')          { steps { script {do_terraform(project.config, environment_name, project.mis, 'common', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS Certs')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'certs', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS s3buckets')       { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud', mis_db_high_availability_count)}}}
+     stage('Provision Databases MIS') {
+       parallel {
+         stage('Delius | MIS database_mis') {
+           steps {
+             script {
+               println("terraform database_mis")
+               do_terraform(project.config, environment_name, project.mis, 'database_mis', mis_db_high_availability_count)
+             }
+           }
+         }
+
+         stage('Delius | MIS StandBy1') {
+             when {expression { mis_db_high_availability_count == "1" ||  mis_db_high_availability_count == "2" }}
+             steps {
+                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
+                     println("terraform database_mis_standbydb1")
+                     do_terraform(project.config, environment_name, project.mis, 'database_mis_standbydb1', mis_db_high_availability_count)
+                 }
+             }
+         }
+
+         stage('Delius | MIS StandBy2') {
+             when {expression { mis_db_high_availability_count == "2" }}
+             steps {
+                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
+                     println("terraform database_mis_standbydb2")
+                     do_terraform(project.config, environment_name, project.mis, 'database_mis_standbydb2', mis_db_high_availability_count)
+                 }
+             }
+         }
+       }
+     }
+
+     stage('Provision Databases MISBOE') {
+       parallel {
+         stage('Delius | MISBOE database_misboe') {
+           steps {
+             script {
+               println("terraform database_misboe")
+               do_terraform(project.config, environment_name, project.mis, 'database_misboe', misboe_db_high_availability_count)
+             }
+           }
+         }
+
+         stage('Delius | MISBOE StandBy1') {
+             when {expression { misboe_db_high_availability_count == "1" ||  misboe_db_high_availability_count == "2" }}
+             steps {
+                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
+                     println("terraform database_misboe_standbydb1")
+                     do_terraform(project.config, environment_name, project.mis, 'database_misboe_standbydb1', misboe_db_high_availability_count)
+                 }
+             }
+         }
+
+         stage('Delius | MISBOE StandBy2') {
+             when {expression { misboe_db_high_availability_count == "2" }}
+             steps {
+                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
+                     println("terraform database_misboe_standbydb2")
+                     do_terraform(project.config, environment_name, project.mis, 'database_misboe_standbydb2', misboe_db_high_availability_count)
+                 }
+             }
+         }
+       }
+     }
+
+     stage('Provision Databases MISDSD') {
+       parallel {
+         stage('Delius | MIS database_misdsd') {
+           steps {
+             script {
+               println("terraform database_misdsd")
+               do_terraform(project.config, environment_name, project.mis, 'database_misdsd', misdsd_db_high_availability_count)
+             }
+           }
+         }
+
+         stage('Delius | MISDSD StandBy1') {
+             when {expression { misdsd_db_high_availability_count == "1" ||  misdsd_db_high_availability_count == "2" }}
+             steps {
+                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
+                     println("terraform database_misdsd_standbydb1")
+                     do_terraform(project.config, environment_name, project.mis, 'database_misdsd_standbydb1', misdsd_db_high_availability_count)
+                 }
+             }
+         }
+
+         stage('Delius | MISDSD StandBy2') {
+             when {expression { misdsd_db_high_availability_count == "2" }}
+             steps {
+                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') { // this is temp catchError will remove after migration to new terraformstructure
+                     println("terraform database_misdsd_standbydb2")
+                     do_terraform(project.config, environment_name, project.mis, 'database_misdsd_standbydb2', misdsd_db_high_availability_count)
+                 }
+             }
+         }
+       }
+     }
+
+     stage('Check Oracle Software Patches on Primary') {
+       parallel {
+         stage('Delius | Check MIS database_mis') {
+            when {expression { db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                    parameters: [
+                       [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'mis_primarydb'],
+                       [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                       [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
+                    ]}
+            }
+         }
+         stage('Delius | Check MIS database_misboe') {
+            when {expression { db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                    parameters: [
+                       [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_primarydb'],
+                       [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                       [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
+                    ]
+                }
+            }
+         }
+         stage('Delius | Check MIS database_misdsd') {
+            when {expression { db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                    parameters: [
+                       [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                       [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_primarydb'],
+                       [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                       [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']
+                    ]
+                }
+            }
+         }
+       }
+     }
+
+     // stage('Provision Servers') {
+     //   parallel {
+     //     stage('Delius | MIS ec2-ndl-dis') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis', mis_db_high_availability_count)}}}
+     //     stage('Delius | MIS ec2-ndl-bcs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs', mis_db_high_availability_count)}}}
+     //     stage('Delius | MIS ec2-ndl-bfs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs', mis_db_high_availability_count)}}}
+     //     stage('Delius | MIS ec2-ndl-bps') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps', mis_db_high_availability_count)}}}
+     //     stage('Delius | MIS ec2-ndl-bws') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws', mis_db_high_availability_count)}}}
+     //   }
+     // }
+     stage('Build Database High Availibilty') {
+       parallel {
+         stage('Build MIS DB HA')    {
+             when {expression { (mis_db_high_availability_count == "1" || mis_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
+             steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MIS",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'db_group', value: "mis"]
+         ]}}
+         stage('Build MISBOE DB HA') {
+             when {expression { (misboe_db_high_availability_count == "1" || misboe_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
+             steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISBOE",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'db_group', value: "misboe"]
+         ]}}
+         stage('Build MISDSD DB HA') {
+             when {expression { (misdsd_db_high_availability_count == "1" || misdsd_db_high_availability_count == "2") && deploy_DATABASE_HA == "true" }}
+             steps { build job: "DAMS/Environments/${environment_name}/MIS/Build_Oracle_DB_HA_MISDSD",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'db_group', value: "misdsd"]
+         ]}}
+       }
+     }
+
+     stage ('Check Oracle Software and Patches on HA') {
+     parallel {
+        stage('Check Oracle Software Patches on MIS DB HA 1') {
+            when {expression { (mis_db_high_availability_count == "1" || mis_db_high_availability_count == "2") && db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'mis_standbydb1'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+        stage('Check Oracle Software Patches on MIS DB HA 2') {
+            when {expression { mis_db_high_availability_count == "2" && db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'mis_standbydb2'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+
+        stage('Check Oracle Software Patches on MISBOE DB HA 1') {
+            when {expression { (misboe_db_high_availability_count == "1" || misboe_db_high_availability_count == "2") && db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_standbydb1'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+        stage('Check Oracle Software Patches on MISBOE DB HA 2') {
+            when {expression { misboe_db_high_availability_count == "2" && db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'misboe_standbydb2'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+
+        stage('Check Oracle Software Patches on MISDSD DB HA 1') {
+            when {expression { (misdsd_db_high_availability_count == "1" || misdsd_db_high_availability_count == "2") && db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_standbydb1'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+        stage('Check Oracle Software Patches on MISDSD DB HA 2') {
+            when {expression { misdsd_db_high_availability_count == "2" && db_patch_check == "true" }}
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                build job: "Ops/Oracle_Operations/Patch_Oracle_Software",
+                parameters: [
+                    [$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"],
+                    [$class: 'StringParameterValue', name: 'target_host', value: 'misdsd_standbydb2'],
+                    [$class: 'BooleanParameterValue', name: 'install_absent_patches', value: false],
+                    [$class: 'StringParameterValue', name: 'patch_id', value: 'ALL']]
+                }
+            }
+        }
+      }
+    }
+
+     // stage('Delius | MIS monitoring')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'monitoring', mis_db_high_availability_count)}}}
+     // stage('Smoke test') { steps { build job: "DAMS/Environments/${environment_name}/MIS/Smoke_test", parameters: [[$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"]]}}
+    }
+
+    post {
+        always {
+            deleteDir()
+        }
+        success {
+            slackSend(message: "\"Apply\" of \"${project.mis_version}\" completed on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} ", color: 'good')
+        }
+        failure {
+            slackSend(message: "\"Apply\" of \"${project.mis_version}\" failed on \"${environment_name}\" - ${env.JOB_NAME} ${env.BUILD_NUMBER} ", color: 'danger')
+        }
+    }
+
+}
