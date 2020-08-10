@@ -238,10 +238,7 @@ variable "nextcloud_redis_node_type" {
   default = "cache.m4.large"
 }
 
-variable "nextcloud_num_node_groups" {
-  default = "2"
-}
-
-variable "nextcloud_replicas_per_node_group" {
-  default = "1"
+variable "number_cache_clusters" {
+  description = "Redis cache clusters"
+  default     = "3"
 }
