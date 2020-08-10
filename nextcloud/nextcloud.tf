@@ -74,6 +74,7 @@ data "template_file" "nextcloud_user_data" {
     cidr_block_b_subnet          = "${local.cidr_block_b_subnet}"
     cidr_block_c_subnet          = "${local.cidr_block_c_subnet}"
     pwm_url                      = "${local.pwm_url}"
+    strategic_pwm_url            = "${local.strategic_pwm_url}"
     environment_type             = "${var.environment_type}"
     region                       = "${var.region}"
   }

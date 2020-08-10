@@ -42,6 +42,7 @@ NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
 LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 LDAP_PORT="${ldap_port}"
 PWM_URL="${pwm_url}"
+STRATEGIC_PWM_URL="${strategic_pwm_url}"
 ENV_TYPE="${environment_type}"
 region="${region}"
 MIS_USER_PASS_NAME="${mis_user_pass_name}"
@@ -82,6 +83,7 @@ export NEXTCLOUD_ADMIN_PASS_PARAM="${nextcloud_admin_pass_param}"
 export LDAP_BIND_PASS_PARAM="${ldap_bind_param}"
 export LDAP_PORT="${ldap_port}"
 export PWM_URL="${pwm_url}"
+export STRATEGIC_PWM_URL="${strategic_pwm_url}"
 export ENV_TYPE="${environment_type}"
 export region="${region}"
 export MIS_USER_PASS_NAME="${mis_user_pass_name}"
@@ -163,6 +165,7 @@ base_install_script: /root/base-install.sh
 key_id: "alias/aws/ssm"
 hmpps_stack_name: $HMPPS_STACKNAME
 pwm_url: $PWM_URL
+strategic_pwm_url: $STRATEGIC_PWM_URL
 httpd_conf_file: "/etc/httpd/conf/httpd.conf"
 cw_installer: "/root/awslogs-agent-setup.py"
 cw_conf_template: "/root/cw_conf_template"
