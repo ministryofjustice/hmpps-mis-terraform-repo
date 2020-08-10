@@ -23,3 +23,7 @@ output "nextcloud_lb_name" {
 output "samba_lb_name" {
   value = "${aws_elb.samba_lb.name}"
 }
+
+output "redis_dns" {
+  value = "${aws_route53_record.nextcloud_cache_dns.fqdn}"
+}

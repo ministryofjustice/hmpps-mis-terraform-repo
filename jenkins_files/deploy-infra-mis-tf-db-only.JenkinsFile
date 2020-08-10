@@ -297,12 +297,12 @@ pipeline {
             }
         }
 
-     stage('Delius | MIS Common')          { steps { script {do_terraform(project.config, environment_name, project.mis, 'common', mis_db_high_availability_count)}}}
-     stage('Delius | MIS Certs')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'certs', mis_db_high_availability_count)}}}
-     stage('Delius | MIS s3buckets')       { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets', mis_db_high_availability_count)}}}
-     stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam', mis_db_high_availability_count)}}}
-     stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups', mis_db_high_availability_count)}}}
-     stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS Common')          { steps { script {do_terraform(project.config, environment_name, project.mis, 'common', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS Certs')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'certs', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS s3buckets')       { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups', mis_db_high_availability_count)}}}
+     // stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud', mis_db_high_availability_count)}}}
      stage('Provision Databases MIS') {
        parallel {
          stage('Delius | MIS database_mis') {
@@ -448,15 +448,15 @@ pipeline {
        }
      }
 
-     stage('Provision Servers') {
-       parallel {
-         stage('Delius | MIS ec2-ndl-dis') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis', mis_db_high_availability_count)}}}
-         stage('Delius | MIS ec2-ndl-bcs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs', mis_db_high_availability_count)}}}
-         stage('Delius | MIS ec2-ndl-bfs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs', mis_db_high_availability_count)}}}
-         stage('Delius | MIS ec2-ndl-bps') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps', mis_db_high_availability_count)}}}
-         stage('Delius | MIS ec2-ndl-bws') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws', mis_db_high_availability_count)}}}
-       }
-     }
+     // stage('Provision Servers') {
+     //   parallel {
+     //     stage('Delius | MIS ec2-ndl-dis') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis', mis_db_high_availability_count)}}}
+     //     stage('Delius | MIS ec2-ndl-bcs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs', mis_db_high_availability_count)}}}
+     //     stage('Delius | MIS ec2-ndl-bfs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs', mis_db_high_availability_count)}}}
+     //     stage('Delius | MIS ec2-ndl-bps') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps', mis_db_high_availability_count)}}}
+     //     stage('Delius | MIS ec2-ndl-bws') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws', mis_db_high_availability_count)}}}
+     //   }
+     // }
      stage('Build Database High Availibilty') {
        parallel {
          stage('Build MIS DB HA')    {
@@ -568,8 +568,8 @@ pipeline {
       }
     }
 
-     stage('Delius | MIS monitoring')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'monitoring', mis_db_high_availability_count)}}}
-     stage('Smoke test') { steps { build job: "DAMS/Environments/${environment_name}/MIS/Smoke_test", parameters: [[$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"]]}}
+     // stage('Delius | MIS monitoring')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'monitoring', mis_db_high_availability_count)}}}
+     // stage('Smoke test') { steps { build job: "DAMS/Environments/${environment_name}/MIS/Smoke_test", parameters: [[$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"]]}}
     }
 
     post {

@@ -21,6 +21,7 @@ locals {
   db3_address             = "${local.high_availability_count >= 2 ? local.db3_add : local.empty}"
   address_list            = "${local.db1_address}${local.db2_address}${local.db3_address}"
 }
+
 output "jdbc_failover_url" {
   value = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=${local.address_list})(CONNECT_DATA=(SERVICE_NAME=${var.ansible_vars_mis_db["database_sid"]}_TAF)))"
 }

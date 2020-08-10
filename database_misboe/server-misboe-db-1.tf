@@ -1,3 +1,11 @@
+#Overide autostop tag
+locals {
+  tags = "${merge(
+    var.tags,
+    map("autostop-${var.environment_type}", "Phase1")
+  )}"
+}
+
 module "misboe_db_1" {
   source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git?ref=1.0.0//modules//oracle-database"
   server_name = "misboe-db-1"
@@ -15,7 +23,7 @@ module "misboe_db_1" {
     "${data.terraform_remote_state.vpc_security_groups.sg_mis_db_in_out_rman_cat_id}"
   ]
 
-  tags                         = "${var.tags}"
+  tags                         = "${local.tags}"
   environment_name             = "${data.terraform_remote_state.vpc.environment_name}"
   bastion_inventory            = "${data.terraform_remote_state.vpc.bastion_inventory}"
   project_name                 = "${var.project_name}"
