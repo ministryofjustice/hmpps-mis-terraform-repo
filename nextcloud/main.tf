@@ -128,15 +128,15 @@ data "aws_acm_certificate" "nextcloud_cert" {
 #-------------------------------------------------------------
 ### Getting the PWM details
 #-------------------------------------------------------------
-data "terraform_remote_state" "delius-core-pwm" {
-  backend = "s3"
-
-  config {
-    bucket = "${var.remote_state_bucket_name}"
-    key    = "delius-core/application/pwm/terraform.tfstate"
-    region = "${var.region}"
-  }
-}
+#data "terraform_remote_state" "delius-core-pwm" {
+#  backend = "s3"
+#
+#  config {
+#    bucket = "${var.remote_state_bucket_name}"
+#    key    = "delius-core/application/pwm/terraform.tfstate"
+#    region = "${var.region}"
+#  }
+#}
 
 #-------------------------------------------------------------
 ### Getting the latest amazon ami
@@ -203,7 +203,7 @@ locals {
   db_dns_name                  = "${aws_route53_record.mariadb_dns_entry.fqdn}"
   ldap_bind_user               = "${data.terraform_remote_state.ldap_elb_name.ldap_bind_user}"
   backup_bucket                = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket}"
-  redis_address                = "${aws_elasticache_cluster.nextcloud_cache.cache_nodes.0.address}"
+  redis_address                = "${aws_route53_record.nextcloud_cache_dns.fqdn}"
   installer_user               = "installer_user"
   config_passw                 = "${local.environment_identifier}-${local.app_name}-config-password"
   nextcloud_s3_bucket_arn      = "${data.terraform_remote_state.s3bucket.nextcloud_s3_bucket_arn}"
@@ -211,5 +211,8 @@ locals {
   cidr_block_a_subnet          = "${replace (element(local.public_cidr_block, 0), "/", "\\/")}"
   cidr_block_b_subnet          = "${replace (element(local.public_cidr_block, 1), "/", "\\/")}"
   cidr_block_c_subnet          = "${replace (element(local.public_cidr_block, 2), "/", "\\/")}"
+#  pwm_url                      = "${data.terraform_remote_state.delius-core-pwm.public_fqdn_pwm}"
+  pwm_url                      = "password-reset.${data.terraform_remote_state.vpc.public_zone_name}"
+  strategic_pwm_url            = "password-reset.${data.terraform_remote_state.vpc.strategic_public_zone_name}"
   sg_smtp_ses                  = "${data.terraform_remote_state.security-groups.sg_smtp_ses}"
 }

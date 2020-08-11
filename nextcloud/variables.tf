@@ -233,3 +233,12 @@ variable "ebs_backup" {
     delete_after       = 120
   }
 }
+
+variable "nextcloud_redis_node_type" {
+  default = "cache.m4.large"
+}
+
+variable "number_cache_clusters" {
+  description = "Redis cache clusters"
+  default     = "3"
+}
