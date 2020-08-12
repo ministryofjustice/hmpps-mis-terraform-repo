@@ -49,3 +49,7 @@ variable "high_availability_count" {
 variable "environment_name" {
   type = "string"
 }
+
+variable "db_aws_ami" {
+  description = "Database AMI Name/Version"
+}
