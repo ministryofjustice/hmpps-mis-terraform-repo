@@ -34,8 +34,8 @@ module "misboe_db_3" {
 
   ansible_vars = {
     service_user_name             = "${var.ansible_vars_misboe_db["service_user_name"]}"
-    database_global_database_name = "${var.ansible_vars_misboe_db["database_global_database_name"]}"
-    database_sid                  = "${var.ansible_vars_misboe_db["database_sid"]}"
+    database_global_database_name = "${var.ansible_vars_misboe_db["database_global_database_name"]}S2"
+    database_sid                  = "${var.ansible_vars_misboe_db["database_sid"]}S2"
     database_characterset         = "${var.ansible_vars_misboe_db["database_characterset"]}"
     oracle_dbca_template_file     = "${var.ansible_vars_misboe_db["oracle_dbca_template_file"]}"
     database_type                 = "standby" # required for the DB module. This file is where the property is set.
