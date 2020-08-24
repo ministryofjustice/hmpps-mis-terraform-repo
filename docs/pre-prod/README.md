@@ -116,7 +116,7 @@ TCP: 25
 ### SES
 #### Server Name
 ```
-email-smtp.eu-west-1.amazonaws.com
+email-smtp.eu-west-2.amazonaws.com
 ```
 #### Port
 ```
