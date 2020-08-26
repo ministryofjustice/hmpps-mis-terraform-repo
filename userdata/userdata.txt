@@ -1,13 +1,16 @@
 <powershell>
 $misCreds = New-Credential -UserName "${user}" -Password "${password}"
 Install-User -Credential $misCreds
-
 Add-GroupMember -Name Administrators -Member ${user}
 
+$bossoCreds = New-Credential -UserName "${bosso_user}" -Password "${bosso_password}"
+Install-User -Credential $bossoCreds
+Add-GroupMember -Name Administrators -Member ${bosso_user}
+
 $ComputerName = "${host_name}"
-   
-Remove-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -name "Hostname" 
-Remove-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -name "NV Hostname" 
+
+Remove-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -name "Hostname"
+Remove-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -name "NV Hostname"
 
 New-PSDrive -name HKU -PSProvider "Registry" -Root "HKEY_USERS"
 
