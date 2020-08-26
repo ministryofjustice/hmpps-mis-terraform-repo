@@ -123,6 +123,7 @@ locals {
   nart_role                    = "${data.terraform_remote_state.common.legacy_environment_name}"
   nart_prefix                  = "${ substr(local.nart_role, 0, length(local.nart_role)-1) }"
   started_message              = "has been started"
+  name_prefix                 = "${var.short_environment_name}"
 }
 
 #dashboard
@@ -144,6 +145,13 @@ data "template_file" "dashboard-body" {
   }
 }
 
+
+### Log Group
+resource "aws_cloudwatch_log_group" "mis_application_log_group" {
+  name              = "/mis/application_logs"
+  retention_in_days = "${var.cloudwatch_log_retention}"
+  tags              = "${merge(var.tags, map("Name", "${local.name_prefix}-offapi-pri-cwl"))}"
+}
 
 ### SNS
 
