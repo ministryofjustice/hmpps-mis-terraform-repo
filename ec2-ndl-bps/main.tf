@@ -84,7 +84,7 @@ data "aws_ami" "amazon_ami" {
 
   filter {
     name   = "name"
-    values = ["HMPPS MIS NART BFS Windows Server master 1567823870"]
+    values = ["HMPPS MIS NART BFS Windows Server master *"]
   }
 
   filter {
