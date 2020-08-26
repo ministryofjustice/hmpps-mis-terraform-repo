@@ -1,0 +1,385 @@
+ PS C:\Windows\system32> Write-Output '--------------------------'
+Write-Output 'hostname'
+Write-Output '--------------------------'
+hostname
+Write-Output '--------------------------'
+Write-Output 'computername'
+Write-Output '--------------------------'
+$env:computername
+
+Write-Output '--------------------------'
+Write-Output 'windows features'
+Write-Output '--------------------------'
+Get-WindowsFeature | Where { $_.InstallState -eq 'Installed'}
+
+Write-Output '--------------------------'
+Write-Output 'installed programs x32'
+Write-Output '--------------------------'
+Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | Format-Table –AutoSize
+
+Write-Output '--------------------------'
+Write-Output 'installed programs x64'
+Write-Output '--------------------------'
+Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | Format-Table –AutoSize
+
+Write-Output '--------------------------'
+Write-Output 'installed hotfixes'
+Write-Output '--------------------------'
+Get-HotFix
+
+Write-Output '--------------------------'
+Write-Output 'local users'
+Write-Output '--------------------------'
+Get-User | Format-Table –AutoSize
+Write-Output '--------------------------'
+Write-Output 'groups'
+Write-Output '--------------------------'
+Get-Group | Format-Table –AutoSize
+
+Write-Output '--------------------------'
+Write-Output 'local administrator group members'
+Write-Output '--------------------------'
+net localgroup administrators
+ 
+
+--------------------------
+hostname
+--------------------------
+ndl-dis-411
+--------------------------
+computername
+--------------------------
+WIN-S35DLISQ2EB
+--------------------------
+windows features
+--------------------------
+
+Display Name                                            Name                       Install State
+------------                                            ----                       -------------
+[X] File and Storage Services                           FileAndStorage-Services        Installed
+    [X] File and iSCSI Services                         File-Services                  Installed
+        [X] File Server                                 FS-FileServer                  Installed
+    [X] Storage Services                                Storage-Services               Installed
+[X] .NET Framework 3.5 Features                         NET-Framework-Features         Installed
+    [X] .NET Framework 3.5 (includes .NET 2.0 and 3.0)  NET-Framework-Core             Installed
+[X] .NET Framework 4.5 Features                         NET-Framework-45-Fea...        Installed
+    [X] .NET Framework 4.5                              NET-Framework-45-Core          Installed
+    [X] WCF Services                                    NET-WCF-Services45             Installed
+        [X] TCP Port Sharing                            NET-WCF-TCP-PortShar...        Installed
+[X] SMB 1.0/CIFS File Sharing Support                   FS-SMB1                        Installed
+[X] User Interfaces and Infrastructure                  User-Interfaces-Infra          Installed
+    [X] Graphical Management Tools and Infrastructure   Server-Gui-Mgmt-Infra          Installed
+    [X] Server Graphical Shell                          Server-Gui-Shell               Installed
+[X] Windows PowerShell                                  PowerShellRoot                 Installed
+    [X] Windows PowerShell 4.0                          PowerShell                     Installed
+    [X] Windows PowerShell 2.0 Engine                   PowerShell-V2                  Installed
+    [X] Windows PowerShell ISE                          PowerShell-ISE                 Installed
+[X] WoW64 Support                                       WoW64-Support                  Installed
+--------------------------
+installed programs x32
+--------------------------
+
+
+
+DisplayName                                                    DisplayVersion Publisher                               InstallDate
+-----------                                                    -------------- ---------                               -----------
+                                                                                                                                 
+Salt Minion 2018.3.2                                           2018.3.2       SaltStack, Inc                                     
+                                                                                                                                 
+Microsoft Visual C++ 2015 Redistributable (x64) - 14.0.24123   14.0.24123.0   Microsoft Corporation                              
+Microsoft Visual C++ 2012 Redistributable (x86) - 11.0.61030   11.0.61030.0   Microsoft Corporation                              
+EC2ConfigService                                               4.9.3519.0     Amazon Web Services                                
+Amazon SSM Agent                                               2.3.634.0      Amazon Web Services                                
+Microsoft Visual C++ 2008 Redistributable - x86 9.0.30729.6161 9.0.30729.6161 Microsoft Corporation                   20190907   
+Microsoft Visual C++ 2012 x86 Additional Runtime - 11.0.61030  11.0.61030     Microsoft Corporation                   20190907   
+Microsoft Visual C++ 2012 x86 Minimum Runtime - 11.0.61030     11.0.61030     Microsoft Corporation                   20190907   
+Microsoft Visual C++ 2012 Redistributable (x64) - 11.0.61030   11.0.61030.0   Microsoft Corporation                              
+EC2ConfigService                                               4.9.3519.0     Amazon Web Services                                
+AWS Tools for Windows                                          3.15.802       Amazon Web Services Developer Relations 20190816   
+
+
+--------------------------
+installed programs x64
+--------------------------
+
+DisplayName                                                    DisplayVersion Publisher                               InstallDate
+-----------                                                    -------------- ---------                               -----------
+                                                                                                                                 
+Git version 2.21.0                                             2.21.0         The Git Development Community           20190907   
+Python 3.7.1 (Miniconda3 4.5.12 64-bit)                        4.5.12         Anaconda, Inc.                                     
+                                                                                                                                 
+EC2ConfigService                                               4.9.3519.0     Amazon Web Services                     20190816   
+Microsoft Visual C++ 2005 Redistributable (x64)                8.0.56336      Microsoft Corporation                   20190907   
+Microsoft Visual C++ 2015 x64 Additional Runtime - 14.0.24123  14.0.24123     Microsoft Corporation                   20190907   
+Amazon SSM Agent                                               2.3.634.0      Amazon Web Services                     20190816   
+aws-cfn-bootstrap                                              1.4.31         Amazon Web Services                     20181014   
+Microsoft Visual C++ 2012 x64 Additional Runtime - 11.0.61030  11.0.61030     Microsoft Corporation                   20190907   
+Microsoft Visual C++ 2008 Redistributable - x64 9.0.30729.6161 9.0.30729.6161 Microsoft Corporation                   20190907   
+Java SE Development Kit 8 Update 221 (64-bit)                  8.0.2210.11    Oracle Corporation                      20190907   
+AWS PV Drivers                                                 8.3.1          Amazon Web Services                     20190816   
+AWS Command Line Interface                                     1.16.133       Amazon Web Services Developer Relations 20190907   
+Microsoft Visual C++ 2012 x64 Minimum Runtime - 11.0.61030     11.0.61030     Microsoft Corporation                   20190907   
+Microsoft Visual C++ 2015 x64 Minimum Runtime - 14.0.24123     14.0.24123     Microsoft Corporation                   20190907   
+
+
+--------------------------
+installed hotfixes
+--------------------------
+
+Source          Description     HotFixID  InstalledBy                   InstalledOn           
+------          -----------     --------  -----------                   -----------           
+WIN-S35DLISQ2EB Security Update KB2894856 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB2896496 NT AUTHORITY\SYSTEM           6/20/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2919355 WIN-S35DLISQ2EB\Administrator 3/18/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2919442 WIN-S35DLISQ2EB\Administrator 3/18/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2934520 NT AUTHORITY\SYSTEM           1/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2938066 NT AUTHORITY\SYSTEM           7/10/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2938772 WIN-S35DLISQ2EB\Administrator 3/18/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Hotfix          KB2949621 WIN-S35DLISQ2EB\Administrator 3/18/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2954879 WIN-S35DLISQ2EB\Administrator 5/17/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2955164 NT AUTHORITY\SYSTEM           5/17/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Hotfix          KB2959626 NT AUTHORITY\SYSTEM           7/10/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2965500 WIN-S35DLISQ2EB\Administrator 5/17/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2967917 NT AUTHORITY\SYSTEM           7/10/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2969339 NT AUTHORITY\SYSTEM           6/20/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2971203 NT AUTHORITY\SYSTEM           7/10/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2973448 NT AUTHORITY\SYSTEM           6/20/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2975061 NT AUTHORITY\SYSTEM           7/10/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2975719 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB2977765 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB2978041 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB2978126 NT AUTHORITY\SYSTEM           11/18/2014 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB2984006 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB2989647 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB2989930 NT AUTHORITY\SYSTEM           12/9/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB2993100 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB2995004 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB2995388 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Hotfix          KB2996799 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB2998174 NT AUTHORITY\SYSTEM           10/15/2014 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB2999226 NT AUTHORITY\SYSTEM           10/22/2015 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB3000483 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3000850 NT AUTHORITY\SYSTEM           11/18/2014 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB3003057 NT AUTHORITY\SYSTEM           8/16/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Hotfix          KB3004545 NT AUTHORITY\SYSTEM           4/15/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3012199 NT AUTHORITY\SYSTEM           12/9/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3012702 NT AUTHORITY\SYSTEM           3/10/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3013172 NT AUTHORITY\SYSTEM           8/16/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3013769 NT AUTHORITY\SYSTEM           12/9/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3013791 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3013816 NT AUTHORITY\SYSTEM           12/9/2014 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3014442 NT AUTHORITY\SYSTEM           11/18/2014 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB3019978 NT AUTHORITY\SYSTEM           1/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3021910 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3022345 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3023222 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3023266 NT AUTHORITY\SYSTEM           1/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3024751 NT AUTHORITY\SYSTEM           3/10/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3024755 NT AUTHORITY\SYSTEM           3/10/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3030947 NT AUTHORITY\SYSTEM           3/10/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3032663 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3033446 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3035126 NT AUTHORITY\SYSTEM           3/10/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3036612 NT AUTHORITY\SYSTEM           3/10/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3037579 NT AUTHORITY\SYSTEM           4/15/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3038002 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Hotfix          KB3038701 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3042085 NT AUTHORITY\SYSTEM           4/15/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3044374 NT AUTHORITY\SYSTEM           4/15/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3044673 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3045634 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3045685 NT AUTHORITY\SYSTEM           4/15/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3045717 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3045719 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3045755 NT AUTHORITY\SYSTEM           4/15/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3045999 NT AUTHORITY\SYSTEM           4/15/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3046017 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Hotfix          KB3046737 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3054169 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3054203 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3054256 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3054464 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3055323 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3055343 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3055642 NT AUTHORITY\SYSTEM           5/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3059317 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3060681 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3060793 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3061512 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3063843 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3064209 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3068708 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3071756 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3074228 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Security Update KB3074548 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3075853 NT AUTHORITY\SYSTEM           8/13/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3077715 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3078405 NT AUTHORITY\SYSTEM           10/22/2015 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB3078676 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3080149 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Security Update KB3082089 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3083325 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3083711 NT AUTHORITY\SYSTEM           10/22/2015 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB3084135 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3084905 NT AUTHORITY\SYSTEM           10/22/2015 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB3086255 NT AUTHORITY\SYSTEM           9/9/2015 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3087137 NT AUTHORITY\SYSTEM           10/22/2015 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB3091297 NT AUTHORITY\SYSTEM           10/22/2015 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB3094486 NT AUTHORITY\SYSTEM           10/22/2015 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB3095701 NT AUTHORITY\SYSTEM           10/22/2015 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB3097997 NT AUTHORITY\SYSTEM           11/12/2015 12:00:00 AM
+WIN-S35DLISQ2EB Security Update KB3098779 NT AUTHORITY\SYSTEM           11/12/2015 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB3099834 NT AUTHORITY\SYSTEM           12/9/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3100473 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3102429 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3102467 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3102812 NT AUTHORITY\SYSTEM           11/12/2015 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB3103616 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3103696 NT AUTHORITY\SYSTEM           12/9/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3103709 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3109103 NT AUTHORITY\SYSTEM           12/9/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3109976 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3110329 NT AUTHORITY\SYSTEM           1/13/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3112148 NT AUTHORITY\SYSTEM           12/9/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3112336 NT AUTHORITY\SYSTEM           12/9/2015 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3115224 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3118401 NT AUTHORITY\SYSTEM           3/8/2016 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3121261 NT AUTHORITY\SYSTEM           3/8/2016 12:00:00 AM  
+WIN-S35DLISQ2EB Security Update KB3122654 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3123245 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3126434 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3126587 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3127226 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3133043 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3133690 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3134179 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3134815 NT AUTHORITY\SYSTEM           3/8/2016 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3135449 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3137728 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3138602 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3138615 NT AUTHORITY\SYSTEM           3/8/2016 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3139164 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3139398 NT AUTHORITY\SYSTEM           3/8/2016 12:00:00 AM  
+WIN-S35DLISQ2EB Security Update KB3139914 NT AUTHORITY\SYSTEM           3/8/2016 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB3140219 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3140234 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Hotfix          KB3141092 NT AUTHORITY\SYSTEM           2/11/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3145384 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3145432 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3146604 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3146723 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3146751 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3147071 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3148851 NT AUTHORITY\SYSTEM           4/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3155784 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3156059 NT AUTHORITY\SYSTEM           5/12/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3156418 NT AUTHORITY\SYSTEM           6/15/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3159398 NT AUTHORITY\SYSTEM           6/15/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3161949 NT AUTHORITY\SYSTEM           6/15/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3162343 NT AUTHORITY\SYSTEM           6/15/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3162835 NT AUTHORITY\SYSTEM           6/15/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3172614 NT AUTHORITY\SYSTEM           8/13/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3172729 WIN-S35DLISQ2EB\Administrator 8/13/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3173424 NT AUTHORITY\SYSTEM           8/13/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3175024 NT AUTHORITY\SYSTEM           9/14/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB3178539 NT AUTHORITY\SYSTEM           9/14/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3179574 NT AUTHORITY\SYSTEM           9/14/2016 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3179948 NT AUTHORITY\SYSTEM           10/11/2016 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB3186539 NT AUTHORITY\SYSTEM           8/10/2017 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB3195387 NT AUTHORITY\SYSTEM           11/22/2016 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB3210135 NT AUTHORITY\SYSTEM           12/14/2016 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB4014510 NT AUTHORITY\SYSTEM           8/10/2017 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4024847 NT AUTHORITY\SYSTEM           8/10/2017 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4033369 NT AUTHORITY\SYSTEM           1/13/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4033428 NT AUTHORITY\SYSTEM           8/10/2017 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4040972 NT AUTHORITY\SYSTEM           9/13/2017 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4041777 NT AUTHORITY\SYSTEM           11/29/2017 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB4043763 NT AUTHORITY\SYSTEM           10/12/2017 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB4054566 NT AUTHORITY\SYSTEM           7/11/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4054854 NT AUTHORITY\SYSTEM           1/13/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4054980 NT AUTHORITY\SYSTEM           2/23/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4055001 NT AUTHORITY\SYSTEM           1/13/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB4056898 NT AUTHORITY\SYSTEM           1/5/2018 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB4073700 NT AUTHORITY\SYSTEM           2/23/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4096417 NT AUTHORITY\SYSTEM           5/9/2018 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB4098972 NT AUTHORITY\SYSTEM           6/13/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4338419 NT AUTHORITY\SYSTEM           7/11/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4344145 NT AUTHORITY\SYSTEM           8/14/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4457015 NT AUTHORITY\SYSTEM           10/14/2018 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB4457034 NT AUTHORITY\SYSTEM           9/16/2018 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4459941 NT AUTHORITY\SYSTEM           11/19/2018 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB4470639 NT AUTHORITY\SYSTEM           12/12/2018 12:00:00 AM
+WIN-S35DLISQ2EB Update          KB4480054 NT AUTHORITY\SYSTEM           1/9/2019 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB4480095 NT AUTHORITY\SYSTEM           2/8/2019 12:00:00 AM  
+WIN-S35DLISQ2EB Update          KB4483450 NT AUTHORITY\SYSTEM           2/13/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4486105 NT AUTHORITY\SYSTEM           8/16/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4486545 NT AUTHORITY\SYSTEM           3/14/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4495585 NT AUTHORITY\SYSTEM           5/15/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB4504418 NT AUTHORITY\SYSTEM           7/13/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4506993 NT AUTHORITY\SYSTEM           8/16/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Update          KB4506996 NT AUTHORITY\SYSTEM           7/13/2019 12:00:00 AM 
+WIN-S35DLISQ2EB Security Update KB4512488 NT AUTHORITY\SYSTEM           8/16/2019 12:00:00 AM 
+--------------------------
+local users
+--------------------------
+
+
+
+Username       DisplayName ContextType ConnectedServer
+--------       ----------- ----------- ---------------
+Administrator              Machine     ndl-dis-411    
+BOSSO-NDL-001              Machine     ndl-dis-411    
+DS_AD_PROD_001             Machine     ndl-dis-411    
+Guest                      Machine     ndl-dis-411    
+misstage                   Machine     ndl-dis-411    
+sshd           sshd        Machine     ndl-dis-411    
+
+
+--------------------------
+groups
+--------------------------
+
+Name                                Description                                                                                      
+----                                -----------                                                                                      
+Access Control Assistance Operators Members of this group can remotely query authorization attributes and permissions for resource...
+Administrators                      Administrators have complete and unrestricted access to the computer/domain                      
+Backup Operators                    Backup Operators can override security restrictions for the sole purpose of backing up or rest...
+Certificate Service DCOM Access     Members of this group are allowed to connect to Certification Authorities in the enterprise      
+Cryptographic Operators             Members are authorized to perform cryptographic operations.                                      
+Distributed COM Users               Members are allowed to launch, activate and use Distributed COM objects on this machine.         
+Event Log Readers                   Members of this group can read event logs from local machine                                     
+Guests                              Guests have the same access as members of the Users group by default, except for the Guest acc...
+Hyper-V Administrators              Members of this group have complete and unrestricted access to all features of Hyper-V.          
+IIS_IUSRS                           Built-in group used by Internet Information Services.                                            
+Network Configuration Operators     Members in this group can have some administrative privileges to manage configuration of netwo...
+Performance Log Users               Members of this group may schedule logging of performance counters, enable trace providers, an...
+Performance Monitor Users           Members of this group can access performance counter data locally and remotely                   
+Power Users                         Power Users are included for backwards compatibility and possess limited administrative powers   
+Print Operators                     Members can administer printers installed on domain controllers                                  
+RDS Endpoint Servers                Servers in this group run virtual machines and host sessions where users RemoteApp programs an...
+RDS Management Servers              Servers in this group can perform routine administrative actions on servers running Remote Des...
+RDS Remote Access Servers           Servers in this group enable users of RemoteApp programs and personal virtual desktops access ...
+Remote Desktop Users                Members in this group are granted the right to logon remotely                                    
+Remote Management Users             Members of this group can access WMI resources over management protocols (such as WS-Managemen...
+Replicator                          Supports file replication in a domain                                                            
+Users                               Users are prevented from making accidental or intentional system-wide changes and can run most...
+WinRMRemoteWMIUsers__               Members of this group can access WMI resources over management protocols (such as WS-Managemen...
+
+
+--------------------------
+local administrator group members
+--------------------------
+Alias name     administrators
+Comment        Administrators have complete and unrestricted access to the computer/domain
+
+Members
+
+-------------------------------------------------------------------------------
+Administrator
+BOSSO-NDL-001
+DS_AD_PROD_001
+misstage
+The command completed successfully.
+
+
+PS C:\Windows\system32>  
