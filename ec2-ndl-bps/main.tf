@@ -143,7 +143,7 @@ locals {
 }
 
 #-------------------------------------------------------------
-## Getting the admin username and password
+## Getting the admin usernames and passwords
 #-------------------------------------------------------------
 data "aws_ssm_parameter" "user" {
   name = "${local.environment_identifier}-${local.app_name}-admin-user"
@@ -152,6 +152,17 @@ data "aws_ssm_parameter" "user" {
 data "aws_ssm_parameter" "password" {
   name = "${local.environment_identifier}-${local.app_name}-admin-password"
 }
+
+
+data "aws_ssm_parameter" "bosso_user" {
+  name = "${local.environment_identifier}-reports-admin-user"
+}
+
+data "aws_ssm_parameter" "bosso_password" {
+  name = "${local.environment_identifier}-reports-admin-password"
+}
+
+
 
 ####################################################
 # instance 1
@@ -166,6 +177,8 @@ data "template_file" "instance_userdata" {
     internal_domain = "${local.internal_domain}"
     user            = "${data.aws_ssm_parameter.user.value}"
     password        = "${data.aws_ssm_parameter.password.value}"
+    bosso_user      = "${data.aws_ssm_parameter.bosso_user.value}"
+    bosso_password  = "${data.aws_ssm_parameter.bosso_password.value}"
   }
 }
 
