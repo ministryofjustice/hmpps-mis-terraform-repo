@@ -303,8 +303,8 @@ pipeline {
      // stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam', mis_db_high_availability_count)}}}
      // stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups', mis_db_high_availability_count)}}}
      // stage('Delius | MIS Nextcloud')       { steps { script {do_terraform(project.config, environment_name, project.mis, 'nextcloud', mis_db_high_availability_count)}}}
-     stage('Provision Databases MIS') {
-       parallel {
+     // stage('Provision Databases MIS') {
+       // parallel {
          stage('Delius | MIS database_mis') {
            steps {
              script {
@@ -333,8 +333,8 @@ pipeline {
                  }
              }
          }
-       }
-     }
+       // }
+     // }
 
      stage('Provision Databases MISBOE') {
        parallel {
