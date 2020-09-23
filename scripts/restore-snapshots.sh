@@ -73,7 +73,7 @@ get_host_list ()   ##$1 is the host type ie bws
         exit 1
     fi
     echo '--------------------------------------------------------------------------------------------------------'
-    echo "Instance IDs found for $ACCOUNT_ID :"
+    echo "Instance IDs found for AccountID:${ACCOUNT_ID} HOST TYPE:${HOST_TYPE} :"
     echo "$INSTANCE_IDS"
     echo '--------------------------------------------------------------------------------------------------------'
 }
@@ -263,7 +263,7 @@ set_account_id
 authenticate
 get_host_list $HOST_TYPE
 stop_instances
-#restore_snapshots
-#enable_delete_on_term
-#start_instances
+restore_snapshots
+enable_delete_on_term
+start_instances
 rm ${HOME}/.aws/credentials
