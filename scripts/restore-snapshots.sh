@@ -163,6 +163,8 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
 
 
     #Restore  volumes and obtain restore job ID
+echo "aws backup start-restore-job --recovery-point-arn $SNAPSHOT_ARN_ROOT  --iam-role-arn arn:aws:iam::${ACCOUNT_ID}:role/tf-eu-west-2-hmpps-delius-${ENV_TYPE}-mis-mis-ec2-bkup-pri-iam  --resource-type EBS  --profile $profile --region $REGION --metadata  volumeId=${ROOT_VOLUME},availabilityZone=${INSTANCE_AZ}"
+sleep 10
     ROOT_RESTORE_JOB_ID=$(aws backup start-restore-job --recovery-point-arn $SNAPSHOT_ARN_ROOT  --iam-role-arn arn:aws:iam::${ACCOUNT_ID}:role/tf-eu-west-2-hmpps-delius-${ENV_TYPE}-mis-mis-ec2-bkup-pri-iam  --resource-type EBS  --profile $profile --region $REGION --metadata  volumeId=${ROOT_VOLUME},availabilityZone=${INSTANCE_AZ} | jq -r .RestoreJobId)
     SECONDARY_RESTORE_JOB_ID=$(aws backup start-restore-job --recovery-point-arn $SNAPSHOT_ARN_SECONDARY  --iam-role-arn arn:aws:iam::${ACCOUNT_ID}:role/tf-eu-west-2-hmpps-delius-${ENV_TYPE}-mis-mis-ec2-bkup-pri-iam  --resource-type EBS  --profile $profile --region $REGION --metadata  volumeId=${SECONDARY_VOLUME},availabilityZone=${INSTANCE_AZ} | jq -r .RestoreJobId)
 
