@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#VARS
 REGION=eu-west-2
 ENV_TYPE=$1     #mis-dev    #$1
 HOST_TYPE=$2  #bws     #$2
@@ -37,6 +36,7 @@ esac
 echo "AccountID: $ACCOUNT_ID"
 }
 
+
 authenticate ()
 {
 mkdir -p ${HOME}/.aws
@@ -57,6 +57,7 @@ aws_session_token = ${aws_session_token}
 EOF
 
 }
+
 
 get_host_list ()   ##$1 is the host type ie bws
 {
@@ -90,7 +91,6 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
   echo "$instance_id is in state: $INSTANCE_STATUS"
 done
 }
-
 
 
 detach_old_volumes ()
@@ -155,7 +155,6 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
     SNAPSHOT_ARN_ROOT=$(aws backup list-recovery-points-by-backup-vault  --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt  --profile $profile --region $REGION  --max-results 1  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$ROOT_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
     SNAPSHOT_ARN_SECONDARY=$(aws backup list-recovery-points-by-backup-vault --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt --profile $profile --region $REGION --max-results 1 --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$SECONDARY_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
     INSTANCE_AZ=$(aws ec2 describe-instances --instance-ids $instance_id --profile $profile --region $REGION --output text --query 'Reservations[*].Instances[*].Placement.[AvailabilityZone]')
-
 
     #Restore  volumes and obtain restore job ID
     echo '--------------------------------------------------------------------------------------------------------'
