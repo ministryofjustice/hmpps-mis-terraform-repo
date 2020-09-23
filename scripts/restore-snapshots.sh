@@ -120,10 +120,10 @@ detach_old_volumes ()
     echo '--------------------------------------------------------------------------------------------------------'
     echo "aws ec2 detach-volume --volume-id $ROOT_VOLUME      --profile $profile --region ${REGION}"
     sleep 10
-    aws ec2 detach-volume --volume-id $ROOT_VOLUME      --profile $profile --region ${REGION}
+    aws ec2 detach-volume --volume-id $ROOT_VOLUME      --profile $profile --region ${REGION} || exit $?
     echo "aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile $profile --region ${REGION}"
     sleep 10
-    aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile $profile --region ${REGION}
+    aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile $profile --region ${REGION} || exit $?
   done
 }
 
@@ -136,7 +136,7 @@ attach_new_volumes ()
   echo '--------------------------------------------------------------------------------------------------------'
   echo "aws ec2 attach-volume --volume-id $ROOT_RESTORED_VOLUME_ID --device /dev/sda1  --instance-id $instance_id  --profile $profile --region ${REGION}"
   sleep 10
-  aws ec2 attach-volume --volume-id $ROOT_RESTORED_VOLUME_ID --device /dev/sda1 --instance-id $instance_id  --profile $profile --region ${REGION}
+  aws ec2 attach-volume --volume-id $ROOT_RESTORED_VOLUME_ID --device /dev/sda1 --instance-id $instance_id  --profile $profile --region ${REGION}  || exit $?
 
   #Attach secondary device
   echo '--------------------------------------------------------------------------------------------------------'
@@ -144,7 +144,7 @@ attach_new_volumes ()
   echo '--------------------------------------------------------------------------------------------------------'
   echo "aws ec2 attach-volume --volume-id $SECONDARY_RESTORED_VOLUME_ID --device /dev/xvdb --instance-id $instance_id  --profile $profile --region ${REGION}"
   sleep 10
-  aws ec2 attach-volume --volume-id $SECONDARY_RESTORED_VOLUME_ID --device /dev/xvdb --instance-id $instance_id  --profile $profile --region ${REGION}
+  aws ec2 attach-volume --volume-id $SECONDARY_RESTORED_VOLUME_ID --device /dev/xvdb --instance-id $instance_id  --profile $profile --region ${REGION}  || exit $?
 }
 
 
@@ -239,7 +239,7 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
   echo '--------------------------------------------------------------------------------------------------------'
   echo "aws ec2 modify-instance-attribute --instance-id ${instance_id} --block-device-mappings file://ebs.json --profile $profile  --region $REGION"
   sleep 10
-  aws ec2 modify-instance-attribute --instance-id ${instance_id} --block-device-mappings file://ebs.json --profile $profile  --region $REGION
+  aws ec2 modify-instance-attribute --instance-id ${instance_id} --block-device-mappings file://ebs.json --profile $profile  --region $REGION || exit $?
 done
 rm -rf ebs.json
 }
@@ -254,7 +254,7 @@ start_instances ()
     echo '--------------------------------------------------------------------------------------------------------'
     echo "aws ec2 start-instances --instance-ids $instance_id --profile $profile --region ${REGION}"
     sleep 10
-    aws ec2 start-instances --instance-ids $instance_id --profile $profile --region ${REGION}
+    aws ec2 start-instances --instance-ids $instance_id --profile $profile --region ${REGION} || exit $?
   done
 }
 
