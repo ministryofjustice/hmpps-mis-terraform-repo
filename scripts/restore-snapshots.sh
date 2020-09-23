@@ -5,6 +5,7 @@ REGION=eu-west-2
 ENV_TYPE=$1     #mis-dev    #$1
 HOST_TYPE=$2  #bws     #$2
 TIME_STAMP=$3
+profile=restore
 
 if [[ -z $ENV_TYPE ]] || [[ -z $HOST_TYPE ]] || [[ -z $TIME_STAMP ]]; then
   echo '--------------------------------------------------------------------------------------------------------'
@@ -38,12 +39,32 @@ esac
 echo "AccountID: $ACCOUNT_ID"
 }
 
+authenticate ()
+{
+echo "Authenticating to AWS"
+echo "aws sts assume-role --role-arn arn:aws:iam::${ACCOUNT_ID}:role/terraform --role-session-name restore-session --duration-seconds 3600"
+temp_role=$(aws sts assume-role --role-arn arn:aws:iam::${ACCOUNT_ID}:role/terraform --role-session-name restore-session --duration-seconds 3600)
+aws_access_key_id=$(echo ${temp_role} | jq .Credentials.AccessKeyId | xargs)
+aws_secret_access_key=$(echo ${temp_role} | jq .Credentials.SecretAccessKey | xargs)
+aws_session_token=$(echo ${temp_role} | jq .Credentials.SessionToken | xargs)
+
+cat << EOF >> ${HOME}/.aws/credentials
+
+[${profile}]
+aws_access_key_id = ${aws_access_key_id}
+aws_secret_access_key = ${aws_secret_access_key}
+aws_session_token = ${aws_session_token}
+
+EOF
+
+}
+
 get_host_list ()   ##$1 is the host type ie bws
 {
     #HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-*
     HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-102
 
-    INSTANCE_IDS=$(aws ec2 describe-instances --output text --region "${REGION}" \
+    INSTANCE_IDS=$(aws ec2 describe-instances --output text --region "${REGION}" --profile $profile \
             --query 'Reservations[*].Instances[*].[InstanceId]' \
             --filters "Name=tag:Name,Values=$HOSTNAME")
     if [[ -z $INSTANCE_IDS ]]; then
@@ -238,6 +259,7 @@ start_instances ()
 
 ##MAIN
 set_account_id
+authenticate
 get_host_list $HOST_TYPE
 #stop_instances
 #restore_snapshots
