@@ -35,6 +35,7 @@ case "${ENV_TYPE}" in
                exit 1
                ;;
 esac
+echo "AccountID: $ACCOUNT_ID"
 }
 
 get_host_list ()   ##$1 is the host type ie bws
