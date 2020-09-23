@@ -41,6 +41,7 @@ echo "AccountID: $ACCOUNT_ID"
 
 authenticate ()
 {
+mkdir -p ${HOME}/.aws
 echo "Authenticating to AWS"
 echo "aws sts assume-role --role-arn arn:aws:iam::${ACCOUNT_ID}:role/terraform --role-session-name restore-session --duration-seconds 3600"
 temp_role=$(aws sts assume-role --role-arn arn:aws:iam::${ACCOUNT_ID}:role/terraform --role-session-name restore-session --duration-seconds 3600)
