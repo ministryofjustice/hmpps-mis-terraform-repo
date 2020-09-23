@@ -42,7 +42,7 @@ echo "AccountID: $ACCOUNT_ID"
 authenticate ()
 {
 mkdir -p ${HOME}/.aws
-echo "Authenticating to AWS"
+echo "Assuming role: arn:aws:iam::${ACCOUNT_ID}:role/terraform "
 echo "aws sts assume-role --role-arn arn:aws:iam::${ACCOUNT_ID}:role/terraform --role-session-name restore-session --duration-seconds 3600"
 temp_role=$(aws sts assume-role --role-arn arn:aws:iam::${ACCOUNT_ID}:role/terraform --role-session-name restore-session --duration-seconds 3600)
 aws_access_key_id=$(echo ${temp_role} | jq .Credentials.AccessKeyId | xargs)
@@ -86,9 +86,9 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
   echo '--------------------------------------------------------------------------------------------------------'
   echo "Stopping instance $instance_id"
   echo '--------------------------------------------------------------------------------------------------------'
-  echo "aws ec2 stop-instances --instance-ids $instance_id --profile backup_profile --region ${REGION}"
+  echo "aws ec2 stop-instances --instance-ids $instance_id --profile $profile --region ${REGION}"
   sleep 10
-  INSTANCE_STATUS=$(aws ec2 stop-instances --instance-ids $instance_id --profile backup_profile --region "${REGION}" | jq .StoppingInstances[0].CurrentState.Name)
+  INSTANCE_STATUS=$(aws ec2 stop-instances --instance-ids $instance_id --profile $profile --region "${REGION}" | jq .StoppingInstances[0].CurrentState.Name)
   echo "$instance_id is in state: $INSTANCE_STATUS"
 done
 }
@@ -105,25 +105,25 @@ detach_old_volumes ()
             echo "$instance_id is not in stopped state ...retrying"
             echo '--------------------------------------------------------------------------------------------------------'
             sleep 30
-            INSTANCE_STATUS=$(aws ec2 stop-instances --instance-ids $instance_id --profile backup_profile --region "${REGION}" | jq .StoppingInstances[0].CurrentState.Name)
+            INSTANCE_STATUS=$(aws ec2 stop-instances --instance-ids $instance_id --profile $profile --region "${REGION}" | jq .StoppingInstances[0].CurrentState.Name)
             echo "$instance_id is in state: $INSTANCE_STATUS"
             if [[ "$INSTANCE_STATUS" == "stopped" ]]; then
                 break
             fi
         done
 
-    ROOT_VOLUME=$(aws ec2 describe-volumes      --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/sda1 --profile backup_profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
-    SECONDARY_VOLUME=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/xvdb --profile backup_profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
+    ROOT_VOLUME=$(aws ec2 describe-volumes      --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/sda1 --profile $profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
+    SECONDARY_VOLUME=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/xvdb --profile $profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
 
     echo '--------------------------------------------------------------------------------------------------------'
     echo "Detaching Volumes: $ROOT_VOLUME  $SECONDARY_VOLUME  from $instance_id"
     echo '--------------------------------------------------------------------------------------------------------'
-    echo "aws ec2 detach-volume --volume-id $ROOT_VOLUME      --profile backup_profile --region ${REGION}"
+    echo "aws ec2 detach-volume --volume-id $ROOT_VOLUME      --profile $profile --region ${REGION}"
     sleep 10
-    aws ec2 detach-volume --volume-id $ROOT_VOLUME      --profile backup_profile --region ${REGION}
-    echo "aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile backup_profile --region ${REGION}"
+    aws ec2 detach-volume --volume-id $ROOT_VOLUME      --profile $profile --region ${REGION}
+    echo "aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile $profile --region ${REGION}"
     sleep 10
-    aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile backup_profile --region ${REGION}
+    aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile $profile --region ${REGION}
   done
 }
 
@@ -134,17 +134,17 @@ attach_new_volumes ()
   echo '--------------------------------------------------------------------------------------------------------'
   echo "Attaching Volume: $ROOT_RESTORED_VOLUME_ID to $instance_id"
   echo '--------------------------------------------------------------------------------------------------------'
-  echo "aws ec2 attach-volume --volume-id $ROOT_RESTORED_VOLUME_ID --device /dev/sda1  --instance-id $instance_id  --profile backup_profile --region ${REGION}"
+  echo "aws ec2 attach-volume --volume-id $ROOT_RESTORED_VOLUME_ID --device /dev/sda1  --instance-id $instance_id  --profile $profile --region ${REGION}"
   sleep 10
-  aws ec2 attach-volume --volume-id $ROOT_RESTORED_VOLUME_ID --device /dev/sda1 --instance-id $instance_id  --profile backup_profile --region ${REGION}
+  aws ec2 attach-volume --volume-id $ROOT_RESTORED_VOLUME_ID --device /dev/sda1 --instance-id $instance_id  --profile $profile --region ${REGION}
 
   #Attach secondary device
   echo '--------------------------------------------------------------------------------------------------------'
   echo "Attaching Volume: $SECONDARY_RESTORED_VOLUME_ID to $instance_id"
   echo '--------------------------------------------------------------------------------------------------------'
-  echo "aws ec2 attach-volume --volume-id $SECONDARY_RESTORED_VOLUME_ID --device /dev/xvdb --instance-id $instance_id  --profile backup_profile --region ${REGION}"
+  echo "aws ec2 attach-volume --volume-id $SECONDARY_RESTORED_VOLUME_ID --device /dev/xvdb --instance-id $instance_id  --profile $profile --region ${REGION}"
   sleep 10
-  aws ec2 attach-volume --volume-id $SECONDARY_RESTORED_VOLUME_ID --device /dev/xvdb --instance-id $instance_id  --profile backup_profile --region ${REGION}
+  aws ec2 attach-volume --volume-id $SECONDARY_RESTORED_VOLUME_ID --device /dev/xvdb --instance-id $instance_id  --profile $profile --region ${REGION}
 }
 
 
@@ -155,30 +155,30 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
 
     EPOCH_TIME=$(date "+%s" -d "$TIME_STAMP")  ##For linux
     ##EPOCH_TIME=$(date -j -f "%Y-%m-%d-%H-%M-%S" "$TIME_STAMP" "+%s")
-    ROOT_VOLUME=$(aws ec2 describe-volumes      --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/sda1 --profile backup_profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
-    SECONDARY_VOLUME=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/xvdb --profile backup_profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
-    SNAPSHOT_ARN_ROOT=$(aws backup list-recovery-points-by-backup-vault  --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt  --profile backup_profile --region $REGION  --by-created-after $EPOCH_TIME  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$ROOT_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
-    SNAPSHOT_ARN_SECONDARY=$(aws backup list-recovery-points-by-backup-vault --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt --profile backup_profile --region $REGION  --by-created-after $EPOCH_TIME  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$SECONDARY_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
-    INSTANCE_AZ=$(aws ec2 describe-instances --instance-ids $instance_id --profile backup_profile --region $REGION --output text --query 'Reservations[*].Instances[*].Placement.[AvailabilityZone]')
+    ROOT_VOLUME=$(aws ec2 describe-volumes      --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/sda1 --profile $profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
+    SECONDARY_VOLUME=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/xvdb --profile $profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
+    SNAPSHOT_ARN_ROOT=$(aws backup list-recovery-points-by-backup-vault  --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt  --profile $profile --region $REGION  --by-created-after $EPOCH_TIME  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$ROOT_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
+    SNAPSHOT_ARN_SECONDARY=$(aws backup list-recovery-points-by-backup-vault --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt --profile $profile --region $REGION  --by-created-after $EPOCH_TIME  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$SECONDARY_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
+    INSTANCE_AZ=$(aws ec2 describe-instances --instance-ids $instance_id --profile $profile --region $REGION --output text --query 'Reservations[*].Instances[*].Placement.[AvailabilityZone]')
 
 
     #Restore  volumes and obtain restore job ID
-    ROOT_RESTORE_JOB_ID=$(aws backup start-restore-job --recovery-point-arn $SNAPSHOT_ARN_ROOT  --iam-role-arn arn:aws:iam::${ACCOUNT_ID}:role/tf-eu-west-2-hmpps-delius-${ENV_TYPE}-mis-mis-ec2-bkup-pri-iam  --resource-type EBS  --profile backup_profile --region $REGION --metadata  volumeId=${ROOT_VOLUME},availabilityZone=${INSTANCE_AZ} | jq -r .RestoreJobId)
-    SECONDARY_RESTORE_JOB_ID=$(aws backup start-restore-job --recovery-point-arn $SNAPSHOT_ARN_SECONDARY  --iam-role-arn arn:aws:iam::${ACCOUNT_ID}:role/tf-eu-west-2-hmpps-delius-${ENV_TYPE}-mis-mis-ec2-bkup-pri-iam  --resource-type EBS  --profile backup_profile --region $REGION --metadata  volumeId=${SECONDARY_VOLUME},availabilityZone=${INSTANCE_AZ} | jq -r .RestoreJobId)
+    ROOT_RESTORE_JOB_ID=$(aws backup start-restore-job --recovery-point-arn $SNAPSHOT_ARN_ROOT  --iam-role-arn arn:aws:iam::${ACCOUNT_ID}:role/tf-eu-west-2-hmpps-delius-${ENV_TYPE}-mis-mis-ec2-bkup-pri-iam  --resource-type EBS  --profile $profile --region $REGION --metadata  volumeId=${ROOT_VOLUME},availabilityZone=${INSTANCE_AZ} | jq -r .RestoreJobId)
+    SECONDARY_RESTORE_JOB_ID=$(aws backup start-restore-job --recovery-point-arn $SNAPSHOT_ARN_SECONDARY  --iam-role-arn arn:aws:iam::${ACCOUNT_ID}:role/tf-eu-west-2-hmpps-delius-${ENV_TYPE}-mis-mis-ec2-bkup-pri-iam  --resource-type EBS  --profile $profile --region $REGION --metadata  volumeId=${SECONDARY_VOLUME},availabilityZone=${INSTANCE_AZ} | jq -r .RestoreJobId)
 
     #Get root restored volume id
     echo '--------------------------------------------------------------------------------------------------------'
     echo "Restoring root device /dev/sda1 for $instance_id"
     echo '--------------------------------------------------------------------------------------------------------'
 
-    ROOT_RESTORE_STATUS=$(aws backup describe-restore-job --restore-job-id $ROOT_RESTORE_JOB_ID --profile backup_profile --region $REGION | jq -r .Status)
+    ROOT_RESTORE_STATUS=$(aws backup describe-restore-job --restore-job-id $ROOT_RESTORE_JOB_ID --profile $profile --region $REGION | jq -r .Status)
     while [[ $ROOT_RESTORE_STATUS == "RUNNING" ]]
         do
             echo '--------------------------------------------------------------------------------------------------------'
             echo "Restore Job: $ROOT_RESTORE_JOB_ID is not in COMPLETED state ...retrying"
             echo '--------------------------------------------------------------------------------------------------------'
             sleep 30
-            ROOT_RESTORE_STATUS=$(aws backup describe-restore-job --restore-job-id $ROOT_RESTORE_JOB_ID --profile backup_profile --region $REGION | jq -r .Status)
+            ROOT_RESTORE_STATUS=$(aws backup describe-restore-job --restore-job-id $ROOT_RESTORE_JOB_ID --profile $profile --region $REGION | jq -r .Status)
             echo '--------------------------------------------------------------------------------------------------------'
             echo "Restore Job: $ROOT_RESTORE_JOB_ID is in state: $ROOT_RESTORE_STATUS"
             echo '--------------------------------------------------------------------------------------------------------'
@@ -186,21 +186,21 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
                 break
             fi
         done
-     ROOT_RESTORED_VOLUME_ID=$(aws backup describe-restore-job --restore-job-id $ROOT_RESTORE_JOB_ID --profile backup_profile --region eu-west-2 | jq -r .CreatedResourceArn | cut -f2 -d/)
+     ROOT_RESTORED_VOLUME_ID=$(aws backup describe-restore-job --restore-job-id $ROOT_RESTORE_JOB_ID --profile $profile --region eu-west-2 | jq -r .CreatedResourceArn | cut -f2 -d/)
 
     #Get secondary restored volume id
     echo '--------------------------------------------------------------------------------------------------------'
     echo "Restoring secondary device /dev/xvdb for $instance_id"
     echo '--------------------------------------------------------------------------------------------------------'
 
-    SECONDARY_RESTORE_STATUS=$(aws backup describe-restore-job --restore-job-id $SECONDARY_RESTORE_JOB_ID --profile backup_profile --region $REGION | jq -r .Status)
+    SECONDARY_RESTORE_STATUS=$(aws backup describe-restore-job --restore-job-id $SECONDARY_RESTORE_JOB_ID --profile $profile --region $REGION | jq -r .Status)
     while [[ $SECONDARY_RESTORE_STATUS == "RUNNING" ]]
         do
             echo '--------------------------------------------------------------------------------------------------------'
             echo "Restore Job: $SECONDARY_RESTORE_JOB_ID is not in COMPLETED state ...retrying"
             echo '--------------------------------------------------------------------------------------------------------'
             sleep 30
-            SECONDARY_RESTORE_STATUS=$(aws backup describe-restore-job --restore-job-id $SECONDARY_RESTORE_JOB_ID --profile backup_profile --region $REGION | jq -r .Status)
+            SECONDARY_RESTORE_STATUS=$(aws backup describe-restore-job --restore-job-id $SECONDARY_RESTORE_JOB_ID --profile $profile --region $REGION | jq -r .Status)
             echo '--------------------------------------------------------------------------------------------------------'
             echo "Restore Job: $SECONDARY_RESTORE_JOB_ID is in state: $SECONDARY_RESTORE_STATUS"
             echo '--------------------------------------------------------------------------------------------------------'
@@ -208,7 +208,7 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
                 break
             fi
         done
-    SECONDARY_RESTORED_VOLUME_ID=$(aws backup describe-restore-job --restore-job-id $SECONDARY_RESTORE_JOB_ID --profile backup_profile --region $REGION | jq -r .CreatedResourceArn | cut -f2 -d/)
+    SECONDARY_RESTORED_VOLUME_ID=$(aws backup describe-restore-job --restore-job-id $SECONDARY_RESTORE_JOB_ID --profile $profile --region $REGION | jq -r .CreatedResourceArn | cut -f2 -d/)
     detach_old_volumes
     attach_new_volumes
 done
@@ -237,9 +237,9 @@ IFS=$'\n';for instance in $INSTANCE_IDS; do
   echo '--------------------------------------------------------------------------------------------------------'
   echo "Setting DeleteOnTermination to true on $instance_id root volume"
   echo '--------------------------------------------------------------------------------------------------------'
-  echo "aws ec2 modify-instance-attribute --instance-id ${instance_id} --block-device-mappings file://ebs.json --profile backup_profile  --region $REGION"
+  echo "aws ec2 modify-instance-attribute --instance-id ${instance_id} --block-device-mappings file://ebs.json --profile $profile  --region $REGION"
   sleep 10
-  aws ec2 modify-instance-attribute --instance-id ${instance_id} --block-device-mappings file://ebs.json --profile backup_profile  --region $REGION
+  aws ec2 modify-instance-attribute --instance-id ${instance_id} --block-device-mappings file://ebs.json --profile $profile  --region $REGION
 done
 rm -rf ebs.json
 }
@@ -252,9 +252,9 @@ start_instances ()
     echo '--------------------------------------------------------------------------------------------------------'
     echo "Starting instance_id $instance_id"
     echo '--------------------------------------------------------------------------------------------------------'
-    echo "aws ec2 start-instances --instance-ids $instance_id --profile backup_profile --region ${REGION}"
+    echo "aws ec2 start-instances --instance-ids $instance_id --profile $profile --region ${REGION}"
     sleep 10
-    aws ec2 start-instances --instance-ids $instance_id --profile backup_profile --region ${REGION}
+    aws ec2 start-instances --instance-ids $instance_id --profile $profile --region ${REGION}
   done
 }
 
@@ -262,7 +262,8 @@ start_instances ()
 set_account_id
 authenticate
 get_host_list $HOST_TYPE
-#stop_instances
+stop_instances
 #restore_snapshots
 #enable_delete_on_term
 #start_instances
+rm ${HOME}/.aws/credentials
