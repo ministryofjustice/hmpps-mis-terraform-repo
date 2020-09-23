@@ -95,24 +95,6 @@ done
 
 detach_old_volumes ()
 {
-  IFS=$'\n';for instance in $INSTANCE_IDS; do
-    instance_id=$(echo "$instance" | awk '{ print $1 }')
-    while [[ $INSTANCE_STATUS == "running" ]]
-        do
-            echo '--------------------------------------------------------------------------------------------------------'
-            echo "$instance_id is not in stopped state ...retrying"
-            echo '--------------------------------------------------------------------------------------------------------'
-            sleep 30
-            INSTANCE_STATUS=$(aws ec2 stop-instances --instance-ids $instance_id --profile $profile --region "${REGION}" | jq .StoppingInstances[0].CurrentState.Name)
-            echo "$instance_id is in state: $INSTANCE_STATUS"
-            if [[ "$INSTANCE_STATUS" == "stopped" ]]; then
-                break
-            fi
-        done
-
-    ROOT_VOLUME=$(aws ec2 describe-volumes      --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/sda1 --profile $profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
-    SECONDARY_VOLUME=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/xvdb --profile $profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
-
     echo '--------------------------------------------------------------------------------------------------------'
     echo "Detaching Volumes: $ROOT_VOLUME  $SECONDARY_VOLUME  from $instance_id"
     echo '--------------------------------------------------------------------------------------------------------'
@@ -122,7 +104,6 @@ detach_old_volumes ()
     echo "aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile $profile --region ${REGION}"
     sleep 10
     aws ec2 detach-volume --volume-id $SECONDARY_VOLUME --profile $profile --region ${REGION} || exit $?
-  done
 }
 
 
