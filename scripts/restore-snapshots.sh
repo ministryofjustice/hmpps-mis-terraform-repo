@@ -45,8 +45,7 @@ get_host_list ()   ##$1 is the host type ie bws
 
     INSTANCE_IDS=$(aws ec2 describe-instances --output text --region "${REGION}" \
             --query 'Reservations[*].Instances[*].[InstanceId]' \
-            --filters "Name=tag:Name,Values=$HOSTNAME" \
-            --profile backup_profile)
+            --filters "Name=tag:Name,Values=$HOSTNAME" \)
     if [[ -z $INSTANCE_IDS ]]; then
         echo "No Instance ids found ...exiting"
         exit 1
