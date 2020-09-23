@@ -159,13 +159,11 @@ echo $EPOCH_TIME
     ##EPOCH_TIME=$(date -j -f "%Y-%m-%d-%H-%M-%S" "$TIME_STAMP" "+%s")
     ROOT_VOLUME=$(aws ec2 describe-volumes      --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/sda1 --profile $profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
     SECONDARY_VOLUME=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instance_id  Name=attachment.device,Values=/dev/xvdb --profile $profile --region ${REGION} | jq -r .Volumes[0].VolumeId)
-echo $ROOT_VOLUME
-echo $SECONDARY_VOLUME
 
-echo "aws backup list-recovery-points-by-backup-vault  --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt  --profile $profile --region $REGION  --by-created-after $EPOCH_TIME  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$ROOT_VOLUME "
-    SNAPSHOT_ARN_ROOT=$(aws backup list-recovery-points-by-backup-vault  --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt  --profile $profile --region $REGION  --by-created-after $EPOCH_TIME  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$ROOT_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
-    SNAPSHOT_ARN_SECONDARY=$(aws backup list-recovery-points-by-backup-vault --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt --profile $profile --region $REGION  --by-created-after $EPOCH_TIME  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$SECONDARY_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
-echo "aws backup list-recovery-points-by-backup-vault --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt --profile $profile --region $REGION  --by-created-after $EPOCH_TIME  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$SECONDARY_VOLUME"
+echo "aws backup list-recovery-points-by-backup-vault  --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt  --profile $profile --region $REGION  --max-results 1  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$ROOT_VOLUME "
+    SNAPSHOT_ARN_ROOT=$(aws backup list-recovery-points-by-backup-vault  --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt  --profile $profile --region $REGION  --max-results 1  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$ROOT_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
+    SNAPSHOT_ARN_SECONDARY=$(aws backup list-recovery-points-by-backup-vault --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt --profile $profile --region $REGION --max-results 1 --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$SECONDARY_VOLUME | jq -r .RecoveryPoints[0].RecoveryPointArn)
+echo "aws backup list-recovery-points-by-backup-vault --backup-vault-name delius-${ENV_TYPE}-${HOST_TYPE}-ec2-bkup-pri-vlt --profile $profile --region $REGION  --max-results 1  --by-resource-arn arn:aws:ec2:eu-west-2:$ACCOUNT_ID:volume/$SECONDARY_VOLUME"
 
     INSTANCE_AZ=$(aws ec2 describe-instances --instance-ids $instance_id --profile $profile --region $REGION --output text --query 'Reservations[*].Instances[*].Placement.[AvailabilityZone]')
 
