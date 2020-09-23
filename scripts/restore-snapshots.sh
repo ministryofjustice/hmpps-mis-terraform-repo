@@ -211,8 +211,8 @@ sleep 10
             fi
         done
     SECONDARY_RESTORED_VOLUME_ID=$(aws backup describe-restore-job --restore-job-id $SECONDARY_RESTORE_JOB_ID --profile $profile --region $REGION | jq -r .CreatedResourceArn | cut -f2 -d/)
-    detach_old_volumes
-    attach_new_volumes
+    #detach_old_volumes
+    #attach_new_volumes
 done
 }
 
