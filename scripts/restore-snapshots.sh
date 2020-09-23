@@ -48,7 +48,7 @@ aws_access_key_id=$(echo ${temp_role} | jq .Credentials.AccessKeyId | xargs)
 aws_secret_access_key=$(echo ${temp_role} | jq .Credentials.SecretAccessKey | xargs)
 aws_session_token=$(echo ${temp_role} | jq .Credentials.SessionToken | xargs)
 
-cat << EOF >> ${HOME}/.aws/credentials
+cat << EOF > ${HOME}/.aws/credentials
 
 [${profile}]
 aws_access_key_id = ${aws_access_key_id}
