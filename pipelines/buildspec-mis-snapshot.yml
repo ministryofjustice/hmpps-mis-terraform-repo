@@ -1,0 +1,11 @@
+---
+version: 0.2
+env:
+  variables:
+    UID: 0
+    GID: 0
+
+phases:
+  build:
+    commands:
+      - make ${ACTION_TYPE}

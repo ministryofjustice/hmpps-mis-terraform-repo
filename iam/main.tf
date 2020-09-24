@@ -149,3 +149,39 @@ resource "aws_iam_role_policy_attachment" "mis_ec2_backup_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
   role       = "${aws_iam_role.mis_ec2_backup_role.name}"
 }
+
+resource "aws_iam_role_policy_attachment" "mis_ec2_restore_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
+  role       = "${aws_iam_role.mis_ec2_backup_role.name}"
+}
+
+resource "aws_iam_role_policy_attachment" "mis_ec2_full_access" {
+  policy_arn = "arn:aws:iam::aws:policy/AWSBackupFullAccess"
+  role       = "${aws_iam_role.mis_ec2_backup_role.name}"
+}
+
+resource "aws_iam_role_policy_attachment" "mis_ec2_passrole_policy" {
+  policy_arn = "${aws_iam_policy.mis_ec2_passrole.arn}"
+  role       = "${aws_iam_role.mis_ec2_backup_role.name}"
+}
+
+resource "aws_iam_policy" "mis_ec2_passrole" {
+  name        = "${var.environment_type}-mis-aws-backup-pass-role-policy"
+  path        = "/"
+  description = "${var.environment_type}-mis-aws-backup-pass-role-policy"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
