@@ -61,8 +61,8 @@ EOF
 
 get_host_list ()   ##$1 is the host type ie bws
 {
-    #HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-*
-    HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-105
+    HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-*
+   #HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-105
 
     INSTANCE_IDS=$(aws ec2 describe-instances --output text --region "${REGION}" --profile $profile \
             --query 'Reservations[*].Instances[*].[InstanceId]' \
