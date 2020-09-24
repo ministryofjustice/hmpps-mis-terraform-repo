@@ -82,6 +82,16 @@ stop_instances ()
 {
 IFS=$'\n';for instance in $INSTANCE_IDS; do
   instance_id=$(echo "$instance" | awk '{ print $1 }')
+
+  if [[ "$ENV_TYPE" == "mis-dev" ]] || [[ "$ENV_TYPE" == "auto-test" ]]; then
+      echo '--------------------------------------------------------------------------------------------------------'
+      echo "Disabling auto-stop on $instance_id"
+      echo '--------------------------------------------------------------------------------------------------------'
+      echo "aws ec2 create-tags --resources $instance_id --tags Key=autostop-${ENV_TYPE},Value=False --profile $profile --region ${REGION}"
+      sleep 10
+      aws ec2 create-tags --resources $instance_id --tags Key=autostop-${ENV_TYPE},Value=False --profile $profile --region ${REGION} || exit $?
+  fi
+
   echo '--------------------------------------------------------------------------------------------------------'
   echo "Stopping instance $instance_id"
   echo '--------------------------------------------------------------------------------------------------------'
@@ -227,7 +237,6 @@ done
 rm -rf ebs.json
 }
 
-
 start_instances ()
 {
   IFS=$'\n';for instance in $INSTANCE_IDS; do
@@ -238,6 +247,15 @@ start_instances ()
     echo "aws ec2 start-instances --instance-ids $instance_id --profile $profile --region ${REGION}"
     sleep 10
     aws ec2 start-instances --instance-ids $instance_id --profile $profile --region ${REGION} || exit $?
+
+    if [[ "$ENV_TYPE" == "mis-dev" ]] || [[ "$ENV_TYPE" == "auto-test" ]]; then
+        echo '--------------------------------------------------------------------------------------------------------'
+        echo "Re-enabling auto-stop on $instance_id"
+        echo '--------------------------------------------------------------------------------------------------------'
+        echo "aws ec2 create-tags --resources $instance_id --tags Key=autostop-${ENV_TYPE},Value=True --profile $profile --region ${REGION}"
+        sleep 10
+        aws ec2 create-tags --resources $instance_id --tags Key=autostop-${ENV_TYPE},Value=True --profile $profile --region ${REGION} || exit $?
+    fi
   done
 }
 
