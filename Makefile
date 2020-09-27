@@ -5,4 +5,4 @@ snapshot:
 	scripts/restore-snapshots.sh $(ENV_TYPE) $(COMPONENT)
 
 ondemandbackup:
-	scripts/restore-snapshots.sh $(ENV_TYPE) $(COMPONENT)
+	scripts/ebs-on-demand-backup.sh $(ENV_TYPE) $(COMPONENT)
