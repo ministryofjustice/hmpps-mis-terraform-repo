@@ -196,7 +196,7 @@ start_instances ()
 set_account_id
 authenticate
 get_host_list $HOST_TYPE
-stop_instances
-backup_snapshots
-start_instances
+#stop_instances
+#backup_snapshots
+#start_instances
 rm ${HOME}/.aws/credentials
