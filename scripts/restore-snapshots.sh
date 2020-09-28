@@ -263,8 +263,8 @@ start_instances ()
 set_account_id
 authenticate
 get_host_list $HOST_TYPE
-stop_instances
-restore_snapshots
-enable_delete_on_term
-start_instances
+#stop_instances
+#restore_snapshots
+#enable_delete_on_term
+#start_instances
 rm ${HOME}/.aws/credentials
