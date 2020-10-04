@@ -22,11 +22,6 @@ variable "is_ca_certificate" {
   default = false
 }
 
-variable depends_on {
-  default = []
-  type    = "list"
-}
-
 # server
 variable "self_signed_server_algorithm" {}
 

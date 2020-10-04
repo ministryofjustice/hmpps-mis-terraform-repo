@@ -10,11 +10,6 @@ variable "tags" {
 
 variable "s3-config-bucket" {}
 
-variable depends_on {
-  default = []
-  type    = "list"
-}
-
 variable "artefact-bucket" {}
 
 variable "s3_oracledb_backups_arn" {
