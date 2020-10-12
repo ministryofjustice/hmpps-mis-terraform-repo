@@ -298,7 +298,6 @@ pipeline {
         }
 
      stage('Delius | MIS Common')          { steps { script {do_terraform(project.config, environment_name, project.mis, 'common', mis_db_high_availability_count)}}}
-     stage('Delius | MIS Certs')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'certs', mis_db_high_availability_count)}}}
      stage('Delius | MIS s3buckets')       { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets', mis_db_high_availability_count)}}}
      stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam', mis_db_high_availability_count)}}}
      stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups', mis_db_high_availability_count)}}}
