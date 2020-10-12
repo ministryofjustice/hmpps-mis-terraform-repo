@@ -1,4 +1,5 @@
-variable "region" {}
+variable "region" {
+}
 
 variable "remote_state_bucket_name" {
   description = "Terraform remote state bucket name"
@@ -8,36 +9,36 @@ variable "environment_type" {
   description = "environment"
 }
 
-variable "cloudwatch_log_retention" {}
+variable "cloudwatch_log_retention" {
+}
 
-variable "dis_instance_type" {}
+variable "dis_instance_type" {
+}
 
-variable "dis_root_size" {}
+variable "dis_root_size" {
+}
 
 variable "dis_server_count" {
   description = "Number of DIS Servers to deploy"
-  default = 1
+  default     = 1
 }
 
 variable "ebs_backup" {
-  type = "map"
+  type = map(string)
 
   default = {
-    schedule           = "cron(0 01 * * ? *)"
-    delete_after       = 15
+    schedule     = "cron(0 01 * * ? *)"
+    delete_after = 15
   }
 }
 
 variable "environment_name" {
-  type = "string"
+  type = string
 }
 
 variable "snap_tag" {
   default = "CreateSnapshotDIS"
 }
-
-
-
 
 # LB
 variable "cross_zone_load_balancing" {
@@ -62,18 +63,16 @@ variable "connection_draining_timeout" {
 
 variable "dis-listener" {
   description = "A list of listener blocks"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "access_logs" {
   description = "An access logs block"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
-variable "dis-health_check" {
-  description = "A health check block"
-  type        = "list"
-  default     = []
+variable "tags" {
+type = map(string)
 }

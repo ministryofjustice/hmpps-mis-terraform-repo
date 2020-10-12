@@ -1,14 +1,16 @@
-variable "region" {}
+variable "region" {
+}
 
 variable "remote_state_bucket_name" {
   description = "Terraform remote state bucket name"
 }
 
 variable "mis_alarms_enabled" {
-  type = "string"
+  type = string
 }
 
-variable "cloudwatch_log_retention" {}
+variable "cloudwatch_log_retention" {
+}
 
 variable "environment_name" {
   description = "Environment name to be used as a unique identifier for resources - eg. delius-core-dev"
@@ -36,5 +38,6 @@ variable "project_name" {
 
 variable "tags" {
   description = "Tags to be applied to resources"
-  type        = "map"
+  type        = map(string)
 }
+

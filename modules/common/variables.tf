@@ -14,22 +14,32 @@ variable "environment" {
   description = "environment"
 }
 
-variable "s3_lb_policy_file" {}
-
-variable "lb_account_id" {}
-
-variable "private_zone_id" {}
-
-variable "vpc_id" {}
-variable "cidr_block" {}
-variable "internal_domain" {}
-
-variable "tags" {
-  type = "map"
+variable "s3_lb_policy_file" {
 }
 
-variable "common_name" {}
+variable "lb_account_id" {
+}
+
+variable "private_zone_id" {
+}
+
+variable "vpc_id" {
+}
+
+variable "cidr_block" {
+}
+
+variable "internal_domain" {
+}
+
+variable "tags" {
+  type = map(string)
+}
+
+variable "common_name" {
+}
 
 variable "password_length" {
   default = "18"
 }
+

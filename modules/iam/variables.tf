@@ -1,16 +1,21 @@
-variable "common_name" {}
-
-variable "ec2_policy_file" {}
-
-variable "ec2_internal_policy_file" {}
-
-variable "tags" {
-  type = "map"
+variable "common_name" {
 }
 
-variable "s3-config-bucket" {}
+variable "ec2_policy_file" {
+}
 
-variable "artefact-bucket" {}
+variable "ec2_internal_policy_file" {
+}
+
+variable "tags" {
+  type = map(string)
+}
+
+variable "s3-config-bucket" {
+}
+
+variable "artefact-bucket" {
+}
 
 variable "s3_oracledb_backups_arn" {
   description = "Oracle database backups S3 bucket arn"
@@ -31,6 +36,9 @@ variable "runtime_role" {
   default = ""
 }
 
-variable "region" {}
+variable "region" {
+}
 
-variable "account_id" {}
+variable "account_id" {
+}
+

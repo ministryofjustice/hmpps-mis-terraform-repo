@@ -1,4 +1,5 @@
-variable "region" {}
+variable "region" {
+}
 
 variable "remote_state_bucket_name" {
   description = "Terraform remote state bucket name"
@@ -8,10 +9,11 @@ variable "environment_type" {
   description = "environment"
 }
 
-variable "cloudwatch_log_retention" {}
+variable "cloudwatch_log_retention" {
+}
 
-variable "bws_instance_type" {}
-
+variable "bws_instance_type" {
+}
 
 # LB
 variable "cross_zone_load_balancing" {
@@ -36,42 +38,44 @@ variable "connection_draining_timeout" {
 
 variable "bws-listener" {
   description = "A list of listener blocks"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "access_logs" {
   description = "An access logs block"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "bws-health_check" {
   description = "A health check block"
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
-variable "bws_root_size" {}
+variable "bws_root_size" {
+}
 
 variable "bws_server_count" {
   description = "Number of BWS Servers to deploy"
-  default = 1
+  default     = 1
 }
 
 variable "ebs_backup" {
-  type = "map"
+  type = map(string)
 
   default = {
-    schedule           = "cron(0 01 * * ? *)"
-    delete_after       = 15
+    schedule     = "cron(0 01 * * ? *)"
+    delete_after = 15
   }
 }
 
 variable "environment_name" {
-  type = "string"
+  type = string
 }
 
 variable "snap_tag" {
   default = "CreateSnapshotBWS"
 }
+

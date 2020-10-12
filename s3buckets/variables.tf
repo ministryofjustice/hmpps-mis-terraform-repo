@@ -1,4 +1,5 @@
-variable "region" {}
+variable "region" {
+}
 
 variable "environment_type" {
   description = "environment"
@@ -9,7 +10,7 @@ variable "remote_state_bucket_name" {
 }
 
 variable "nextcloud_backups_config" {
-  type = "map"
+  type = map(string)
   default = {
     transition_days                            = 7
     expiration_days                            = 14
@@ -18,3 +19,4 @@ variable "nextcloud_backups_config" {
     noncurrent_version_expiration_days         = 2560
   }
 }
+

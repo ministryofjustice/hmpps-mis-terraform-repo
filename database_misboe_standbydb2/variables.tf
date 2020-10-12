@@ -24,17 +24,17 @@ variable "remote_state_bucket_name" {
 }
 
 variable "tags" {
-  type = "map"
+  type = map(string)
 }
 
 variable "ansible_vars_misboe_db" {
   description = "Ansible (oracle_db) vars for user_data script "
-  type        = "map"
+  type        = map(string)
 }
 
 variable "db_size_misboe" {
   description = "Details of the database resources size"
-  type = "map"
+  type        = map(string)
 }
 
 variable "dependencies_bucket_arn" {
@@ -44,3 +44,4 @@ variable "dependencies_bucket_arn" {
 variable "db_aws_ami" {
   description = "Database AMI Name/Version"
 }
+
