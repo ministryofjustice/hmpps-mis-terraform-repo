@@ -20,17 +20,21 @@ variable "remote_state_bucket_name" {
   description = "Terraform remote state bucket name"
 }
 
-variable "lb_account_id" {}
+variable "lb_account_id" {
+}
 
-variable "role_arn" {}
+variable "role_arn" {
+}
 
-variable "route53_hosted_zone_id" {}
+variable "route53_hosted_zone_id" {
+}
 
 variable "mis_app_name" {
   default = "mis"
 }
 
-variable "cloudwatch_log_retention" {}
+variable "cloudwatch_log_retention" {
+}
 
 variable "password_length" {
   default = 12
@@ -40,3 +44,4 @@ variable "legacy_environment_name" {
   default     = "100"
   description = "legacy environment name"
 }
+

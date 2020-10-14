@@ -3,14 +3,13 @@
 #--------------------------------------------
 
 locals {
-  transition_days = "${var.nextcloud_backups_config["transition_days"]}"
-  expiration_days = "${var.nextcloud_backups_config["expiration_days"]}"
-  bucket_name     = "${data.terraform_remote_state.common.environment_identifier}-nextcloud-backups"
+  transition_days = var.nextcloud_backups_config["transition_days"]
+  expiration_days = var.nextcloud_backups_config["expiration_days"]
+  bucket_name     = "${data.terraform_remote_state.common.outputs.environment_identifier}-nextcloud-backups"
 }
 
-
 resource "aws_s3_bucket" "backups" {
-  bucket = "${local.bucket_name}"
+  bucket = local.bucket_name
   acl    = "private"
 
   versioning {
@@ -32,14 +31,20 @@ resource "aws_s3_bucket" "backups" {
   lifecycle_rule {
     enabled = true
     transition {
-      days          = "${local.transition_days}"
+      days          = local.transition_days
       storage_class = "GLACIER"
     }
 
     expiration {
-      days = "${local.expiration_days}"
+      days = local.expiration_days
     }
   }
 
-  tags = "${merge(local.tags, map("Name", "${local.bucket_name}"))}"
+  tags = merge(
+    local.tags,
+    {
+      "Name" = local.bucket_name
+    },
+  )
 }
+

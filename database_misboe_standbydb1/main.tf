@@ -1,11 +1,8 @@
 terraform {
   # The configuration for this backend will be filled in by Terragrunt
-  backend "s3" {}
-}
-
-provider "aws" {
-  region  = "${var.region}"
-  version = "~> 2.65"
+  # The configuration for this backend will be filled in by Terragrunt
+  backend "s3" {
+  }
 }
 
 ####################################################
@@ -17,10 +14,10 @@ provider "aws" {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
 
-  config {
-    bucket = "${var.remote_state_bucket_name}"
+  config = {
+    bucket = var.remote_state_bucket_name
     key    = "vpc/terraform.tfstate"
-    region = "${var.region}"
+    region = var.region
   }
 }
 
@@ -30,10 +27,10 @@ data "terraform_remote_state" "vpc" {
 data "terraform_remote_state" "vpc_security_groups" {
   backend = "s3"
 
-  config {
-    bucket = "${var.remote_state_bucket_name}"
+  config = {
+    bucket = var.remote_state_bucket_name
     key    = "security-groups/terraform.tfstate"
-    region = "${var.region}"
+    region = var.region
   }
 }
 
@@ -43,10 +40,10 @@ data "terraform_remote_state" "vpc_security_groups" {
 data "terraform_remote_state" "common" {
   backend = "s3"
 
-  config {
-    bucket = "${var.remote_state_bucket_name}"
+  config = {
+    bucket = var.remote_state_bucket_name
     key    = "${var.environment_type}/common/terraform.tfstate"
-    region = "${var.region}"
+    region = var.region
   }
 }
 
@@ -56,10 +53,10 @@ data "terraform_remote_state" "common" {
 data "terraform_remote_state" "s3-oracledb-backups" {
   backend = "s3"
 
-  config {
-    bucket = "${var.remote_state_bucket_name}"
+  config = {
+    bucket = var.remote_state_bucket_name
     key    = "s3/oracledb-backups/terraform.tfstate"
-    region = "${var.region}"
+    region = var.region
   }
 }
 
@@ -69,10 +66,10 @@ data "terraform_remote_state" "s3-oracledb-backups" {
 data "terraform_remote_state" "iam" {
   backend = "s3"
 
-  config {
-    bucket = "${var.remote_state_bucket_name}"
+  config = {
+    bucket = var.remote_state_bucket_name
     key    = "${var.environment_type}/iam/terraform.tfstate"
-    region = "${var.region}"
+    region = var.region
   }
 }
 
@@ -82,10 +79,10 @@ data "terraform_remote_state" "iam" {
 data "terraform_remote_state" "security-groups" {
   backend = "s3"
 
-  config {
-    bucket = "${var.remote_state_bucket_name}"
+  config = {
+    bucket = var.remote_state_bucket_name
     key    = "${var.environment_type}/security-groups/terraform.tfstate"
-    region = "${var.region}"
+    region = var.region
   }
 }
 
@@ -95,10 +92,10 @@ data "terraform_remote_state" "security-groups" {
 data "terraform_remote_state" "misboe-db-1" {
   backend = "s3"
 
-  config {
-    bucket = "${var.remote_state_bucket_name}"
+  config = {
+    bucket = var.remote_state_bucket_name
     key    = "${var.environment_type}/database_misboe/terraform.tfstate"
-    region = "${var.region}"
+    region = var.region
   }
 }
 
@@ -112,7 +109,7 @@ data "aws_ami" "centos_oracle_db" {
 
   filter {
     name   = "name"
-    values = ["${var.db_aws_ami}"]
+    values = [var.db_aws_ami]
   }
 
   filter {
@@ -125,3 +122,4 @@ data "aws_ami" "centos_oracle_db" {
     values = ["ebs"]
   }
 }
+

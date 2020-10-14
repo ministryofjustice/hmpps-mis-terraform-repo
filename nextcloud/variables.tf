@@ -1,4 +1,5 @@
-variable "region" {}
+variable "region" {
+}
 
 variable "remote_state_bucket_name" {
   description = "Terraform remote state bucket name"
@@ -8,9 +9,11 @@ variable "environment_type" {
   description = "environment"
 }
 
-variable "nextcloud_instance_type" {}
+variable "nextcloud_instance_type" {
+}
 
-variable "bastion_inventory" {}
+variable "bastion_inventory" {
+}
 
 variable "nextcloud_instance_count" {
   default = "1"
@@ -39,7 +42,6 @@ variable "connection_draining_timeout" {
 
 variable "nextcloud_health_check" {
   description = "A health check block"
-  type        = "list"
   default     = []
 }
 
@@ -70,13 +72,13 @@ variable "family" {
 
 variable "parameters" {
   description = "A list of DB parameters (map) to apply"
-  type = "list"
+  type = list(map(string))
   default = [
     {
       name         = "tx_isolation"
       value        = "READ-COMMITTED"
       apply_method = "pending-reboot"
-    }
+    },
   ]
 }
 
@@ -97,7 +99,7 @@ variable "major_engine_version" {
 }
 
 variable "options" {
-  type        = "list"
+  type        = list(string)
   description = "A list of Options to apply."
   default     = []
 }
@@ -197,7 +199,7 @@ variable "mariadb_backup_retention_period" {
 
 variable "backup_window" {
   description = "The daily time range (in UTC) during which automated backups are created if they are enabled. Example: '09:46-10:16'. Must not overlap with maintenance_window"
-  default = "03:00-06:00"
+  default     = "03:00-06:00"
 }
 
 variable "mariadb_monitoring_interval" {
@@ -215,17 +217,18 @@ variable "character_set_name" {
 }
 
 variable "tags" {
-  type = "map"
+  type = map(string)
 }
 
 variable "snap_tag" {
   default = "Name"
 }
 
-variable "environment_name" {}
+variable "environment_name" {
+}
 
 variable "ebs_backup" {
-  type = "map"
+  type = map(string)
 
   default = {
     schedule           = "cron(0 01 * * ? *)"

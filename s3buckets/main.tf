@@ -1,11 +1,8 @@
 terraform {
   # The configuration for this backend will be filled in by Terragrunt
-  backend "s3" {}
-}
-
-provider "aws" {
-  region  = "${var.region}"
-  version = "~> 2.65"
+  # The configuration for this backend will be filled in by Terragrunt
+  backend "s3" {
+  }
 }
 
 ####################################################
@@ -17,10 +14,10 @@ provider "aws" {
 data "terraform_remote_state" "common" {
   backend = "s3"
 
-  config {
-    bucket = "${var.remote_state_bucket_name}"
+  config = {
+    bucket = var.remote_state_bucket_name
     key    = "${var.environment_type}/common/terraform.tfstate"
-    region = "${var.region}"
+    region = var.region
   }
 }
 
@@ -29,9 +26,9 @@ data "terraform_remote_state" "common" {
 ####################################################
 
 locals {
-  region      = "${var.region}"
-  common_name = "${data.terraform_remote_state.common.common_name}"
-  tags        = "${data.terraform_remote_state.common.common_tags}"
+  region      = var.region
+  common_name = data.terraform_remote_state.common.outputs.common_name
+  tags        = data.terraform_remote_state.common.outputs.common_tags
 }
 
 ####################################################
@@ -39,6 +36,7 @@ locals {
 ####################################################
 module "s3bucket" {
   source      = "../modules/s3bucket"
-  common_name = "${local.common_name}"
-  tags        = "${local.tags}"
+  common_name = local.common_name
+  tags        = local.tags
 }
+

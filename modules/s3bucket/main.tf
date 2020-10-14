@@ -7,8 +7,8 @@
 ####################################################
 
 locals {
-  common_name = "${var.common_name}"
-  tags        = "${var.tags}"
+  common_name = var.common_name
+  tags        = var.tags
 }
 
 ############################################
@@ -20,7 +20,8 @@ locals {
 # #-------------------------------------------
 
 module "s3bucket" {
-  source         = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git?ref=master//modules//s3bucket//s3bucket_without_policy"
+  source         = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git//modules/s3bucket/s3bucket_without_policy?ref=terraform-0.12"
   s3_bucket_name = "${local.common_name}-artefacts"
-  tags           = "${local.tags}"
+  tags           = local.tags
 }
+

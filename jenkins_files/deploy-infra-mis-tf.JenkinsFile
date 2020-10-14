@@ -92,7 +92,7 @@ def debug_env(git_project_dir, git_version) {
 def prepare_env() {
     sh '''
     #!/usr/env/bin bash
-    docker pull mojdigitalstudio/hmpps-terraform-builder-0-11-14:latest
+    docker pull mojdigitalstudio/hmpps-terraform-builder-0-12:latest
     '''
 }
 
@@ -109,7 +109,7 @@ def plan_submodule(config_dir, env_name, git_project_dir, submodule_name, db_hig
         -v `pwd`:/home/tools/data \
         -v ~/.aws:/home/tools/.aws \
         --env TF_VAR_high_availability_count \
-        mojdigitalstudio/hmpps-terraform-builder-0-11-14  \
+        mojdigitalstudio/hmpps-terraform-builder-0-12  \
         bash -c "\
             source env_configs/${env_name}/${env_name}.properties; \
             cd ${submodule_name}; \
@@ -145,7 +145,7 @@ def apply_submodule(config_dir, env_name, git_project_dir, submodule_name, db_hi
           -v `pwd`:/home/tools/data \
           -v ~/.aws:/home/tools/.aws \
           --env TF_VAR_high_availability_count \
-          mojdigitalstudio/hmpps-terraform-builder-0-11-14  \
+          mojdigitalstudio/hmpps-terraform-builder-0-12  \
           bash -c "\
               source env_configs/${env_name}/${env_name}.properties; \
               cd ${submodule_name}; \
@@ -298,7 +298,6 @@ pipeline {
         }
 
      stage('Delius | MIS Common')          { steps { script {do_terraform(project.config, environment_name, project.mis, 'common', mis_db_high_availability_count)}}}
-     stage('Delius | MIS Certs')           { steps { script {do_terraform(project.config, environment_name, project.mis, 'certs', mis_db_high_availability_count)}}}
      stage('Delius | MIS s3buckets')       { steps { script {do_terraform(project.config, environment_name, project.mis, 's3buckets', mis_db_high_availability_count)}}}
      stage('Delius | MIS iam')             { steps { script {do_terraform(project.config, environment_name, project.mis, 'iam', mis_db_high_availability_count)}}}
      stage('Delius | MIS security-groups') { steps { script {do_terraform(project.config, environment_name, project.mis, 'security-groups', mis_db_high_availability_count)}}}
@@ -448,15 +447,13 @@ pipeline {
        }
      }
 
-     stage('Provision Servers') {
-       parallel {
-         stage('Delius | MIS ec2-ndl-dis') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis', mis_db_high_availability_count)}}}
-         stage('Delius | MIS ec2-ndl-bcs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs', mis_db_high_availability_count)}}}
-         stage('Delius | MIS ec2-ndl-bfs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs', mis_db_high_availability_count)}}}
-         stage('Delius | MIS ec2-ndl-bps') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps', mis_db_high_availability_count)}}}
-         stage('Delius | MIS ec2-ndl-bws') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws', mis_db_high_availability_count)}}}
-       }
-     }
+     stage('Delius | MIS ec2-ndl-dis') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-dis', mis_db_high_availability_count)}}}
+     stage('Delius | MIS ec2-ndl-bcs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bcs', mis_db_high_availability_count)}}}
+     stage('Delius | MIS ec2-ndl-bfs') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bfs', mis_db_high_availability_count)}}}
+     stage('Delius | MIS ec2-ndl-bps') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bps', mis_db_high_availability_count)}}}
+     stage('Delius | MIS ec2-ndl-bws') { steps { script {do_terraform(project.config, environment_name, project.mis, 'ec2-ndl-bws', mis_db_high_availability_count)}}}
+
+
      stage('Build Database High Availibilty') {
        parallel {
          stage('Build MIS DB HA')    {
