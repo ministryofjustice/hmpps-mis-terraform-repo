@@ -22,6 +22,11 @@ variable "s3_oracledb_backups_arn" {
   default     = ""
 }
 
+variable "s3_ssm_ansible_arn" {
+  description = "ssm docs s3 bucket arn"
+  default     = ""
+}
+
 variable "delius-deps-bucket" {
   description = "delius dependencies in Engineering AWS Account name S3 bucket name"
   default     = ""
