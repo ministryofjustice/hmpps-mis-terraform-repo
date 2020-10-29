@@ -11,6 +11,7 @@ locals {
   s3-config-bucket        = var.s3-config-bucket
   artefact-bucket         = var.artefact-bucket
   s3_oracledb_backups_arn = var.s3_oracledb_backups_arn
+  s3_ssm_ansible_arn      = var.s3_ssm_ansible_arn
   delius-deps-bucket      = var.delius-deps-bucket
   migration-bucket        = var.migration-bucket
   region                  = var.region
@@ -32,6 +33,7 @@ data "template_file" "iam_policy_app_int" {
     s3-config-bucket        = local.s3-config-bucket
     s3-artefact-bucket      = local.artefact-bucket
     s3_oracledb_backups_arn = local.s3_oracledb_backups_arn
+    s3_ssm_ansible_arn      = local.s3_ssm_ansible_arn
     delius-deps-bucket      = local.delius-deps-bucket
     migration-bucket        = local.migration-bucket
     app_role_arn            = module.create-iam-app-role-int.iamrole_arn
