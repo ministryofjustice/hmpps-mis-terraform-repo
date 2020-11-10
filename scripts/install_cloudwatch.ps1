@@ -2,10 +2,10 @@
 #--------------------------------------------------------------------------
 # create temp folder for downloading amazon cloudwatch agent
 #--------------------------------------------------------------------------
-New-Item c:\temp -ItemType Directory -ErrorAction Ignore
-Invoke-WebRequest -Uri 'https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi' -OutFile 'c:\temp\amazon-cloudwatch-agent.msi'
+#New-Item c:\temp -ItemType Directory -ErrorAction Ignore
+Invoke-WebRequest -Uri 'https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi' -OutFile 'c:\cloudwatch_installer\amazon-cloudwatch-agent.msi'
 #--------------------------------------------------------------------------
-Start-Process msiexec.exe -Wait -ArgumentList '/i c:\temp\amazon-cloudwatch-agent.msi'
+Start-Process msiexec.exe -Wait -ArgumentList '/i c:\cloudwatch_installer\amazon-cloudwatch-agent.msi'
 #--------------------------------------------------------------------------
 # start agent (for testing)
 #--------------------------------------------------------------------------

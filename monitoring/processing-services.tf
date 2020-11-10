@@ -42,6 +42,7 @@ module "PROCTIER001_WebIntelligenceProcessingServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER001WebIntelligenceProcessingServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER001_WebIntelligenceProcessingServer} ${local.started_message}"
+  alarm_threshold       = "3"
 }
 
 module "PROCTIER001_AdaptiveJobServer" {
@@ -117,6 +118,7 @@ module "PROCTIER002_WebIntelligenceProcessingServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER002WebIntelligenceProcessingServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER002_WebIntelligenceProcessingServer} ${local.started_message}"
+  alarm_threshold       = "3"
 }
 
 module "PROCTIER002_AdaptiveJobServer" {
@@ -192,6 +194,7 @@ module "PROCTIER003_WebIntelligenceProcessingServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER003WebIntelligenceProcessingServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER003_WebIntelligenceProcessingServer} ${local.started_message}"
+  alarm_threshold       = "3"
 }
 
 module "PROCTIER003_AdaptiveJobServer" {
@@ -249,4 +252,3 @@ module "PROCTIER003_ConnectionServer32" {
   metric_name     = "PROCTIER003ConnectionServer32"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER003_ConnectionServer32} ${local.started_message}"
 }
-

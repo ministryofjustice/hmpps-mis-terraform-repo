@@ -38,3 +38,6 @@ variable "pattern_ok" {
   description = "Patten for OK Alerts. Must include INFO log level only"
 }
 
+variable "alarm_threshold" {
+  default = "1"
+}

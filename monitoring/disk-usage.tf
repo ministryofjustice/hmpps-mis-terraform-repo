@@ -64,18 +64,18 @@ module "bps" {
 }
 
 module "bcs" {
-    source             = "../modules/disk-usage-alarms/"
-    component          = "BCS"
-    objectname         = "LogicalDisk"
-    alert_threshold    = "25"
-    critical_threshold = "5"
-    period             = "60"
-    environment_name   = local.environment_name
-    instance_ids       = local.bcs_instance_ids
-    primary_dns_ext    = local.bcs_primary_dns_ext
-    ami_id             = local.bcs_ami_id
-    instance_type      = local.bcs_instance_type
-    sns_topic          = local.sns_topic
+  source             = "../modules/disk-usage-alarms/"
+  component          = "BCS"
+  objectname         = "LogicalDisk"
+  alert_threshold    = "25"
+  critical_threshold = "5"
+  period             = "60"
+  environment_name   = local.environment_name
+  instance_ids       = local.bcs_instance_ids
+  primary_dns_ext    = local.bcs_primary_dns_ext
+  ami_id             = local.bcs_ami_id
+  instance_type      = local.bcs_instance_type
+  sns_topic          = local.sns_topic
 }
 
 module "bfs" {
