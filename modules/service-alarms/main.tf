@@ -7,7 +7,7 @@ resource "aws_cloudwatch_metric_alarm" "mis_service_alarm" {
   namespace           = var.name_space
   period              = "60"
   statistic           = "Sum"
-  threshold           = "1"
+  threshold           = var.alarm_threshold
   alarm_description   = "${var.service_name} Service in Error state on ${var.host}. ${var.mis_team_action}"
   alarm_actions       = [var.alarm_actions]
   treat_missing_data  = "notBreaching"
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "mis_service_alarm_OK" {
   namespace           = var.name_space
   period              = "60"
   statistic           = "Sum"
-  threshold           = "1"
+  threshold           = var.alarm_threshold
   alarm_description   = "${var.service_name} Service in Error state on ${var.host}. ${var.mis_team_action}"
   alarm_actions       = [var.alarm_actions]
   treat_missing_data  = "notBreaching"
@@ -55,4 +55,3 @@ resource "aws_cloudwatch_log_metric_filter" "mis_service_metric_OK" {
     value     = "1"
   }
 }
-
