@@ -564,7 +564,6 @@ pipeline {
         }
       }
     }
-     stage('Oracle SSM Agent') { steps { build job: "DAMS/Environments/${env.ENVIRONMENT}/MIS/Install SSM Agent on Oracle Databases" }}
      stage('Delius | MIS monitoring')      { steps { script {do_terraform(project.config, environment_name, project.mis, 'monitoring', mis_db_high_availability_count)}}}
      stage('Smoke test') { steps { build job: "DAMS/Environments/${environment_name}/MIS/Smoke_test", parameters: [[$class: 'StringParameterValue', name: 'environment_name', value: "${environment_name}"]]}}
     }
