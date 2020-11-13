@@ -76,6 +76,8 @@ locals {
   s3_ssm_ansible_arn      = data.terraform_remote_state.ci_common.outputs.ssm_ansible_bucket.arn
   runtime_role            = var.cross_account_iam_role
   account_id              = data.terraform_remote_state.common.outputs.common_account_id
+  environment_name        = var.environment_name
+  project_name            = var.project_name
 }
 
 ####################################################
@@ -209,3 +211,52 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
   role       = module.mis_db.iam_policy_int_app_role_name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
+
+
+
+
+data "template_file" "mis_ec2_ssm_parameterstore_read" {
+  template = "${file("./ssm-paramstore-policy.tpl")}"
+
+  vars = {
+    account_number     = local.account_id
+    environment_name   = local.environment_name
+    application_name   = local.project_name
+  }
+}
+
+# "Resource": "arn:aws:ssm:eu-west-2:{account_number}:parameter//${environment_name}/${application_name}/mis-activedirectory/ad/*"
+# "Resource": "arn:aws:ssm:eu-west-2:479759138745:parameter//delius-mis-dev/delius/mis-activedirectory/ad/*"
+resource "aws_iam_policy" "mis_ec2_ssm_parameterstore_read" {
+  name        = "${var.environment_type}-mis-aws-ssm-policy"
+  path        = "/"
+  description = "${var.environment_type}-mis-aws-ssm-policy"
+  policy      = data.template_file.mis_ec2_ssm_parameterstore_read.rendered
+}
+
+resource "aws_iam_role_policy_attachment" "mis_ec2_ssm_parameterstore_read" {
+  role       = module.iam.iam_policy_int_app_role_name
+  policy_arn = aws_iam_policy.mis_ec2_ssm_parameterstore_read.arn
+}
+
+
+# resource "aws_iam_policy" "mis_ec2_ssm_parameterstore_read" {
+#   name        = "${var.environment_type}-mis-aws-backup-pass-role-policy"
+#   path        = "/"
+#   description = "${var.environment_type}-mis-aws-backup-pass-role-policy"
+
+#   policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Sid": "VisualEditor0",
+#             "Effect": "Allow",
+#             "Action": "ssm:GetParametersByPath",
+#             "Resource": "arn:aws:ssm:eu-west-2:479759138745:parameter//delius-mis-dev/delius/mis-activedirectory/ad/*"
+#         }
+#     ]
+# }
+# EOF
+
+# }
