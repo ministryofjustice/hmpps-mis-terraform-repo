@@ -25,7 +25,7 @@ case "${ENV_TYPE}" in
                ;;
     stage)     ACCOUNT_ID="205048117103"
     ;;
-    pre-prod)  ACCOUNT_ID="010587221707 "
+    pre-prod)  ACCOUNT_ID="010587221707"
     ;;
     prod)      ACCOUNT_ID="050243167760"
     ;;
