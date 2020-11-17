@@ -140,8 +140,7 @@ data "aws_ami" "amazon_ami" {
 
   filter {
     name   = "name"
-    ##values = ["HMPPS Nextcloud master *"]
-    values = ["HMPPS Nextcloud master 1597164042"]  ##Temp lock AMI pending Nextcloud upgrade
+    values = ["HMPPS Nextcloud master *"]
   }
 
   filter {
