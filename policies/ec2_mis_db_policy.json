@@ -66,21 +66,13 @@
     },
     {
       "Effect": "Allow",
-      "Sid": "allowSSMReadOnly",
-      "Action": [
-        "ssm:Describe*",
-        "ssm:Get*",
-        "ssm:List*"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
       "Sid": "allowSSMUpdate",
       "Action": [
         "ssm:PutParameter"
       ],
-      "Resource": "*"
+      "Resource": [
+        "*"
+      ]
     },
     {
       "Sid": "allowRoute53Update",
