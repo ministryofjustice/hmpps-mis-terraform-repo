@@ -64,10 +64,14 @@
         "${s3_oracledb_backups_arn}/*"
       ]
     },
+    
     {
       "Effect": "Allow",
       "Sid": "allowSSMUpdate",
       "Action": [
+        "ssm:Describe*",
+        "ssm:Get*",
+        "ssm:List*",
         "ssm:PutParameter"
       ],
       "Resource": [
