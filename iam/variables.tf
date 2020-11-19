@@ -23,3 +23,10 @@ variable "migration_bucket_arn" {
   description = "arn for Migration S3 bucket in the Engineering AWS Account"
 }
 
+variable "environment_name" {
+  description = "environment name"
+}
+
+variable "project_name" {
+  description = "project name"
+}
