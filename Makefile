@@ -12,3 +12,8 @@ terraform_plan:
 
 terraform_apply: terraform_plan
 	./run.sh $(ENVIRONMENT_NAME) apply $(component)  || (exit $$?)
+
+get_configs:
+	rm -rf env_configs
+	git config --global advice.detachedHead false
+	git clone -b $(ENV_CONFIGS_VERSION) $(ENV_CONFIGS_REPO) env_configs

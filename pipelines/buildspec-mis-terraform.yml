@@ -1,7 +1,16 @@
 ---
 version: 0.2
+env:
+  variables:
+    - ENV_CONFIGS_REPO: "https://github.com/ministryofjustice/hmpps-env-configs.git"
+  parameters-store:
+    - ENV_CONFIGS_VERSION: "/versions/mis/repo/hmpps-env-configs/$ENVIRONMENT_NAME"
 phases:
+  pre_build:
+    commands:
+      - make get_configs
   build:
     commands:
+      - echo $ENV_CONFIGS_VERSION
       - export HMPPS_BUILD_WORK_DIR=${CODEBUILD_SRC_DIR}
       - make ${ACTION_TYPE} component=${COMPONENT}
