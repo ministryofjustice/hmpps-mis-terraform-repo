@@ -14,9 +14,8 @@ terraform_apply: terraform_plan
 	./run.sh $(ENVIRONMENT_NAME) apply $(component)  || (exit $$?)
 
 get_configs:
+	CONFIGS_VERSION=$(aws ssm get-parameters --names $CONFIGS_VERSION_PARAM --region ${TF_VAR_region} --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+	echo "env_configs Version: $CONFIGS_VERSION"
 	rm -rf env_configs
 	git config --global advice.detachedHead false
 	git clone -b $(ENV_CONFIGS_VERSION) $(ENV_CONFIGS_REPO) env_configs
-	pwd
-	ls env_configs
-	#git describe --tags && cd CODEBUILD_SRC_DIR
