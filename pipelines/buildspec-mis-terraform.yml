@@ -3,7 +3,6 @@ version: 0.2
 env:
   variables:
     ENV_CONFIGS_REPO: "https://github.com/ministryofjustice/hmpps-env-configs.git"
-    CONFIGS_VERSION_PARAM: "/versions/mis/repo/hmpps-env-configs/$ENVIRONMENT_NAME"
   parameter-store:
     ENV_CONFIGS_VERSION: "/versions/mis/repo/hmpps-env-configs/$ENVIRONMENT_NAME"
 phases:
