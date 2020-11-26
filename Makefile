@@ -17,5 +17,6 @@ get_configs:
 	rm -rf env_configs
 	git config --global advice.detachedHead false
 	git clone -b $(ENV_CONFIGS_VERSION) $(ENV_CONFIGS_REPO) env_configs
-	cd env_configs
-	git describe --tags && cd CODEBUILD_SRC_DIR
+	pwd
+	ls env_configs
+	#git describe --tags && cd CODEBUILD_SRC_DIR
