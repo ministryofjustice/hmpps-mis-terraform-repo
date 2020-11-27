@@ -125,7 +125,7 @@ elif [ ${JOB_TYPE} = "db-restore" ] && [ -z "$BACKUP_DATE" ];
 then
     echo "JOB_TYPE : db-restore requires date parameter Format: YYYY-MM-DD. Please update SSM Parameter: $BACKUP_DATE_PARAM"
     exit 1
-elif [ "$BACKUP_DATE" = "null" ];
+elif [ ${JOB_TYPE} = "db-restore" ] && [ "$BACKUP_DATE" = "null" ];
 then
     echo "Please update SSM Parameter: $BACKUP_DATE_PARAM with restore date, Format: YYYY-MM-DD"
     exit 1
