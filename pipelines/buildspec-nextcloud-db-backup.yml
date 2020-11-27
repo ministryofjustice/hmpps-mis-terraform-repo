@@ -1,8 +1,5 @@
 ---
 version: 0.2
-env:
-  variables:
-    BACKUP_DATE_PARAM: "/$ENV_TYPE/nextcloud/db/restore/timestamp"
 phases:
   build:
     commands:

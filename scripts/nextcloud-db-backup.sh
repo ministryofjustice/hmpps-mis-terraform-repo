@@ -109,6 +109,7 @@ esac
 BACKUP_DIR="/home/tools/data/backup"
 JOB_TYPE=$1
 TG_ENVIRONMENT_TYPE=${2}
+BACKUP_DATE_PARAM="/${TG_ENVIRONMENT_TYPE}/nextcloud/db/restore/timestamp"
 BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region ${TF_VAR_region} --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 
 set_env_stage
