@@ -143,5 +143,6 @@ then
     echo "Please update SSM Parameter: $BACKUP_DATE_PARAM with restore date, Format: YYYY-MM-DD"
     exit 1
 fi
-
+echo "BACKUP_DATE_PARAM is $BACKUP_DATE_PARAM"
+echo "TG_ENVIRONMENT_TYPE ${TG_ENVIRONMENT_TYPE}"
 db_backup_restore
