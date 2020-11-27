@@ -97,9 +97,6 @@ case "${JOB_TYPE}" in
                mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME < $SQL_FILE && echo "DB Restore Successfull" || exit 1
                # delete sql file
                rm -rf ${SQL_FILE}
-               #Reset SSN Parameter to null after restore, to prevent accidental Restore
-               #Script will fail if value is null
-               echo "Please ResetSSM Parameter: $BACKUP_DATE_PARAM to value: null "
                ;;
     *)         echo "${JOB_TYPE} argument is not a valid argument. db-backup | db-restore"
                ;;
@@ -112,17 +109,8 @@ esac
 BACKUP_DIR="/home/tools/data/backup"
 JOB_TYPE=$1
 RESTORE_ENVIRONMENT=${2}
-
-set_env_stage
-
 BACKUP_DATE_PARAM="/${RESTORE_ENVIRONMENT}/nextcloud/db/restore/timestamp"
-BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region ${TG_REGION} --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
-DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
-DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
-NEXT_CLOUD_DB_NAME="nextcloud"
-NEXTCLOUD_BACKUP_BUCKET="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-backups"
-PREFIX_DATE=$(date +%F)
-SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
+BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 
 ##Check args provided
 if [ -z "${JOB_TYPE}" ];
@@ -142,5 +130,19 @@ then
     echo "Please update SSM Parameter: $BACKUP_DATE_PARAM with restore date, Format: YYYY-MM-DD"
     exit 1
 fi
+
+#Reset SSM Parameter to null setting BACKUP_DATE var , to prevent accidental Restore
+#Script will fail if value is null
+echo "Resetting SSM Parameter $BACKUP_DATE_PARAM to value: null to prevent accidental restore"
+aws ssm put-parameter --name "$BACKUP_DATE_PARAM" --type "String" --value "null" --overwrite --region eu-west-2
+
+set_env_stage
+
+DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
+DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
+NEXT_CLOUD_DB_NAME="nextcloud"
+NEXTCLOUD_BACKUP_BUCKET="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-backups"
+PREFIX_DATE=$(date +%F)
+SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
 
 db_backup_restore
