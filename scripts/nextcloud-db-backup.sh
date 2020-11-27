@@ -133,7 +133,7 @@ fi
 
 #Reset SSM Parameter to null setting BACKUP_DATE var , to prevent accidental Restore
 #Script will fail if value is null
-echo "Resetting SSM Parameter $BACKUP_DATE_PARAM to value: null to prevent accidental restore"
+echo "Resetting SSM Parameter $BACKUP_DATE_PARAM to value: null to prevent future accidental restore"
 aws ssm put-parameter --name "$BACKUP_DATE_PARAM" --type "String" --value "null" --overwrite --region eu-west-2
 
 set_env_stage
