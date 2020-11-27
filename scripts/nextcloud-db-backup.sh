@@ -134,5 +134,4 @@ then
     exit 1
 fi
 echo "Checking ip Address"
-ip a
 db_backup_restore
