@@ -19,4 +19,4 @@ get_configs:
 	git clone -b $(ENV_CONFIGS_VERSION) $(ENV_CONFIGS_REPO) env_configs
 
 db-backup:
-	scripts/nextcloud_db_backup.sh $(ACTION_TYPE) $(ENV_TYPE)
+	scripts/nextcloud-db-backup.sh $(ACTION_TYPE) $(ENV_TYPE)
