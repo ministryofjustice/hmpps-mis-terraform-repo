@@ -113,6 +113,7 @@ esac
 BACKUP_DIR="/home/tools/data/backup"
 JOB_TYPE=$1
 TG_ENVIRONMENT_TYPE=${2}
+echo " TG_ENVIRONMENT_TYPE preSource is $TG_ENVIRONMENT_TYPE"
 
 set_env_stage
 
