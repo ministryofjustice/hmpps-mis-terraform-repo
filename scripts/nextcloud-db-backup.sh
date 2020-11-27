@@ -10,29 +10,21 @@ exit_on_error() {
   fi
 }
 
-
 ###set environment
 set_env_stage ()
 {
   env_config_dir="${CODEBUILD_SRC_DIR}/env_configs"
-
   echo "Output -> clone configs stage"
   rm -rf ${env_config_dir}
   echo "Output ---> Cloning branch: master"
   git clone https://github.com/ministryofjustice/hmpps-env-configs.git ${env_config_dir}
   exit_on_error $? !!
-
   echo "Output -> environment stage"
-
   echo "Output -> environment_type set to: ${TG_ENVIRONMENT_TYPE}"
-
   source ${env_config_dir}/${TG_ENVIRONMENT_TYPE}/${TG_ENVIRONMENT_TYPE}.properties
   exit_on_error $? !!
-
   echo "Using IAM role: ${TERRAGRUNT_IAM_ROLE}"
-
   export OUTPUT_FILE="${env_config_dir}/temp_creds"
-
   export temp_role=$(aws sts assume-role --role-arn ${TERRAGRUNT_IAM_ROLE} --role-session-name testing --duration-seconds 3600 )
 }
 
@@ -57,16 +49,12 @@ case "${JOB_TYPE}" in
                DB_USER=$(aws ssm get-parameters --region ${TG_REGION} --names "${DB_USER_PARAM}" --query "Parameters[0]"."Value" --output text) || exit 1
                DB_PASS=$(aws ssm get-parameters --with-decryption --names $DB_PASS_PARAM --region ${TG_REGION}  --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:') || exit 1
                DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud"
-
-
                DB_HOST=$(aws rds describe-db-instances --region ${TG_REGION} --db-instance-identifier ${DB_IDENTIFIER} --query 'DBInstances[*].[Endpoint]' | grep Address | awk '{print $2}' | sed 's/"//g')
                exit_on_error $? !!
-
                mkdir $BACKUP_DIR
 
                # Perform db backup
                echo "Performing DB Backup"
-               echo "mysqldump -u $DB_USER -h $DB_HOST $NEXT_CLOUD_DB_NAME > $SQL_FILE"
                mysqldump -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME > $SQL_FILE
                exit_on_error $? !!
                echo "DB Backup complete"
@@ -94,25 +82,19 @@ case "${JOB_TYPE}" in
                DB_IDENTIFIER="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud"
                DB_HOST=$(aws rds describe-db-instances --region ${TG_REGION} --db-instance-identifier ${DB_IDENTIFIER} --query 'DBInstances[*].[Endpoint]' | grep Address | awk '{print $2}' | sed 's/"//g')
                exit_on_error $? !!
-
                echo "Creating Backup DIR --$BACKUP_DIR"
                mkdir $BACKUP_DIR
-
                #Download backup from s3
                echo "Downloading backup file from date ${BACKUP_DATE}"
                aws s3 cp --only-show-errors s3://${NEXTCLOUD_BACKUP_BUCKET}/nextcloud_db_backups/${BACKUP_DATE}/${NEXT_CLOUD_DB_NAME}.sql  ${BACKUP_DIR}   && echo "Backup file copied successfully" || exit 1
-
                ###Clean Database
                echo "Dropping Nextcloud DB"
                mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST  -e "DROP DATABASE ${NEXT_CLOUD_DB_NAME}"  && echo "DB Dropped successfully" || exit 1
-
                echo "Creating fresh Nextcloud DB"
                mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST  -e "CREATE DATABASE ${NEXT_CLOUD_DB_NAME}" && echo "DB creation Successfull" || exit 1
-
                #Restore db
                echo "Restoring Nextcloud DB from backup dated: ${BACKUP_DATE} "
                mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME < $SQL_FILE && echo "DB Restore Successfull" || exit 1
-
                # delete sql file
                rm -rf ${SQL_FILE}
                ;;
@@ -130,14 +112,12 @@ TG_ENVIRONMENT_TYPE=${2}
 BACKUP_DATE=${3}
 set_env_stage
 
-
 DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
 DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
 NEXT_CLOUD_DB_NAME="nextcloud"
 NEXTCLOUD_BACKUP_BUCKET="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-backups"
 PREFIX_DATE=$(date +%F)
 SQL_FILE="${BACKUP_DIR}/nextcloud.sql"
-
 
 ##Check args provided
 if [ -z "${JOB_TYPE}" ];
