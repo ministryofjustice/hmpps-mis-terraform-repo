@@ -133,5 +133,5 @@ then
     echo "JOB_TYPE : db-restore requires date parameter Format: YYYY-MM-DD"
     exit 1
 fi
-echo "Checking ip Address"
+
 db_backup_restore
