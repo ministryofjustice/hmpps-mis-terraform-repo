@@ -109,8 +109,12 @@ esac
 BACKUP_DIR="/home/tools/data/backup"
 JOB_TYPE=$1
 RESTORE_ENVIRONMENT=${2}
-BACKUP_DATE_PARAM="/${RESTORE_ENVIRONMENT}/nextcloud/db/restore/timestamp"
-BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+
+if [ "${JOB_TYPE}" = "db-restore" ];
+then
+   BACKUP_DATE_PARAM="/${RESTORE_ENVIRONMENT}/nextcloud/db/restore/timestamp"
+   BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+fi
 
 ##Check args provided
 if [ -z "${JOB_TYPE}" ];
@@ -133,8 +137,11 @@ fi
 
 #Reset SSM Parameter to null setting BACKUP_DATE var , to prevent accidental Restore
 #Script will fail if value is null
-echo "Resetting SSM Parameter $BACKUP_DATE_PARAM to value: null to prevent future accidental restore"
-aws ssm put-parameter --name "$BACKUP_DATE_PARAM" --type "String" --value "null" --overwrite --region eu-west-2
+if [ "${JOB_TYPE}" = "db-restore" ];
+then
+  echo "Resetting SSM Parameter $BACKUP_DATE_PARAM to value: null to prevent future accidental restore"
+  aws ssm put-parameter --name "$BACKUP_DATE_PARAM" --type "String" --value "null" --overwrite --region eu-west-2
+fi
 
 set_env_stage
 
