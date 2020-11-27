@@ -99,6 +99,7 @@ case "${JOB_TYPE}" in
                rm -rf ${SQL_FILE}
                #Reset SSN Parameter to null after restore, to prevent accidental Restore
                #Script will fail if value is null
+               echo "Resetting SSM Parameter $BACKUP_DATE_PARAM to value: null "
                aws ssm put-parameter --name "$BACKUP_DATE_PARAM" --type "String" --value "null" --overwrite --region ${TG_REGION}
                ;;
     *)         echo "${JOB_TYPE} argument is not a valid argument. db-backup | db-restore"
