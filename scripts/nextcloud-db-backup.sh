@@ -20,8 +20,8 @@ set_env_stage ()
   git clone https://github.com/ministryofjustice/hmpps-env-configs.git ${env_config_dir}
   exit_on_error $? !!
   echo "Output -> environment stage"
-  echo "Output -> environment_type set to: ${TG_ENVIRONMENT_TYPE}"
-  source ${env_config_dir}/${TG_ENVIRONMENT_TYPE}/${TG_ENVIRONMENT_TYPE}.properties
+  echo "Output -> environment_type set to: $RESTORE_ENVIRONMENT"
+  source ${env_config_dir}/${RESTORE_ENVIRONMENT}/${RESTORE_ENVIRONMENT}.properties
   exit_on_error $? !!
   echo "Using IAM role: ${TERRAGRUNT_IAM_ROLE}"
   export OUTPUT_FILE="${env_config_dir}/temp_creds"
@@ -112,12 +112,11 @@ esac
 #Vars
 BACKUP_DIR="/home/tools/data/backup"
 JOB_TYPE=$1
-TG_ENVIRONMENT_TYPE=${2}
-echo " TG_ENVIRONMENT_TYPE preSource is $TG_ENVIRONMENT_TYPE"
+RESTORE_ENVIRONMENT=${2}
 
 set_env_stage
 
-BACKUP_DATE_PARAM="/${TG_ENVIRONMENT_TYPE}/nextcloud/db/restore/timestamp"
+BACKUP_DATE_PARAM="/${RESTORE_ENVIRONMENT}/nextcloud/db/restore/timestamp"
 BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region ${TG_REGION} --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
 DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
@@ -131,9 +130,9 @@ if [ -z "${JOB_TYPE}" ];
 then
     echo "JOB_TYPE argument not supplied."
     exit 1
-elif [ -z "${TG_ENVIRONMENT_TYPE}" ];
+elif [ -z "${RESTORE_ENVIRONMENT}" ];
 then
-    echo "TG_ENVIRONMENT_TYPE argument not supplied."
+    echo "ENVIRONMENT argument not supplied."
     exit 1
 elif [ ${JOB_TYPE} = "db-restore" ] && [ -z "$BACKUP_DATE" ];
 then
@@ -144,6 +143,5 @@ then
     echo "Please update SSM Parameter: $BACKUP_DATE_PARAM with restore date, Format: YYYY-MM-DD"
     exit 1
 fi
-echo "BACKUP_DATE_PARAM is $BACKUP_DATE_PARAM"
-echo "TG_ENVIRONMENT_TYPE ${TG_ENVIRONMENT_TYPE}"
+
 db_backup_restore
