@@ -113,11 +113,11 @@ esac
 BACKUP_DIR="/home/tools/data/backup"
 JOB_TYPE=$1
 TG_ENVIRONMENT_TYPE=${2}
-BACKUP_DATE_PARAM="/${TG_ENVIRONMENT_TYPE}/nextcloud/db/restore/timestamp"
-BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region ${TG_REGION} --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 
 set_env_stage
 
+BACKUP_DATE_PARAM="/${TG_ENVIRONMENT_TYPE}/nextcloud/db/restore/timestamp"
+BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region ${TG_REGION} --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 DB_USER_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-user"
 DB_PASS_PARAM="tf-${TG_REGION}-${TG_BUSINESS_UNIT}-${TG_PROJECT_NAME}-${TG_ENVIRONMENT_TYPE}-nextcloud-db-password"
 NEXT_CLOUD_DB_NAME="nextcloud"
