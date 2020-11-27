@@ -97,6 +97,9 @@ case "${JOB_TYPE}" in
                mysql -u $DB_USER -p"$DB_PASS" -h $DB_HOST $NEXT_CLOUD_DB_NAME < $SQL_FILE && echo "DB Restore Successfull" || exit 1
                # delete sql file
                rm -rf ${SQL_FILE}
+               #Reset SSN Parameter to null after restore, to prevent accidental Restore
+               #Script will fail if value is null
+               aws ssm put-parameter --name "$BACKUP_DATE_PARAM" --type "String" --value "null" --overwrite --region ${TG_REGION}
                ;;
     *)         echo "${JOB_TYPE} argument is not a valid argument. db-backup | db-restore"
                ;;
@@ -110,7 +113,7 @@ BACKUP_DIR="/home/tools/data/backup"
 JOB_TYPE=$1
 TG_ENVIRONMENT_TYPE=${2}
 BACKUP_DATE_PARAM="/${TG_ENVIRONMENT_TYPE}/nextcloud/db/restore/timestamp"
-BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region eu-west-2 --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
+BACKUP_DATE=$(aws ssm get-parameters --names $BACKUP_DATE_PARAM --region ${TG_REGION} --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')
 
 set_env_stage
 
