@@ -83,6 +83,19 @@ data "terraform_remote_state" "network-security-groups" {
 }
 
 #-------------------------------------------------------------
+### Getting the FSx Filesystem details (for security group)
+#-------------------------------------------------------------
+data "terraform_remote_state" "fsx-integration" {
+  backend = "s3"
+
+  config = {
+    bucket = var.remote_state_bucket_name
+    key    = "${var.environment_type}/fsx-integration/terraform.tfstate"
+    region = var.region
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -151,6 +164,10 @@ locals {
   bws_port           = data.terraform_remote_state.security-groups.outputs.bws_port
   sg_bws_ldap        = data.terraform_remote_state.network-security-groups.outputs.sg_bws_ldap
   nextcloud_samba_sg = data.terraform_remote_state.network-security-groups.outputs.sg_mis_samba
+
+  #FSx Filesytem integration via Security Group membership
+  fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
+
 }
 
 #-------------------------------------------------------------
@@ -207,6 +224,7 @@ resource "aws_instance" "bws_server" {
     local.sg_map_ids["sg_delius_db_out"],
     local.sg_bws_ldap,
     local.nextcloud_samba_sg,
+    local.fsx_integration_security_group
   ]
   key_name = local.ssh_deployer_key
 
