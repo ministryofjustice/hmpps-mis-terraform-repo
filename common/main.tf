@@ -58,6 +58,12 @@ locals {
     {
       "legacy_environment_name" = var.legacy_environment_name
     },
+    {
+      "source-hash" = "ignored"
+    },
+    {
+      "source-code" = "hmpps-mis-terraform-repo"
+    }
   )
 
   ssh_deployer_key = data.terraform_remote_state.vpc.outputs.ssh_deployer_key
@@ -118,4 +124,3 @@ module "common" {
   region                       = local.region
   password_length              = local.password_length
 }
-
