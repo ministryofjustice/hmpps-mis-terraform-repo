@@ -1,0 +1,7 @@
+{
+  "branch": "master",
+  "github": {
+    "org": "ministryofjustice",
+    "repository": "hmpps-mis-terraform-repo"
+  }
+}
