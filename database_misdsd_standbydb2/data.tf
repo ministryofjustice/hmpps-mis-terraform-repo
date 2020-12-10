@@ -103,13 +103,17 @@ data "terraform_remote_state" "misdsd-db-1" {
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 
+data "aws_ssm_parameter" "db_ami_version" {
+  name = "/versions/mis/ami/misdsd-db-ami/${var.environment_name}"
+}
+
 data "aws_ami" "centos_oracle_db" {
   owners      = ["895523100917"]
   most_recent = true
 
   filter {
     name   = "name"
-    values = [var.db_aws_ami]
+    values = [data.aws_ssm_parameter.db_ami_version.value]
   }
 
   filter {
@@ -122,4 +126,3 @@ data "aws_ami" "centos_oracle_db" {
     values = ["ebs"]
   }
 }
-

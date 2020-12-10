@@ -41,7 +41,6 @@ variable "dependencies_bucket_arn" {
   description = "arn for Delius Depencies S3 bucket in the Engineering AWS Account"
 }
 
-variable "db_aws_ami" {
-  description = "Database AMI Name/Version"
+variable "environment_name" {
+  type = string
 }
-
