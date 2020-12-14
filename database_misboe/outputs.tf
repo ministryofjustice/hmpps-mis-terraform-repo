@@ -14,7 +14,7 @@ locals {
   )
 
   # db_size_delius_core attribute may not be set in all envs, if not we default to two
-  high_availability_count = var.high_availability_count
+  high_availability_count = var.database_high_availability_count["misboe"]
   empty                   = ""
   db1                     = "misboe-db-1.${local.public_fqdn}"
   db2                     = "misboe-db-2.${local.public_fqdn}"
@@ -31,4 +31,3 @@ locals {
 output "jdbc_failover_url" {
   value = "jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=OFF)(FAILOVER=ON)(CONNECT_TIMEOUT=10)(RETRY_COUNT=3)(ADDRESS_LIST=${local.address_list})(CONNECT_DATA=(SERVICE_NAME=${var.ansible_vars_misboe_db["database_sid"]}_TAF)))"
 }
-
