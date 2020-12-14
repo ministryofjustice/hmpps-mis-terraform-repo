@@ -41,16 +41,11 @@ variable "dependencies_bucket_arn" {
   description = "arn for Delius Depencies S3 bucket in the Engineering AWS Account"
 }
 
-variable "high_availability_count" {
-  description = "number of standby databases"
-  default     = 2
-}
-
 variable "environment_name" {
   type = string
 }
 
-variable "db_aws_ami" {
-  description = "Database AMI Name/Version"
+variable "database_high_availability_count" {
+  description = "number of standby databases"
+  type        = map(number)
 }
-

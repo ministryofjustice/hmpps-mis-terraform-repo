@@ -87,21 +87,12 @@ data "terraform_remote_state" "security-groups" {
 }
 
 #-------------------------------------------------------------
-### Getting the mis-db-1 data
-#-------------------------------------------------------------
-data "terraform_remote_state" "mis-db-1" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/database_mis/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
+
+data "aws_ssm_parameter" "db_ami_version" {
+  name = "/versions/mis/ami/misdsd-db-ami/${var.environment_name}"
+}
 
 data "aws_ami" "centos_oracle_db" {
   owners      = ["895523100917"]
@@ -109,7 +100,7 @@ data "aws_ami" "centos_oracle_db" {
 
   filter {
     name   = "name"
-    values = [var.db_aws_ami]
+    values = [data.aws_ssm_parameter.db_ami_version.value]
   }
 
   filter {
@@ -123,3 +114,6 @@ data "aws_ami" "centos_oracle_db" {
   }
 }
 
+data "aws_route53_zone" "public" {
+  zone_id = data.terraform_remote_state.vpc.outputs.public_zone_id
+}
