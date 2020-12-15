@@ -74,6 +74,20 @@ data "terraform_remote_state" "network-security-groups" {
 }
 
 #-------------------------------------------------------------
+### Getting the FSx Filesystem details (for security group)
+#-------------------------------------------------------------
+data "terraform_remote_state" "fsx-integration" {
+  backend = "s3"
+
+  config = {
+    bucket = var.remote_state_bucket_name
+    key    = "${var.environment_type}/fsx-integration/terraform.tfstate"
+    region = var.region
+  }
+}
+
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -138,6 +152,10 @@ locals {
   # Create a prefix that removes the final integer from the nart_role value
   nart_prefix    = substr(local.nart_role, 0, length(local.nart_role) - 1)
   sg_outbound_id = data.terraform_remote_state.common.outputs.common_sg_outbound_id
+
+  #FSx Filesytem integration via Security Group membership
+  fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
+
 }
 
 #-------------------------------------------------------------
@@ -192,6 +210,7 @@ resource "aws_instance" "bfs_server" {
     local.sg_map_ids["sg_mis_common"],
     local.sg_outbound_id,
     local.nextcloud_samba_sg,
+    local.fsx_integration_security_group
   ]
   key_name = local.ssh_deployer_key
 

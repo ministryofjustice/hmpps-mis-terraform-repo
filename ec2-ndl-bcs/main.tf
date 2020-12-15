@@ -156,7 +156,6 @@ locals {
   nextcloud_samba_sg = data.terraform_remote_state.network-security-groups.outputs.sg_mis_samba
 
   #FSx Filesytem integration via Security Group membership
-  # mis_bfs_filesystem_security_group = data.aws_security_group.mis_bfs_filesystem_security_group.id
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
 }
 

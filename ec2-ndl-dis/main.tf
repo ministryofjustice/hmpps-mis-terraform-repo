@@ -83,6 +83,19 @@ data "aws_acm_certificate" "cert" {
 }
 
 #-------------------------------------------------------------
+### Getting the FSx Filesystem details (for security group)
+#-------------------------------------------------------------
+data "terraform_remote_state" "fsx-integration" {
+  backend = "s3"
+
+  config = {
+    bucket = var.remote_state_bucket_name
+    key    = "${var.environment_type}/fsx-integration/terraform.tfstate"
+    region = var.region
+  }
+}
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
@@ -151,6 +164,10 @@ locals {
   public_subnet_ids = flatten([data.terraform_remote_state.common.outputs.public_subnet_ids])
   logs_bucket       = data.terraform_remote_state.common.outputs.common_s3_lb_logs_bucket
   tags              = data.terraform_remote_state.common.outputs.common_tags
+
+   #FSx Filesytem integration via Security Group membership
+  fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
+
 }
 
 #-------------------------------------------------------------
@@ -206,6 +223,7 @@ resource "aws_instance" "dis_server" {
     local.sg_map_ids["sg_mis_db_in"],
     local.sg_map_ids["sg_delius_db_out"],
     local.sg_smtp_ses,
+    local.fsx_integration_security_group
   ]
   key_name = local.ssh_deployer_key
 
