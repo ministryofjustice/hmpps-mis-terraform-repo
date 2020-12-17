@@ -60,6 +60,19 @@ data "terraform_remote_state" "natgateway" {
   }
 }
 
+#-------------------------------------------------------------
+### Getting the Code Build CI Details
+#-------------------------------------------------------------
+data "terraform_remote_state" "codebuild" {
+  backend = "s3"
+
+  config = {
+    bucket = var.remote_state_bucket_name
+    key    = "delius-pipelines/components/mis/terraform.tfstate"
+    region = var.region
+  }
+}
+
 ####################################################
 # Locals
 ####################################################
