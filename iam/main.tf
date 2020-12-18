@@ -212,11 +212,8 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-
-
-
 data "template_file" "mis_ec2_ssm_parameterstore_read" {
-  template = "${file("./ssm-paramstore-policy.tpl")}"
+  template = "${file("../policies/ec2_mis_internal_policy_ssm.tpl")}"
 
   vars = {
     account_number     = local.account_id
@@ -225,8 +222,6 @@ data "template_file" "mis_ec2_ssm_parameterstore_read" {
   }
 }
 
-# "Resource": "arn:aws:ssm:eu-west-2:{account_number}:parameter//${environment_name}/${application_name}/mis-activedirectory/ad/*"
-# "Resource": "arn:aws:ssm:eu-west-2:479759138745:parameter//delius-mis-dev/delius/mis-activedirectory/ad/*"
 resource "aws_iam_policy" "mis_ec2_ssm_parameterstore_read" {
   name        = "${var.environment_type}-mis-aws-ssm-policy"
   path        = "/"
@@ -238,25 +233,3 @@ resource "aws_iam_role_policy_attachment" "mis_ec2_ssm_parameterstore_read" {
   role       = module.iam.iam_policy_int_app_role_name
   policy_arn = aws_iam_policy.mis_ec2_ssm_parameterstore_read.arn
 }
-
-
-# resource "aws_iam_policy" "mis_ec2_ssm_parameterstore_read" {
-#   name        = "${var.environment_type}-mis-aws-backup-pass-role-policy"
-#   path        = "/"
-#   description = "${var.environment_type}-mis-aws-backup-pass-role-policy"
-
-#   policy = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Sid": "VisualEditor0",
-#             "Effect": "Allow",
-#             "Action": "ssm:GetParametersByPath",
-#             "Resource": "arn:aws:ssm:eu-west-2:479759138745:parameter//delius-mis-dev/delius/mis-activedirectory/ad/*"
-#         }
-#     ]
-# }
-# EOF
-
-# }

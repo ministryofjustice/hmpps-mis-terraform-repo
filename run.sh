@@ -1,128 +1,105 @@
-#!/bin/sh
-
+#!/usr/bin/env bash
 set -e
+## HMPPS Terragrunt wrapper script.
+## Runs Terragrunt commands in the HMPPS container, with sensible defaults and mounted config.
+##
+## This script takes any number of arguments and will pass them directly to Terragrunt.
+##
+## Example usage:
+##    AWS_PROFILE=hmpps_token ENVIRONMENT=delius-test COMPONENT=vpc ./run.sh plan
+##
+## Environment variables are used to configure the script:
+##  * ENVIRONMENT        Required. Which environment to run against, used to select Terraform
+##                                 configuration from the config repository.
+##  * CONFIG_LOCATION    Optional. Path to the environment configuration repository. Defaults
+##                                 to ../hmpps-env-configs.
+##  * COMPONENT          Optional. Sub-directory containing the Terraform code to apply.
+##                                 Defaults to current directory.
+##  * CONTAINER          Optional. The container to run the Terragrunt commands in. Defaults to
+##                                 mojdigitalstudio/hmpps-terraform-builder-0-12.
+##  * CMD                Optional. The executable to run in the container. Useful for debugging,
+##                                 for example by setting to 'bash'. Defaults to terragrunt.
+##
+## Additionally, any environment variables prefixed with AWS_or TF_ will also be passed to the
+## Terragrunt container. This enables you to set your AWS credentials/profile on the host, and
+## also to pass any extra Terraform vars using TF_VAR_xxx=...
+##
 
-#Usage
-# Scripts takes 2 arguments: environment_type and action
-# environment_type: target environment example dev prod
-# ACTION_TYPE: task to complete example plan apply test clean
-# AWS_TOKEN: token to use when running locally eg hmpps-token
+# Print usage if ENVIRONMENT not set:
+if [ "${ENVIRONMENT}" == "" ]; then grep '^##' "${0}" && exit; fi
 
-# Error handler function
-exit_on_error() {
-  exit_code=$1
-  last_command=${@:2}
-  if [ $exit_code -ne 0 ]; then
-      >&2 echo "\"${last_command}\" command failed with exit code ${exit_code}."
-      exit ${exit_code}
+heading() { if [ -n "${CODEBUILD_CI}" ]; then echo -e "\n* ${*}"; else echo -e "\n\033[1m${*}\033[0m"; fi }
+load_config() { if [ -f "$1" ]; then echo "$1"; source "$1"; fi }
+config_is_local() { git config remote.origin.url | grep 'hmpps-engineering-platform-terraform\|hmpps-security-access-terraform\|hmpps-vcms-terraform'; }
+engineering_env() { [[ "${ENVIRONMENT}" == eng-* ]]; }
+vcms_env() { [[ "${ENVIRONMENT}" == vcms-* ]]; }
+sec_env() { [[ "${ENVIRONMENT}" == sec-* ]]; }
+
+# Start container with mounted config:
+if [ -z "${TF_IN_AUTOMATION}" ]; then
+
+  if [ -z "${CONFIG_LOCATION}" ]; then
+    heading No config provided. Using defaults...
+    CONFIG_LOCATION="$(pwd)/../hmpps-env-configs"
+    if   config_is_local; then CONFIG_LOCATION="$(pwd)";
+    elif engineering_env; then CONFIG_LOCATION="$(pwd)/../hmpps-engineering-platform-terraform";
+    elif vcms_env;        then CONFIG_LOCATION="$(pwd)/../hmpps-vcms-terraform";
+    elif sec_env;         then CONFIG_LOCATION="$(pwd)/../hmpps-security-access-terraform"; fi
+    if [ -d "${CONFIG_LOCATION}" ]; then echo "Mounting config from ${CONFIG_LOCATION}";
+                                    else (echo "Couldn't find config at ${CONFIG_LOCATION}" && exit 1); fi
   fi
-}
 
-env_config_dir="${HOME}/data/env_configs"
-
-TG_ENVIRONMENT_TYPE=$1
-ACTION_TYPE=$2
-COMPONENT=${3}
-REPO=${4}
-
-
-if [ -z "${TG_ENVIRONMENT_TYPE}" ]
-then
-    echo "environment_type argument not supplied, please provide an argument!"
-    exit 1
+  heading Starting container...
+  CONTAINER=${CONTAINER:-mojdigitalstudio/hmpps-terraform-builder-0-12}
+  echo "${CONTAINER}"
+  docker run -e COMPONENT -e ENVIRONMENT -e CMD -e SOURCE_REPO_URL \
+    $(test -t 0 && echo '-it')                               `# Allocate an interactive terminal if one is available` \
+    --env-file <(env | grep -E '^(TF_|TG_|AWS_)')            `# Pass any environment variables prefixed with TF_, TG_ or AWS_` \
+    -e GITHUB_TOKEN -e "TF_VAR_github_token=${GITHUB_TOKEN}" `# Pass GitHub token, in case we need to create CodeBuild resources` \
+    -e "TF_IN_AUTOMATION=True"                               `# This flag is used by Terraform to indicate a script run` \
+    -e "TF_PLUGIN_CACHE_DIR=/tmp/plugin-cache"               `# Enable caching of Terraform plugins on host` \
+    $(test -n "${TF_PLUGIN_CACHE_DIR}" && echo "-v ${TF_PLUGIN_CACHE_DIR}:/tmp/plugin-cache") \
+    -e "CONFIG_LOCATION=/home/tools/config"                  `# Pass the Terraform config location`\
+    -v "${CONFIG_LOCATION}:/home/tools/config:ro"            `# Mount the Terraform config` \
+    -v "$(pwd):/home/tools/data"                             `# Mount the Terraform code` \
+    -v "${HOME}/.aws:/home/tools/.aws:ro"                    `# Mount the hosts AWS config files` \
+    -v "$(cd "${0%/*}" && pwd):/home/tools/util:ro"          `# Mount the current script` \
+  "${CONTAINER}" bash -c "/home/tools/util/${0##*/} ${*}"     # Re-run the current script in the container
+  exit $?
 fi
 
-echo "Output -> environment_type set to: ${TG_ENVIRONMENT_TYPE}"
-
-if [ -z "${ACTION_TYPE}" ]
-then
-    echo "ACTION_TYPE argument not supplied."
-    echo "--> Defaulting to plan ACTION_TYPE"
-    ACTION_TYPE="plan"
+heading Parsing arguments...
+OUT_DIR=${OUT_DIR:-.terraform/output/${ENVIRONMENT}}
+action=${*}
+options=""
+if [ -n "${CODEBUILD_CI}" ];   then options="${options} -no-color"; fi
+if [ "${action}" == "apply" ]; then options="${options} ${OUT_DIR}/tfplan"; fi
+if [ "${action}" == "plan" ];  then
+  if [[ "$(terraform -version)" != *0.11* ]]; then options="${options} -compact-warnings"; fi # this option is not available in Terraform 11
+  options="${options} -out ${OUT_DIR}/tfplan"
 fi
+echo "Environment: ${ENVIRONMENT:--}"
+echo "Component:   ${COMPONENT:--}"
+echo "Command:     ${action} ${options}"
 
-echo "Output -> ACTION_TYPE set to: ${ACTION_TYPE}"
+heading Loading configuration from ${CONFIG_LOCATION:-$(pwd)}...
+[ ! -d env_configs ] && [ ! -h env_configs ] && ln -s "${CONFIG_LOCATION}" env_configs
+load_config "${CONFIG_LOCATION:-.}/${ENVIRONMENT}/${ENVIRONMENT}.properties"        # hmpps-env-configs
+load_config "${CONFIG_LOCATION:-.}/env_configs/${ENVIRONMENT}.properties"           # hmpps-security-access-terraform
+load_config "${CONFIG_LOCATION:-.}/env_configs/${ENVIRONMENT/eng-/}.properties"     # hmpps-engineering-platform-terraform
+load_config "${CONFIG_LOCATION:-.}/env_configs/${ENVIRONMENT/vcms-/}.properties.sh" # hmpps-vcms-terraform
+load_config "${CONFIG_LOCATION:-.}/env_configs/common.propeties.sh"                 # hmpps-vcms-terraform/common - notice deliberate typo in 'propeties' to match config
+export TERRAGRUNT_IAM_ROLE="${TERRAGRUNT_IAM_ROLE/admin/terraform}"
+[ -n "${SOURCE_REPO_URL}" ] && export TF_VAR_tags=$(echo "${TF_VAR_tags}" | sed -E "s|(source-code = )\"[^\"]*\"|\1\"${SOURCE_REPO_URL}\"|")
+echo "Loaded $(env | grep -Ec '^(TF_|TG_)') properties"
 
-if [ -z "${COMPONENT}" ]
-then
-    echo "COMPONENT argument not supplied."
-    echo "--> Defaulting to common component"
-    COMPONENT="common"
-fi
+heading Setting up workspace...
+cd "${COMPONENT}"
+mkdir -p "${OUT_DIR}"
+rm -rf .terraform/terraform.tfstate
+pwd
 
-#check env vars for RUNNING_IN_CONTAINER switch
-if [[ ${RUNNING_IN_CONTAINER} == True ]]
-then
-    workDirContainer=${3}
-    echo "Output -> clone configs stage"
-    rm -rf ${env_config_dir}
-    echo "Output ---> Cloning branch: ${GIT_BRANCH}"
-    git clone -b ${GIT_BRANCH} ${REPO} ${env_config_dir}
-    echo "Output -> environment stage"
-    source ${env_config_dir}/${TG_ENVIRONMENT_TYPE}/${TG_ENVIRONMENT_TYPE}.properties
-    exit_on_error $? !!
-    echo "Output ---> set environment stage complete"
-    # set runCmd
-    ACTION_TYPE="docker-${ACTION_TYPE}"
-    export workDir=${workDirContainer}
-    cd ${workDir}
-    export PLAN_RET_FILE=${HOME}/data/${workDirContainer}_plan_ret
-    echo "Output -> Container workDir: ${workDir}"
-fi
-
-case ${ACTION_TYPE} in
-  docker-plan)
-    echo "Running docker plan action"
-    rm -rf .terraform *.plan ${PLAN_RET_FILE}
-    terragrunt init
-    exit_on_error $? !!
-    terragrunt plan -detailed-exitcode --out ${TG_ENVIRONMENT_TYPE}.plan || export tf_exit_code="$?"
-    if [ -z ${tf_exit_code} ]
-    then
-      export tf_exit_code="0"
-    fi
-    echo "export exitcode=${tf_exit_code}" > ${PLAN_RET_FILE}
-    exit_on_error $? !!
-    ;;
-  docker-apply)
-    echo "Running docker apply action"
-    terragrunt apply ${TG_ENVIRONMENT_TYPE}.plan
-    exit_on_error $? !!
-    ;;
-  docker-destroy)
-    echo "Running docker destroy action"
-    terragrunt destroy -force
-    exit_on_error $? !!
-    ;;
-  docker-test)
-    echo "Running docker test action"
-    for cmp in ${components_list}
-    do
-      output_file="${inspec_profile_files_path}/output-${cmp}.json"
-      rm -rf ${output_file}
-      cd ${workingDir}/${cmp}
-      terragrunt output -json > ${output_file}
-      exit_on_error $? !!
-    done
-    exit_on_error $? !!
-    temp_role=$(aws sts assume-role --role-arn ${TERRAGRUNT_IAM_ROLE} --role-session-name testing --duration-seconds 900)
-    echo "unset AWS_PROFILE
-    export AWS_ACCESS_KEY_ID=$(echo ${temp_role} | jq .Credentials.AccessKeyId | xargs)
-    export AWS_SECRET_ACCESS_KEY=$(echo ${temp_role} | jq .Credentials.SecretAccessKey | xargs)
-    export AWS_SESSION_TOKEN=$(echo ${temp_role} | jq .Credentials.SessionToken | xargs)" > ${inspec_creds_file}
-    source ${inspec_creds_file}
-    exit_on_error $? !!
-    cd ${workingDir}
-    inspec exec ${inspec_profile} -t aws://${TG_REGION}
-    exit_on_error $? !!
-    rm -rf ${inspec_creds_file} ${inspec_profile_files_path}/output*.json
-    ;;
-  docker-output)
-    echo "Running docker apply action"
-    terragrunt output
-    exit_on_error $? !!
-    ;;
-  *)
-    echo "${ACTION_TYPE} is not a valid argument. init - apply - test - output - destroy"
-  ;;
-esac
+heading Running terragrunt...
+set -o pipefail
+set -x
+${CMD:-terragrunt} ${action} ${options} | tee "${OUT_DIR}/tg.log"
