@@ -46,7 +46,6 @@ module "mis_db_2" {
   ## the following are retrieved from SSM Parameter Store
   ## oradb_sys_password            = "/${environment_name}/mis/mis-database/db/oradb_sys_password"
   ## oradb_system_password         = "/${environment_name}/mis/mis-database/db/oradb_system_password"
-  ## oradb_sysman_password         = "/${environment_name}/mis/mis-database/db/oradb_sysman_password"
   ## oradb_dbsnmp_password         = "/${environment_name}/mis/mis-database/db/oradb_dbsnmp_password"
   ## oradb_asmsnmp_password        = "/${environment_name}/mis/mis-database/db/oradb_asmsnmp_password"
 }
