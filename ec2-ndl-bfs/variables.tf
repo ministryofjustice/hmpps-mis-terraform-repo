@@ -40,3 +40,6 @@ variable "snap_tag" {
   default = "CreateSnapshotBFS"
 }
 
+variable "tags" {
+  type = map(string)
+}

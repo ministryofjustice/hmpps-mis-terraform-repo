@@ -4,7 +4,7 @@ locals {
     var.tags,
     {
       "autostop-${var.environment_type}" = "Phase1"
-    },
+    }
   )
 }
 
