@@ -8,10 +8,10 @@ backup:
 	scripts/ebs-on-demand-backup.sh $(ENV_TYPE) $(COMPONENT)
 
 terraform_plan:
-	./run.sh $(ENVIRONMENT_NAME) plan $(component)   || (exit $$?)
+	./run-local.sh $(ENVIRONMENT_NAME) plan $(component)   || (exit $$?)
 
 terraform_apply: terraform_plan
-	./run.sh $(ENVIRONMENT_NAME) apply $(component)  || (exit $$?)
+	./run-local.sh $(ENVIRONMENT_NAME) apply $(component)  || (exit $$?)
 
 get_configs:
 	rm -rf env_configs
