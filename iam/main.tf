@@ -1,85 +1,3 @@
-terraform {
-  # The configuration for this backend will be filled in by Terragrunt
-  # The configuration for this backend will be filled in by Terragrunt
-  backend "s3" {
-  }
-}
-
-####################################################
-# DATA SOURCE MODULES FROM OTHER TERRAFORM BACKENDS
-####################################################
-#-------------------------------------------------------------
-### Getting the common details
-#-------------------------------------------------------------
-data "terraform_remote_state" "common" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/common/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the s3bucket
-#-------------------------------------------------------------
-data "terraform_remote_state" "s3buckets" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/s3buckets/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the oracledb backup s3 bucket
-#-------------------------------------------------------------
-data "terraform_remote_state" "s3-oracledb-backups" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "s3/oracledb-backups/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the ssm docs s3 bucket
-#-------------------------------------------------------------
-data "terraform_remote_state" "ci_common" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "delius-pipelines/components/common/terraform.tfstate"
-    region = var.region
-  }
-}
-
-####################################################
-# Locals
-####################################################
-
-locals {
-  region                  = var.region
-  common_name             = data.terraform_remote_state.common.outputs.common_name
-  tags                    = data.terraform_remote_state.common.outputs.common_tags
-  s3-config-bucket        = data.terraform_remote_state.common.outputs.common_s3-config-bucket
-  artefact-bucket         = data.terraform_remote_state.s3buckets.outputs.s3bucket
-  delius-deps-bucket      = substr(var.dependencies_bucket_arn, 13, -1) # name (cut arn off - then insert name into arn in template??)
-  migration-bucket        = substr(var.migration_bucket_arn, 13, -1)    # name
-  s3_oracledb_backups_arn = data.terraform_remote_state.s3-oracledb-backups.outputs.s3_oracledb_backups.arn
-  s3_ssm_ansible_arn      = data.terraform_remote_state.ci_common.outputs.ssm_ansible_bucket.arn
-  runtime_role            = var.cross_account_iam_role
-  account_id              = data.terraform_remote_state.common.outputs.common_account_id
-  environment_name        = var.environment_name
-  project_name            = var.project_name
-}
-
 ####################################################
 # IAM - Application Specific
 ####################################################
@@ -212,9 +130,6 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-
-
-
 data "template_file" "mis_ec2_ssm_parameterstore_read" {
   template = "${file("./ssm-paramstore-policy.tpl")}"
 
@@ -260,3 +175,23 @@ resource "aws_iam_role_policy_attachment" "mis_ec2_ssm_parameterstore_read" {
 # EOF
 
 # }
+
+
+# Windows Instances AD Autojoin policy
+# https://aws.amazon.com/blogs/security/how-to-configure-your-ec2-instances-to-automatically-join-a-microsoft-active-directory-domain/
+
+data "template_file" "AmazonEC2RoleforSSM_ASGDomainJoin" {
+  template = "${file("../policies/AmazonEC2RoleforSSM-ASGDomainJoin.json")}"
+}
+
+resource "aws_iam_policy" "AmazonEC2RoleforSSM_ASGDomainJoin" {
+  name        = "AmazonEC2RoleforSSM_ASGDomainJoin"
+  path        = "/"
+  description = "AmazonEC2RoleforSSM-ASGDomainJoin for Windows Instance AD Auto Join"
+  policy      = data.template_file.AmazonEC2RoleforSSM_ASGDomainJoin.rendered
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonEC2RoleforSSM_ASGDomainJoin" {
+  role       = module.iam.iam_policy_int_app_role_name
+  policy_arn = aws_iam_policy.AmazonEC2RoleforSSM_ASGDomainJoin.arn
+}
