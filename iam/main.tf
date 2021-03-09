@@ -240,23 +240,40 @@ resource "aws_iam_role_policy_attachment" "mis_ec2_ssm_parameterstore_read" {
 }
 
 
-# resource "aws_iam_policy" "mis_ec2_ssm_parameterstore_read" {
-#   name        = "${var.environment_type}-mis-aws-backup-pass-role-policy"
-#   path        = "/"
-#   description = "${var.environment_type}-mis-aws-backup-pass-role-policy"
 
-#   policy = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Sid": "VisualEditor0",
-#             "Effect": "Allow",
-#             "Action": "ssm:GetParametersByPath",
-#             "Resource": "arn:aws:ssm:eu-west-2:479759138745:parameter//delius-mis-dev/delius/mis-activedirectory/ad/*"
-#         }
-#     ]
-# }
-# EOF
+# arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+data "aws_iam_policy" "AmazonSSMManagedInstanceCore" {
+  arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
 
-# }
+resource "aws_iam_role_policy_attachment" "mis_AmazonSSMManagedInstanceCore" {
+  role       = module.iam.iam_policy_int_app_role_name
+  policy_arn = data.aws_iam_policy.AmazonSSMManagedInstanceCore.arn
+}
+
+# AmazonEC2RoleForSSM-ASGDomainJoin
+data "template_file" "AmazonEC2RoleForSSM-ASGDomainJoin" {
+  template = "${file("../policies/AmazonEC2RoleForSSM-ASGDomainJoin.tpl")}"
+}
+
+resource "aws_iam_policy" "AmazonEC2RoleForSSM-ASGDomainJoin" {
+  name        = "AmazonEC2RoleForSSM-ASGDomainJoin"
+  path        = "/"
+  description = "AmazonEC2RoleForSSM-ASGDomainJoin"
+  policy      = data.template_file.AmazonEC2RoleForSSM-ASGDomainJoin.rendered
+}
+
+resource "aws_iam_role_policy_attachment" "mis_AmazonEC2RoleForSSM-ASGDomainJoin" {
+  role       = module.iam.iam_policy_int_app_role_name
+  policy_arn = aws_iam_policy.AmazonEC2RoleForSSM-ASGDomainJoin.arn
+}
+
+# arn:aws:iam::aws:policy/AmazonFSxReadOnlyAccess
+data "aws_iam_policy" "AmazonFSxReadOnlyAccess" {
+  arn = "arn:aws:iam::aws:policy/AmazonFSxReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "mis_AmazonFSxReadOnlyAccess" {
+  role       = module.iam.iam_policy_int_app_role_name
+  policy_arn = data.aws_iam_policy.AmazonFSxReadOnlyAccess.arn
+}
