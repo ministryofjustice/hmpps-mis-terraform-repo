@@ -164,6 +164,7 @@ locals {
   public_subnet_ids = flatten([data.terraform_remote_state.common.outputs.public_subnet_ids])
   logs_bucket       = data.terraform_remote_state.common.outputs.common_s3_lb_logs_bucket
   tags              = data.terraform_remote_state.common.outputs.common_tags
+  config_bucket     = data.terraform_remote_state.common.outputs.common_s3-config-bucket
 
    #FSx Filesytem integration via Security Group membership
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
@@ -197,12 +198,13 @@ data "template_file" "instance_userdata" {
   template = file("../userdata/userdata.txt")
   count    = var.dis_server_count
   vars = {
-    host_name       = "${local.nart_prefix}${count.index + 1}"
-    internal_domain = local.internal_domain
-    user            = data.aws_ssm_parameter.user.value
-    password        = data.aws_ssm_parameter.password.value
-    bosso_user      = data.aws_ssm_parameter.bosso_user.value
-    bosso_password  = data.aws_ssm_parameter.bosso_password.value
+    host_name         = "${local.nart_prefix}${count.index + 1}"
+    internal_domain   = local.internal_domain
+    user              = data.aws_ssm_parameter.user.value
+    password          = data.aws_ssm_parameter.password.value
+    bosso_user        = data.aws_ssm_parameter.bosso_user.value
+    bosso_password    = data.aws_ssm_parameter.bosso_password.value
+    cloudwatch_config = "s3://${local.config_bucket}/config.json"
   }
 }
 

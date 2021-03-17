@@ -107,6 +107,7 @@ locals {
   fsx_domain                = "${var.environment_name}.local"
 }
 
+#Creating by aws cli as some features are currently not present via Terraform ie schedule
 resource "null_resource" "s3_to_efs_sync_task" {
   triggers = {
     region = var.region

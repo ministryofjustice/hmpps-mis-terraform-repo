@@ -12,7 +12,7 @@ resource "aws_backup_plan" "dfi_ec2_backup_plan" {
   name = "${var.environment_name}-dfi-ec2-bkup-pri-pln"
 
   rule {
-    rule_name         = "MIS EC2 instance volume backup"
+    rule_name         = "MIS-EC2-instance-volume-backup"
     target_vault_name = aws_backup_vault.dfi_ec2_backup_vault.name
     schedule          = var.ebs_backup["schedule"]
 

@@ -89,20 +89,6 @@ data "terraform_remote_state" "fsx-integration" {
 }
 
 #-------------------------------------------------------------
-### Getting the FSX details
-#-------------------------------------------------------------
-#data "terraform_remote_state" "fsx" {
-#  backend = "s3"
-#
-#  config = {
-#    bucket = var.remote_state_bucket_name
-#    key    = "${var.environment_type}/fsx/terraform.tfstate"
-#    region = var.region
-#  }
-#}
-
-
-#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {

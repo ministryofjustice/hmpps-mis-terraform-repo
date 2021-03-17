@@ -14,7 +14,7 @@ resource "aws_backup_plan" "nextcloud_efs_backup_plan" {
   name = "${var.environment_name}-nextcloud-efs-bkup-pri-pln"
 
   rule {
-    rule_name         = "MIS EFS backup"
+    rule_name         = "MIS-EFS-backup"
     target_vault_name = aws_backup_vault.nextcloud_efs.name
     schedule          = var.ebs_backup["schedule"]
 
