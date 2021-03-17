@@ -124,3 +124,13 @@ module "common" {
   region                       = local.region
   password_length              = local.password_length
 }
+
+####################################################
+# Cloudwatch config object
+####################################################
+
+resource "aws_s3_bucket_object" "cloudwatch_config" {
+  bucket = module.common.common_s3-config-bucket
+  key    = "config.json"
+  source = "../scripts/config.json"
+}
