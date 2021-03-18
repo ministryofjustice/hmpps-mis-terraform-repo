@@ -22,6 +22,11 @@ variable "s3_oracledb_backups_arn" {
   default     = ""
 }
 
+variable "s3_oracledb_backups_inventory_s3bucket_arn" {
+  description = "The S3 bucket arn for oracle db data backups inventory file"
+  default     = ""
+}
+
 variable "s3_ssm_ansible_arn" {
   description = "ssm docs s3 bucket arn"
   default     = ""
