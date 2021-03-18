@@ -102,8 +102,8 @@ locals {
   cloud-watch-log-group-arn = "arn:aws:logs:${var.region}:${local.account_id}:log-group:/${var.environment_name}/${local.app_name}/aws/datasync"
   name                      = "${var.environment_name}-dfi-s3-to-fsx"
   fsx-sg-arn                = "arn:aws:ec2:${var.region}:${local.account_id}:security-group/${local.fsx_integration_security_group}"
-  ad_user_param             = "/${var.environment_name}/delius/${local.app_name}-activedirectory/ad/ad_admin_username"
-  ad_pass_param             = "/${var.environment_name}/delius/${local.app_name}-activedirectory/ad/ad_admin_password"
+  ad_user_param             = "/${var.environment_name}/delius/${local.app_name}-service-accounts/SVC_DFI_NDL/SVC_DFI_NDL_username"
+  ad_pass_param             = "/${var.environment_name}/delius/${local.app_name}-service-accounts/SVC_DFI_NDL/SVC_DFI_NDL_password"
   fsx_domain                = "${var.environment_name}.local"
 }
 
@@ -116,4 +116,4 @@ resource "null_resource" "s3_to_efs_sync_task" {
   provisioner "local-exec" {
     command = "sh scripts/create_data-sync-task.sh ${var.region} ${local.source-location-arn}  ${local.cloud-watch-log-group-arn} ${local.name} ${local.fsx-sg-arn} ${local.ad_user_param} ${local.ad_pass_param} ${local.fsx_domain}"
   }
-}
+ }
