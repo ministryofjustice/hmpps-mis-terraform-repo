@@ -160,12 +160,3 @@ resource "aws_route53_record" "dfi_dns_ext" {
   ttl     = "300"
   records = [element(aws_instance.dfi_server.*.private_ip, count.index)]
 }
-
-#-------------------------------------------------------------
-# Create elb attachments
-#-------------------------------------------------------------
-resource "aws_elb_attachment" "environment" {
-  count    = var.dfi_server_count
-  elb      = module.create_app_elb.environment_elb_name
-  instance = element(aws_instance.dfi_server.*.id, count.index)
-}

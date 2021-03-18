@@ -87,7 +87,15 @@ variable "dfi_account_ids" {
   default     = "431912413968"  #Temp account id until actual account is provided
 }
 
-variable "dfi_server_backup" {
-  description = "Whether AWS Backup resource should be created"
+variable "dfi_server_resources" {
+  description = "Whether AWS Backup and loadbalancer resources should be created for dfi server"
   default     = 0
+}
+
+variable "http_protocol" {
+  default = "http"
+}
+
+variable "http_port" {
+  default = 80
 }

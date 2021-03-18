@@ -28,24 +28,24 @@ output "dfi_instance_type" {
 # ELB
 output "dfi_elb_id" {
   description = "The name of the ELB"
-  value       = module.create_app_elb.environment_elb_id
+  value       = element(concat(aws_elb.dfi.*.id, [""]), 0)
 }
 
 output "dfi_elb_name" {
   description = "The name of the ELB"
-  value       = module.create_app_elb.environment_elb_name
+  value       = element(concat(aws_elb.dfi.*.name, [""]), 0)
 }
 
 output "dfi_elb_dns_name" {
   description = "The DNS name of the ELB"
-  value       = module.create_app_elb.environment_elb_dns_name
+  value       = element(concat(aws_elb.dfi.*.dns_name, [""]), 0)
 }
 
 output "dfi_elb_zone_id" {
   description = "The canonical hosted zone ID of the ELB (to be used in a Route 53 Alias record)"
-  value       = module.create_app_elb.environment_elb_zone_id
+  value       = element(concat(aws_elb.dfi.*.zone_id, [""]), 0)
 }
 
 output "dfi_elb_dns_cname" {
-  value = aws_route53_record.dns_entry.fqdn
+  value = element(concat(aws_route53_record.dns_entry.*.fqdn, [""]), 0)
 }
