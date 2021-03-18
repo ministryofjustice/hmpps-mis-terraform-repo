@@ -139,6 +139,7 @@ module "mis_db" {
   s3-config-bucket         = local.s3-config-bucket
   artefact-bucket          = local.artefact-bucket
   s3_oracledb_backups_arn  = local.s3_oracledb_backups_arn
+  s3_oracledb_backups_inventory_s3bucket_arn  = local.s3_oracledb_backups_inventory_s3bucket_arn
   s3_ssm_ansible_arn       = local.s3_ssm_ansible_arn
   delius-deps-bucket       = local.delius-deps-bucket
   migration-bucket         = local.migration-bucket
