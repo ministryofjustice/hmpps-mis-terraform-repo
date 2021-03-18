@@ -20,7 +20,7 @@ variable "dfi_root_size" {
 
 variable "dfi_server_count" {
   description = "Number of DFI Servers to deploy"
-  default     = 1
+  default     = 0
 }
 
 variable "ebs_backup" {
@@ -85,4 +85,9 @@ variable "lifecycle_expiration" {
 variable "dfi_account_ids" {
   description = "Account DFI granted access to DFI bucket"
   default     = "431912413968"  #Temp account id until actual account is provided
+}
+
+variable "dfi_server_backup" {
+  description = "Whether AWS Backup resource should be created"
+  default     = 0
 }
