@@ -98,8 +98,27 @@ ndl-dis-001.delius-prod.internal
 ndl-dis-001.probation.service.justice.gov.uk
 ```
 
+
+## DFI
+DFI Endpoint [https://ndl-dfi.probation.service.justice.gov.uk/DataServices/](https://ndl-dfi.probation.service.justice.gov.uk/DataServices/)
+
+#### Internal DNS
+
+
+```
+ndl-dfi-001.delius-prod.internal
+```
+
+#### External DNS
+
+```
+ndl-dfi-001.probation.service.justice.gov.uk
+```
+
+
+
 ## SMTP Relay/SES
-An SMTP relay EC2 instance is in place to forward email notifications from SAP on ndl-dis-001 to AWS SES. The SAP SMTP client is currently unable to authenticate to AWS SES, therefore an SMTP Server running Postfix is in place between ndl-dis-001 and AWS SES to enable authentication and connection.
+An SMTP relay EC2 instance is in place to forward email notifications from SAP on ndl-dis-001 and ndl-dfi-001 to AWS SES. The SAP SMTP client is currently unable to authenticate to AWS SES, therefore an SMTP Server running Postfix is in place between ndl-dis-001 and AWS SES to enable authentication and connection.
 
 ### SMTP Relay/Postfix
 #### Internal DNS
