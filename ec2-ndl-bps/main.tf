@@ -146,6 +146,7 @@ locals {
   instance_profile   = data.terraform_remote_state.iam.outputs.iam_policy_int_app_instance_profile_name
   ssh_deployer_key   = data.terraform_remote_state.common.outputs.common_ssh_deployer_key
   nart_role          = "ndl-bps-${data.terraform_remote_state.common.outputs.legacy_environment_name}"
+  config_bucket      = data.terraform_remote_state.common.outputs.common_s3-config-bucket
 
   # Create a prefix that removes the final integer from the nart_role value
   nart_prefix        = substr(local.nart_role, 0, length(local.nart_role) - 1)
@@ -185,12 +186,13 @@ data "template_file" "instance_userdata" {
   template = file("../userdata/userdata.txt")
 
   vars = {
-    host_name       = "${local.nart_prefix}${count.index + 1}"
-    internal_domain = local.internal_domain
-    user            = data.aws_ssm_parameter.user.value
-    password        = data.aws_ssm_parameter.password.value
-    bosso_user      = data.aws_ssm_parameter.bosso_user.value
-    bosso_password  = data.aws_ssm_parameter.bosso_password.value
+    host_name         = "${local.nart_prefix}${count.index + 1}"
+    internal_domain   = local.internal_domain
+    user              = data.aws_ssm_parameter.user.value
+    password          = data.aws_ssm_parameter.password.value
+    bosso_user        = data.aws_ssm_parameter.bosso_user.value
+    bosso_password    = data.aws_ssm_parameter.bosso_password.value
+    cloudwatch_config = "s3://${local.config_bucket}/config.json"
   }
 }
 

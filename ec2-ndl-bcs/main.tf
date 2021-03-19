@@ -154,6 +154,7 @@ locals {
   sg_outbound_id     = data.terraform_remote_state.common.outputs.common_sg_outbound_id
   sg_bws_ldap        = data.terraform_remote_state.network-security-groups.outputs.sg_bws_ldap
   nextcloud_samba_sg = data.terraform_remote_state.network-security-groups.outputs.sg_mis_samba
+  config_bucket      = data.terraform_remote_state.common.outputs.common_s3-config-bucket
 
   #FSx Filesytem integration via Security Group membership
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
@@ -191,12 +192,13 @@ data "template_file" "instance_userdata" {
   count    = var.bcs_server_count
   vars = {
     # Build the host name by
-    host_name       = "${local.nart_prefix}${count.index + 1}"
-    internal_domain = local.internal_domain
-    user            = data.aws_ssm_parameter.user.value
-    password        = data.aws_ssm_parameter.password.value
-    bosso_user      = data.aws_ssm_parameter.bosso_user.value
-    bosso_password  = data.aws_ssm_parameter.bosso_password.value
+    host_name         = "${local.nart_prefix}${count.index + 1}"
+    internal_domain   = local.internal_domain
+    user              = data.aws_ssm_parameter.user.value
+    password          = data.aws_ssm_parameter.password.value
+    bosso_user        = data.aws_ssm_parameter.bosso_user.value
+    bosso_password    = data.aws_ssm_parameter.bosso_password.value
+    cloudwatch_config = "s3://${local.config_bucket}/config.json"
   }
 }
 

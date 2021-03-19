@@ -6,126 +6,6 @@ terraform {
 }
 
 ####################################################
-# DATA SOURCE MODULES FROM OTHER TERRAFORM BACKENDS
-####################################################
-#-------------------------------------------------------------
-### Getting the common details
-#-------------------------------------------------------------
-data "terraform_remote_state" "common" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/common/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the s3 details
-#-------------------------------------------------------------
-data "terraform_remote_state" "s3bucket" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/s3buckets/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the IAM details
-#-------------------------------------------------------------
-data "terraform_remote_state" "iam" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/iam/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the security groups details
-#-------------------------------------------------------------
-data "terraform_remote_state" "security-groups" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/security-groups/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the security groups details
-#-------------------------------------------------------------
-data "terraform_remote_state" "security-groups_secondary" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "security-groups/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting ACM Cert
-#-------------------------------------------------------------
-data "aws_acm_certificate" "cert" {
-  domain      = "*.${data.terraform_remote_state.common.outputs.external_domain}"
-  types       = ["AMAZON_ISSUED"]
-  most_recent = true
-}
-
-#-------------------------------------------------------------
-### Getting the FSx Filesystem details (for security group)
-#-------------------------------------------------------------
-data "terraform_remote_state" "fsx-integration" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/fsx-integration/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the latest amazon ami
-#-------------------------------------------------------------
-data "aws_ami" "amazon_ami" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["HMPPS MIS NART BCS Windows Server master *"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-
-  owners = ["895523100917"]
-}
-
-
-####################################################
 # Locals
 ####################################################
 
@@ -154,21 +34,20 @@ locals {
   sg_map_ids                   = data.terraform_remote_state.security-groups.outputs.sg_map_ids
   instance_profile             = data.terraform_remote_state.iam.outputs.iam_policy_int_app_instance_profile_name
   ssh_deployer_key             = data.terraform_remote_state.common.outputs.common_ssh_deployer_key
-  nart_role                    = "ndl-dis-${data.terraform_remote_state.common.outputs.legacy_environment_name}"
+  nart_role                    = "ndl-dfi-${data.terraform_remote_state.common.outputs.legacy_environment_name}"
 
   # Create a prefix that removes the final integer from the nart_role value
-  nart_prefix       = substr(local.nart_role, 0, length(local.nart_role) - 1)
-  sg_outbound_id    = data.terraform_remote_state.common.outputs.common_sg_outbound_id
-  sg_smtp_ses       = data.terraform_remote_state.security-groups_secondary.outputs.sg_smtp_ses
-  dis_port          = data.terraform_remote_state.security-groups.outputs.bws_port
-  public_subnet_ids = flatten([data.terraform_remote_state.common.outputs.public_subnet_ids])
-  logs_bucket       = data.terraform_remote_state.common.outputs.common_s3_lb_logs_bucket
-  tags              = data.terraform_remote_state.common.outputs.common_tags
-  config_bucket     = data.terraform_remote_state.common.outputs.common_s3-config-bucket
+  nart_prefix                  = substr(local.nart_role, 0, length(local.nart_role) - 1)
+  sg_outbound_id               = data.terraform_remote_state.common.outputs.common_sg_outbound_id
+  sg_smtp_ses                  = data.terraform_remote_state.security-groups_secondary.outputs.sg_smtp_ses
+  dfi_port                     = data.terraform_remote_state.security-groups.outputs.bws_port
+  public_subnet_ids            = flatten([data.terraform_remote_state.common.outputs.public_subnet_ids])
+  logs_bucket                  = data.terraform_remote_state.common.outputs.common_s3_lb_logs_bucket
+  tags                         = data.terraform_remote_state.common.outputs.common_tags
+  config_bucket                = data.terraform_remote_state.common.outputs.common_s3-config-bucket
 
    #FSx Filesytem integration via Security Group membership
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
-
 }
 
 #-------------------------------------------------------------
@@ -196,7 +75,7 @@ data "aws_ssm_parameter" "bosso_password" {
 
 data "template_file" "instance_userdata" {
   template = file("../userdata/userdata.txt")
-  count    = var.dis_server_count
+  count    = var.dfi_server_count
   vars = {
     host_name         = "${local.nart_prefix}${count.index + 1}"
     internal_domain   = local.internal_domain
@@ -209,10 +88,10 @@ data "template_file" "instance_userdata" {
 }
 
 # Iteratively create EC2 instances
-resource "aws_instance" "dis_server" {
-  count         = var.dis_server_count
+resource "aws_instance" "dfi_server" {
+  count         = var.dfi_server_count
   ami           = data.aws_ami.amazon_ami.id
-  instance_type = var.dis_instance_type
+  instance_type = var.dfi_instance_type
 
   # element() function wraps if index > list count, so we get an even distribution across AZ subnets
   subnet_id                   = element(values(local.private_subnet_map), count.index)
@@ -252,7 +131,7 @@ tags = merge(
   user_data  = element(data.template_file.instance_userdata.*.rendered, count.index)
 
   root_block_device {
-    volume_size = var.dis_root_size
+    volume_size = var.dfi_root_size
   }
 
   lifecycle {
@@ -263,30 +142,21 @@ tags = merge(
   }
 }
 
-resource "aws_route53_record" "dis_dns" {
-  count   = var.dis_server_count
+resource "aws_route53_record" "dfi_dns" {
+  count   = var.dfi_server_count
   zone_id = local.private_zone_id
   name    = "${local.nart_prefix}${count.index + 1}.${local.internal_domain}"
   type    = "A"
   ttl     = "300"
 
-  records = [element(aws_instance.dis_server.*.private_ip, count.index)]
+  records = [element(aws_instance.dfi_server.*.private_ip, count.index)]
 }
 
-resource "aws_route53_record" "dis_dns_ext" {
-  count   = var.dis_server_count
+resource "aws_route53_record" "dfi_dns_ext" {
+  count   = var.dfi_server_count
   zone_id = local.public_zone_id
   name    = "${local.nart_prefix}${count.index + 1}.${local.external_domain}"
   type    = "A"
   ttl     = "300"
-  records = [element(aws_instance.dis_server.*.private_ip, count.index)]
-}
-
-#-------------------------------------------------------------
-# Create elb attachments
-#-------------------------------------------------------------
-resource "aws_elb_attachment" "environment" {
-  count    = var.dis_server_count
-  elb      = module.create_app_elb.environment_elb_name
-  instance = element(aws_instance.dis_server.*.id, count.index)
+  records = [element(aws_instance.dfi_server.*.private_ip, count.index)]
 }

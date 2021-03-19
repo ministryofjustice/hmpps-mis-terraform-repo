@@ -12,7 +12,7 @@ resource "aws_backup_plan" "bws_ec2_backup_plan" {
   name = "${var.environment_name}-bws-ec2-bkup-pri-pln"
 
   rule {
-    rule_name         = "MIS EC2 instance volume backup"
+    rule_name         = "MIS-EC2-instance-volume-backup"
     target_vault_name = aws_backup_vault.bws_ec2_backup_vault.name
     schedule          = var.ebs_backup["schedule"]
 
@@ -40,4 +40,3 @@ resource "aws_backup_selection" "bws_ec2_backup_selection" {
     value = "1"
   }
 }
-

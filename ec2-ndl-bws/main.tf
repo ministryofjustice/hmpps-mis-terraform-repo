@@ -164,6 +164,7 @@ locals {
   bws_port           = data.terraform_remote_state.security-groups.outputs.bws_port
   sg_bws_ldap        = data.terraform_remote_state.network-security-groups.outputs.sg_bws_ldap
   nextcloud_samba_sg = data.terraform_remote_state.network-security-groups.outputs.sg_mis_samba
+  config_bucket      = data.terraform_remote_state.common.outputs.common_s3-config-bucket
 
   #FSx Filesytem integration via Security Group membership
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
@@ -204,6 +205,7 @@ data "template_file" "instance_userdata" {
     password        = data.aws_ssm_parameter.password.value
     bosso_user      = data.aws_ssm_parameter.bosso_user.value
     bosso_password  = data.aws_ssm_parameter.bosso_password.value
+    cloudwatch_config = "s3://${local.config_bucket}/config.json"
   }
 }
 
