@@ -73,7 +73,7 @@ locals {
   delius-deps-bucket      = substr(var.dependencies_bucket_arn, 13, -1) # name (cut arn off - then insert name into arn in template??)
   migration-bucket        = substr(var.migration_bucket_arn, 13, -1)    # name
   s3_oracledb_backups_arn = data.terraform_remote_state.s3-oracledb-backups.outputs.s3_oracledb_backups.arn
-  s3_oracledb_backups_inventory_s3bucket_arn       = data.terraform_remote_state.s3-oracledb-backups.outputs.s3_oracledb_backups_inventory_s3bucket.arn
+  s3_oracledb_backups_inventory_arn       = data.terraform_remote_state.s3-oracledb-backups.outputs.s3_oracledb_backups_inventory.arn
   s3_ssm_ansible_arn      = data.terraform_remote_state.ci_common.outputs.ssm_ansible_bucket.arn
   runtime_role            = var.cross_account_iam_role
   account_id              = data.terraform_remote_state.common.outputs.common_account_id
