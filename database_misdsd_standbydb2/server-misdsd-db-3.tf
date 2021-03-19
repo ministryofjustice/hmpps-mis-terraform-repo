@@ -41,7 +41,7 @@ module "misdsd_db_3" {
     database_type                 = "standby" # required for the DB module. This file is where the property is set.
     dependencies_bucket_arn       = var.dependencies_bucket_arn
     s3_oracledb_backups_arn       = data.terraform_remote_state.s3-oracledb-backups.outputs.s3_oracledb_backups.arn
-    s3_oracledb_backups_inventory_s3bucket_arn       = data.terraform_remote_state.s3-oracledb-backups.outputs.s3_oracledb_backups_inventory_s3bucket.arn
+    s3_oracledb_backups_inventory_arn       = data.terraform_remote_state.s3-oracledb-backups.outputs.s3_oracledb_backups_inventory.arn
   }
   ## the following are retrieved from SSM Parameter Store
   ## oradb_sys_password            = "/${environment_name}/mis/misdsd-database/db/oradb_sys_password"
