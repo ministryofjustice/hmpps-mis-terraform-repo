@@ -62,10 +62,10 @@ resource "aws_s3_bucket_object" "dfi" {
     key      = format("%s/", each.key)
 }
 
-resource "aws_s3_bucket_ownership_controls" "dfi" {
-  bucket = aws_s3_bucket.dfi.id
-
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
+#resource "aws_s3_bucket_ownership_controls" "dfi" {
+#  bucket = aws_s3_bucket.dfi.id
+#
+#  rule {
+#    object_ownership = "BucketOwnerPreferred"
+#  }
+#}
