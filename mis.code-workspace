@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "../hmpps-delius-mis-packer"
+		},
+		{
+			"path": "../hmpps-mis-terraform-repo-fsx"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../hmpps-env-configs"
+		},
+		{
+			"path": "../hmpps-delius-pipelines"
+		},
+		{
+			"path": "../hmpps-base-packer"
+		},
+		{
+			"path": "../hmpps-engineering-pipelines"
+		},
+		{
+			"path": "../hmpps-engineering-tools"
+		}
+	],
+	"settings": {}
+}
