@@ -89,6 +89,20 @@ data "terraform_remote_state" "fsx-integration" {
 }
 
 #-------------------------------------------------------------
+### Getting monitoring details
+#-------------------------------------------------------------
+data "terraform_remote_state" "monitoring" {
+  backend = "s3"
+
+  config = {
+    bucket = var.remote_state_bucket_name
+    key    = "${var.environment_type}/monitoring/terraform.tfstate"
+    region = var.region
+  }
+}
+
+
+#-------------------------------------------------------------
 ### Getting the latest amazon ami
 #-------------------------------------------------------------
 data "aws_ami" "amazon_ami" {
