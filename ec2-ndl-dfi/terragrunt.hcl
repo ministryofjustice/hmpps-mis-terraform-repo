@@ -3,5 +3,5 @@ include {
 }
 
 dependencies {
-  paths = ["../common", "../securty-groups", "../iam", "../s3buckets",]
+  paths = ["../common", "../securty-groups", "../iam", "../s3buckets", "../monitoring",]
 }

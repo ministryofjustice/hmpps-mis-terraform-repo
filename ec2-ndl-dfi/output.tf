@@ -49,3 +49,13 @@ output "dfi_elb_zone_id" {
 output "dfi_elb_dns_cname" {
   value = element(concat(aws_route53_record.dns_entry.*.fqdn, [""]), 0)
 }
+
+#Log group
+output "datasync_log_group_name" {
+  value = aws_cloudwatch_log_group.s3_to_efs.name
+}
+
+#dfi s3bucket
+output "dfi_s3bucket_name" {
+  value = aws_s3_bucket.dfi.id
+}

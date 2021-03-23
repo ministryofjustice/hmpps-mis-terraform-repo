@@ -56,10 +56,10 @@ resource "aws_s3_bucket" "dfi" {
 }
 
 resource "aws_s3_bucket_object" "dfi" {
-    for_each = toset(["DFInterventions"])
+    for_each = toset(["dfi"])
     bucket   = aws_s3_bucket.dfi.id
     acl      = "private"
-    key      = format("%s/", each.key)
+    key      = format("/dfinterventions/%s/", each.key)
 }
 
 #resource "aws_s3_bucket_ownership_controls" "dfi" {
