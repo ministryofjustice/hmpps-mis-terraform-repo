@@ -79,12 +79,11 @@ type = map(string)
 
 variable "lifecycle_expiration" {
   description = "Specifies a period in the object's expire"
-  default     = 290
+  default     = 30
 }
 
-variable "dfi_account_ids" {
-  description = "Account DFI granted access to DFI bucket"
-  default     = "431912413968"  #Temp account id until actual account is provided
+variable "aws_account_ids" {
+  description = "Cloud_Platform Account ID with access to DFI bucket"
 }
 
 variable "dfi_server_resources" {

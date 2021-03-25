@@ -7,7 +7,7 @@ FSX_SG_ARN=$5
 USER_PARAM=$6
 PASS_PARAM=$7
 FSX_DOMAIN=$8
-OPTIONS=VerifyMode="POINT_IN_TIME_CONSISTENT",OverwriteMode="ALWAYS",Atime="BEST_EFFORT",Mtime="PRESERVE",Uid="NONE",Gid="NONE",PreserveDeletedFiles="REMOVE",PreserveDevices="NONE",PosixPermissions="NONE",BytesPerSecond="-1",TaskQueueing="ENABLED",LogLevel="TRANSFER"
+OPTIONS=VerifyMode="NONE",OverwriteMode="ALWAYS",Atime="BEST_EFFORT",Mtime="PRESERVE",Uid="NONE",Gid="NONE",PreserveDeletedFiles="REMOVE",PreserveDevices="NONE",PosixPermissions="NONE",TaskQueueing="ENABLED",LogLevel="TRANSFER"
 
 #Create Destination Location    #Unable to consume FSX outputs as it is written in TF13
 FSX_USER=$(aws ssm get-parameters --names $USER_PARAM --region $REGION --query "Parameters[0]"."Value" | sed 's:^.\(.*\).$:\1:')                      || exit $?
