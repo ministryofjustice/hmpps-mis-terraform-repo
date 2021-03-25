@@ -61,7 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "datasync_verification_alert" {
 
 resource "aws_cloudwatch_log_metric_filter" "datasync_verification_alert" {
   name           = "DataSyncVerificationErrorCount"
-  pattern        = local.error_pattern
+  pattern        = local.verification_error_pattern
   log_group_name = local.datasync_log_group
 
   metric_transformation {
