@@ -82,9 +82,8 @@ variable "lifecycle_expiration" {
   default     = 30
 }
 
-variable "dfi_account_ids" {
-  description = "Account DFI granted access to DFI bucket"
-  default     = "754256621582"  #Cloud_Platform Account ID.
+variable "aws_account_ids" {
+  description = "Cloud_Platform Account ID with access to DFI bucket"
 }
 
 variable "dfi_server_resources" {
