@@ -1,6 +1,6 @@
 locals {
   verification_error_pattern = "Verification failed"
-  error_pattern              = "ERROR"
+  error_pattern              = "WARN Failed"
   datasync_log_group         = aws_cloudwatch_log_group.s3_to_efs.name
   sns_topic_arn              = data.terraform_remote_state.monitoring.outputs.sns_topic_arn
   name_space                 = "LogMetrics"

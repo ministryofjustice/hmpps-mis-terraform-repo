@@ -21,6 +21,17 @@
           "arn:aws:s3:::${region}-${environment_name}-dfi-extracts/dfinterventions/dfi/*",
           "arn:aws:s3:::${region}-${environment_name}-dfi-extracts"
       ]
+    },
+    {
+      "Sid":"DfiS3GetPolicy",
+      "Effect":"Deny",
+    "Principal": "*",
+      "Action":["s3:GetObject"],
+      "Resource": [
+          "arn:aws:s3:::${region}-${environment_name}-dfi-extracts/*",
+          "arn:aws:s3:::${region}-${environment_name}-dfi-extracts"
+      ],
+      "Condition":{"StringEquals":{"s3:ExistingObjectTag/av-status":["infected"]}}
     }
   ]
 }
