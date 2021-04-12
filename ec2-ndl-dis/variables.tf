@@ -76,3 +76,15 @@ variable "access_logs" {
 variable "tags" {
 type = map(string)
 }
+
+variable "dis_disable_api_termination" {
+  type = bool
+}
+
+variable "dis_ebs_optimized" {
+  type = bool
+}
+
+variable "dis_hibernation" {
+  type = bool
+}
