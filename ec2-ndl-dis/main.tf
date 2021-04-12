@@ -169,6 +169,9 @@ locals {
    #FSx Filesytem integration via Security Group membership
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
 
+  dis_disable_api_termination = var.dis_disable_api_termination
+  dis_ebs_optimized           = var.dis_ebs_optimized 
+  dis_hibernation             = var.dis_hibernation  
 }
 
 #-------------------------------------------------------------
@@ -254,6 +257,10 @@ tags = merge(
   root_block_device {
     volume_size = var.dis_root_size
   }
+
+  disable_api_termination = local.dis_disable_api_termination
+  ebs_optimized           = local.dis_ebs_optimized 
+  hibernation             = local.dis_hibernation
 
   lifecycle {
     ignore_changes = [

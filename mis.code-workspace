@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "../hmpps-engineering-tools"
+		},
+		{
+			"path": "../hmpps-delius-iaps-shared-terraform"
 		}
 	],
 	"settings": {}

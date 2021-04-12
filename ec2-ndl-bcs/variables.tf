@@ -40,3 +40,14 @@ variable "snap_tag" {
   default = "CreateSnapshotBCS"
 }
 
+variable "bcs_disable_api_termination" {
+  type = bool
+}
+
+variable "bcs_ebs_optimized" {
+  type = bool
+}
+
+variable "bcs_hibernation" {
+  type = bool
+}

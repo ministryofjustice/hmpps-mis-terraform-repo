@@ -169,6 +169,9 @@ locals {
   #FSx Filesytem integration via Security Group membership
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
 
+  bws_disable_api_termination = var.bws_disable_api_termination
+  bws_ebs_optimized           = var.bws_ebs_optimized 
+  bws_hibernation             = var.bws_hibernation
 }
 
 #-------------------------------------------------------------
@@ -255,6 +258,10 @@ resource "aws_instance" "bws_server" {
   root_block_device {
     volume_size = var.bws_root_size
   }
+
+  disable_api_termination = local.bws_disable_api_termination
+  ebs_optimized           = local.bws_ebs_optimized 
+  hibernation             = local.bws_hibernation
 
   lifecycle {
     ignore_changes = [

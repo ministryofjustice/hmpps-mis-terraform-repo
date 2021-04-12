@@ -99,3 +99,15 @@ variable "http_protocol" {
 variable "http_port" {
   default = 80
 }
+
+variable "dfi_disable_api_termination" {
+  type = bool
+}
+
+variable "dfi_ebs_optimized" {
+  type = bool
+}
+
+variable "dfi_hibernation" {
+  type = bool
+}
