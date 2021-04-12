@@ -40,3 +40,14 @@ variable "snap_tag" {
   default = "CreateSnapshotBFS"
 }
 
+variable "bfs_disable_api_termination" {
+  type = bool
+}
+
+variable "bfs_ebs_optimized" {
+  type = bool
+}
+
+variable "bfs_hibernation" {
+  type = bool
+}

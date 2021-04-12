@@ -79,3 +79,14 @@ variable "snap_tag" {
   default = "CreateSnapshotBWS"
 }
 
+variable "bws_disable_api_termination" {
+  type = bool
+}
+
+variable "bws_ebs_optimized" {
+  type = bool
+}
+
+variable "bws_hibernation" {
+  type = bool
+}

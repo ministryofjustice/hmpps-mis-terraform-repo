@@ -40,3 +40,14 @@ variable "snap_tag" {
   default = "CreateSnapshotBPS"
 }
 
+variable "bps_disable_api_termination" {
+  type = bool
+}
+
+variable "bps_ebs_optimized" {
+  type = bool
+}
+
+variable "bps_hibernation" {
+  type = bool
+}
