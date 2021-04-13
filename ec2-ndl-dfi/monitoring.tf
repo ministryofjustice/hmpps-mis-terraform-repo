@@ -9,6 +9,8 @@ locals {
   dfi_ami_id                 = aws_instance.dfi_server.*.ami
   dfi_instance_type          = aws_instance.dfi_server.*.instance_type
   dfi_lb_name                = element(concat(aws_elb.dfi.*.id, [""]), 0)
+  dfi_lambda_log_group       = "/aws/lambda/dfi-lambda-function"
+  dfi_lambda_error_pattern   = "Error processing request"
 }
 
 #--------------------------------------------------------
@@ -190,4 +192,37 @@ resource "aws_cloudwatch_metric_alarm" "dfi_instance-memory-critical" {
     InstanceType = local.dfi_instance_type[count.index]
     objectname   = "Memory"
   }
+}
+
+
+#--------------------------------------------------------
+#DFI Lambda Alert
+#--------------------------------------------------------
+resource "aws_cloudwatch_metric_alarm" "s3_events_error_alert" {
+  alarm_name          = "${var.environment_name}__dfi_s3_events__alert__DFI_S3Events"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DfiS3EventsErrorCount"
+  namespace           = local.name_space
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "DFI S3 Event Lambda Invoke Error. May affect DFI ETL run. Please review log group ${local.dfi_lambda_log_group}"
+  alarm_actions       = [local.sns_topic_arn]
+  ok_actions          = [local.sns_topic_arn]
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+}
+
+resource "aws_cloudwatch_log_metric_filter" "s3_events_error_alert" {
+  name           = "DfiS3EventsErrorCount"
+  pattern        = local.dfi_lambda_error_pattern
+  log_group_name = local.dfi_lambda_log_group
+
+  metric_transformation {
+    name      = "DfiS3EventsErrorCount"
+    namespace = local.name_space
+    value     = "1"
+  }
+  depends_on = [aws_cloudwatch_log_group.dfi_lambda]
 }
