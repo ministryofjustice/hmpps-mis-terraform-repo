@@ -4,16 +4,15 @@ import os
 
 print('Loading function')
 
-s3 = boto3.client('s3')
-client = boto3.client('codebuild')
+client = boto3.client('codepipeline')
 
 def lambda_handler(event, context):
     print("Received event: " + json.dumps(event, indent=2))
-    PROJECT_NAME = os.environ.get("CODEBUILD_PROJECT_NAME")
+    PIPELINE_NAME = os.environ.get("CODE_PIPELINE_NAME")
 
     try:
-        print(f'Invoking {PROJECT_NAME}')
-        response = client.start_build(projectName=PROJECT_NAME)
+        print(f'Invoking {PIPELINE_NAME}')
+        response = client.start_pipeline_execution(name=PIPELINE_NAME)
     except Exception as e:
         print(e)
         print('Error processing request')

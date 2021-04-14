@@ -207,7 +207,7 @@ resource "aws_cloudwatch_metric_alarm" "s3_events_error_alert" {
   period              = "60"
   statistic           = "Sum"
   threshold           = "1"
-  alarm_description   = "DFI S3 Event Lambda Invoke Error. May affect DFI ETL run. Please review log group ${local.dfi_lambda_log_group}"
+  alarm_description   = "DFI S3 Event Lambda Invoke Error. May affect DFI File Transfer from S3 to FSX and DFI ETL run. Please review log group ${local.dfi_lambda_log_group}"
   alarm_actions       = [local.sns_topic_arn]
   ok_actions          = [local.sns_topic_arn]
   datapoints_to_alarm = "1"

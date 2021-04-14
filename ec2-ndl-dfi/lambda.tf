@@ -88,7 +88,7 @@ resource "aws_lambda_function" "dfi_lambda" {
 
   environment {
     variables = {
-      CODEBUILD_PROJECT_NAME = "${var.environment_name}-dfi-s3-fsx-build"
+      CODE_PIPELINE_NAME = "${var.environment_name}-dfi-s3-fsx"
     }
   }
 }
