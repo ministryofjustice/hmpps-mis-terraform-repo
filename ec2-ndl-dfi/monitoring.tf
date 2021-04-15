@@ -1,6 +1,7 @@
 locals {
   verification_error_pattern = "Verification failed"
   error_pattern              = "WARN Failed"
+  creds_error_pattern        = "Volume did not receive creds for location"
   datasync_log_group         = aws_cloudwatch_log_group.s3_to_efs.name
   sns_topic_arn              = data.terraform_remote_state.monitoring.outputs.sns_topic_arn
   name_space                 = "LogMetrics"
@@ -40,6 +41,34 @@ resource "aws_cloudwatch_log_metric_filter" "datasync_error_alert" {
 
   metric_transformation {
     name      = "DataSyncErrorCount"
+    namespace = local.name_space
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "datasync_creds_error_alert" {
+  alarm_name          = "${var.environment_name}__datasync_creds_error__alert__DFI_Datasync"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DataSyncCredsErrorCount"
+  namespace           = local.name_space
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "Datasync Task Execution finished with status S3 Volume did not receive creds for location. Please re-run Codepipeline: ${var.environment_name}-dfi-s3-fsx"
+  alarm_actions       = [local.sns_topic_arn]
+  ok_actions          = [local.sns_topic_arn]
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+}
+
+resource "aws_cloudwatch_log_metric_filter" "datasync_creds_error_alert" {
+  name           = "DataSyncCredsErrorCount"
+  pattern        = local.creds_error_pattern
+  log_group_name = local.datasync_log_group
+
+  metric_transformation {
+    name      = "DataSyncCredsErrorCount"
     namespace = local.name_space
     value     = "1"
   }
