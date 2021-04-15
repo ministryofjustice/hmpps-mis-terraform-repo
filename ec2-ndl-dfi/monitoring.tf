@@ -1,6 +1,7 @@
 locals {
   verification_error_pattern = "Verification failed"
-  error_pattern              = "ERROR"
+  error_pattern              = "WARN Failed"
+  creds_error_pattern        = "Volume did not receive creds for location"
   datasync_log_group         = aws_cloudwatch_log_group.s3_to_efs.name
   sns_topic_arn              = data.terraform_remote_state.monitoring.outputs.sns_topic_arn
   name_space                 = "LogMetrics"
@@ -9,6 +10,8 @@ locals {
   dfi_ami_id                 = aws_instance.dfi_server.*.ami
   dfi_instance_type          = aws_instance.dfi_server.*.instance_type
   dfi_lb_name                = element(concat(aws_elb.dfi.*.id, [""]), 0)
+  dfi_lambda_log_group       = "/aws/lambda/dfi-lambda-function"
+  dfi_lambda_error_pattern   = "Error processing request"
 }
 
 #--------------------------------------------------------
@@ -38,6 +41,34 @@ resource "aws_cloudwatch_log_metric_filter" "datasync_error_alert" {
 
   metric_transformation {
     name      = "DataSyncErrorCount"
+    namespace = local.name_space
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "datasync_creds_error_alert" {
+  alarm_name          = "${var.environment_name}__datasync_creds_error__alert__DFI_Datasync"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DataSyncCredsErrorCount"
+  namespace           = local.name_space
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "Datasync Task Execution finished with status S3 Volume did not receive creds for location. Please re-run Codepipeline: ${var.environment_name}-dfi-s3-fsx"
+  alarm_actions       = [local.sns_topic_arn]
+  ok_actions          = [local.sns_topic_arn]
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+}
+
+resource "aws_cloudwatch_log_metric_filter" "datasync_creds_error_alert" {
+  name           = "DataSyncCredsErrorCount"
+  pattern        = local.creds_error_pattern
+  log_group_name = local.datasync_log_group
+
+  metric_transformation {
+    name      = "DataSyncCredsErrorCount"
     namespace = local.name_space
     value     = "1"
   }
@@ -190,4 +221,47 @@ resource "aws_cloudwatch_metric_alarm" "dfi_instance-memory-critical" {
     InstanceType = local.dfi_instance_type[count.index]
     objectname   = "Memory"
   }
+}
+
+
+#--------------------------------------------------------
+#DFI Lambda Alert
+#--------------------------------------------------------
+resource "aws_cloudwatch_metric_alarm" "s3_events_error_alert" {
+  alarm_name          = "${var.environment_name}__dfi_s3_events__alert__DFI_S3Events"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DfiS3EventsErrorCount"
+  namespace           = local.name_space
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "DFI S3 Event Lambda Invoke Error. May affect DFI File Transfer from S3 to FSX and DFI ETL run. Please review log group ${local.dfi_lambda_log_group}"
+  alarm_actions       = [local.sns_topic_arn]
+  ok_actions          = [local.sns_topic_arn]
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+}
+
+resource "aws_cloudwatch_log_metric_filter" "s3_events_error_alert" {
+  name           = "DfiS3EventsErrorCount"
+  pattern        = local.dfi_lambda_error_pattern
+  log_group_name = local.dfi_lambda_log_group
+
+  metric_transformation {
+    name      = "DfiS3EventsErrorCount"
+    namespace = local.name_space
+    value     = "1"
+  }
+  depends_on = [aws_cloudwatch_log_group.dfi_lambda]
+}
+
+#--------------------------------------------------------
+#DFI ClamAV Alerts
+#Notify in slack that infected files found
+#--------------------------------------------------------
+module "clamav-notify" {
+  source  = "../modules/clamav-notify/"
+  name    = var.environment_type
+  tags    = var.tags
 }

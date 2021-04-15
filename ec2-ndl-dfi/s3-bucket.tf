@@ -55,11 +55,19 @@ resource "aws_s3_bucket" "dfi" {
   )
 }
 
+#Create folders for dfi
 resource "aws_s3_bucket_object" "dfi" {
     for_each = toset(["dfi"])
     bucket   = aws_s3_bucket.dfi.id
     acl      = "private"
     key      = format("/dfinterventions/%s/", each.key)
+}
+
+#Create folder for infected files
+resource "aws_s3_bucket_object" "infected" {
+    bucket   = aws_s3_bucket.dfi.id
+    acl      = "private"
+    key      = "/infected/"
 }
 
 #resource "aws_s3_bucket_ownership_controls" "dfi" {

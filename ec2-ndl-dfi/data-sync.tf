@@ -1,8 +1,6 @@
-##################################################
-#
-# Datasync Locations
-#
-##################################################
+#--------------------------------------------------------
+#Datasync Locations
+#--------------------------------------------------------
 #S3 Location
 resource "aws_datasync_location_s3" "dfi" {
   s3_bucket_arn = aws_s3_bucket.dfi.arn
@@ -20,12 +18,9 @@ resource "aws_datasync_location_s3" "dfi" {
   )
 }
 
-##################################################
-#
-# Datasync IAM for s3 access
-#
-##################################################
-
+#--------------------------------------------------------
+#Datasync IAM for s3 access
+#--------------------------------------------------------
 #IAM Role for access to s3
 data "template_file" "data_sync_s3_acces" {
   template = "${file("./templates/data-sync-policy.tpl")}"
@@ -79,13 +74,9 @@ resource "aws_iam_role_policy_attachment" "data_sync_s3_acces" {
   policy_arn = aws_iam_policy.data_sync_s3_acces.arn
 }
 
-
-##################################################
-#
-# Datasync Task
-#
-##################################################
-
+#--------------------------------------------------------
+#Datasync Task
+#--------------------------------------------------------
 resource "aws_cloudwatch_log_group" "s3_to_efs" {
   name              = "/${var.environment_name}/${local.app_name}/aws/datasync"
   retention_in_days = "30"
