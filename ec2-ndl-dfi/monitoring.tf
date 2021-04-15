@@ -226,3 +226,13 @@ resource "aws_cloudwatch_log_metric_filter" "s3_events_error_alert" {
   }
   depends_on = [aws_cloudwatch_log_group.dfi_lambda]
 }
+
+#--------------------------------------------------------
+#DFI ClamAV Alerts
+#Notify in slack that infected files found
+#--------------------------------------------------------
+module "clamav-notify" {
+  source  = "../modules/clamav-notify/"
+  name    = var.environment_type
+  tags    = var.tags
+}
