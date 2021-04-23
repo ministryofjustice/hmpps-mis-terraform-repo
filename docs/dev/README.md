@@ -88,6 +88,22 @@ ndl-dis-101.delius-mis-dev.internal
 ndl-dis-101.mis-dev.delius.probation.hmpps.dsd.io
 ```
 
+## DFI
+DFI Endpoint [https://ndl-dfi.mis-dev.delius.probation.hmpps.dsd.io/DataServices/(https://ndl-dfi.mis-dev.delius.probation.hmpps.dsd.io/DataServices/)
+
+#### Internal DNS
+
+
+```
+ndl-dfi-101.delius-mis-dev.internal
+```
+
+#### External DNS
+
+```
+ndl-dfi-101.mis-dev.delius.probation.hmpps.dsd.io
+```
+
 ## SMTP Relay/SES
 An SMTP relay EC2 instance is in place to forward email notifications from SAP on ndl-dis-101 to AWS SES. The SAP SMTP client is currently unable to authenticate to AWS SES, therefore an SMTP Server running Postfix is in place between ndl-dis-101 and AWS SES to enable authentication and connection.
 

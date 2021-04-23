@@ -98,6 +98,22 @@ ndl-dis-411.delius-stage.internal
 ndl-dis-411.stage.delius.probation.hmpps.dsd.io
 ```
 
+## DFI
+DFI Endpoint [https://ndl-dfi.stage.delius.probation.hmpps.dsd.io/DataServices](https://ndl-dfi.stage.delius.probation.hmpps.dsd.io/DataServices/)
+
+#### Internal DNS
+
+
+```
+ndl-dfi-411.delius-stage.internal
+```
+
+#### External DNS
+
+```
+ndl-dfi-411.stage.delius.probation.hmpps.dsd.io
+```
+
 ## SMTP Relay/SES
 An SMTP relay EC2 instance is in place to forward email notifications from SAP on ndl-dis-411 to AWS SES. The SAP SMTP client is currently unable to authenticate to AWS SES, therefore an SMTP Server running Postfix is in place between ndl-dis-411 and AWS SES to enable authentication and connection.
 
