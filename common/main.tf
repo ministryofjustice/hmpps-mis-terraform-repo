@@ -62,7 +62,7 @@ locals {
       "source-hash" = "ignored"
     },
     {
-      "source-code" = "hmpps-mis-terraform-repo"
+      "source-code" = "https://github.com/ministryofjustice/hmpps-mis-terraform-repo"
     }
   )
 

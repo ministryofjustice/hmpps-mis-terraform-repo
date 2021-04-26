@@ -3,7 +3,7 @@
 resource "aws_backup_vault" "nextcloud_efs" {
   name = "${var.environment_name}-nextcloud-efs-bkup-pri-vlt"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${var.environment_name}-nextcloud-efs-bkup-pri-vlt"
     },
@@ -25,7 +25,7 @@ resource "aws_backup_plan" "nextcloud_efs_backup_plan" {
   }
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${var.environment_name}-nextcloud-efs-bkup-pri-pln"
     },

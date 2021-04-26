@@ -51,7 +51,7 @@ resource "aws_iam_role" "dfi_lambda" {
 EOF
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${var.environment_name}-${local.lambda_name}"
     },
@@ -71,7 +71,7 @@ resource "aws_cloudwatch_log_group" "dfi_lambda" {
   name              = local.dfi_lambda_log_group
   retention_in_days = "14"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = local.dfi_lambda_log_group
     },

@@ -24,7 +24,7 @@ module "nextcloud_lb" {
   lb_protocol                 = "http"
   lb_protocol_https           = "https"
   target                      = "HTTP:80/index.php/login"
-  tags                        = var.tags
+  tags                        = local.tags
 }
 
 ###############################################

@@ -11,6 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_alert" {
   alarm_description   = "The BWS loadbalancer ${local.bws_lb_name} has 1 Unhealthy host. Please contact the MIS Team or the MIS AWS Support contact"
   alarm_actions       = [aws_sns_topic.alarm_notification.arn]
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.bws_lb_name
@@ -29,6 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_critical" {
   alarm_description   = "The BWS loadbalancer ${local.bws_lb_name} has 2 Unhealthy hosts. Please contact the MIS Team or the MIS AWS Support contact"
   alarm_actions       = [aws_sns_topic.alarm_notification.arn]
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.bws_lb_name
@@ -48,6 +50,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
   alarm_actions       = [aws_sns_topic.alarm_notification.arn]
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
   treat_missing_data  = "notBreaching"
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.bws_lb_name
@@ -68,6 +71,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts_alert" {
   alarm_description   = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} has 1 Unhealthy host. Please contact the MIS AWS Support contact"
   alarm_actions       = [aws_sns_topic.alarm_notification.arn]
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.nextcloud_lb_name
@@ -86,6 +90,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts_critical" {
   alarm_description   = "The NEXTCLOUD loadbalancer ${local.nextcloud_lb_name} has 2 Unhealthy hosts. Please contact the MIS AWS Support contact"
   alarm_actions       = [aws_sns_topic.alarm_notification.arn]
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.nextcloud_lb_name
@@ -105,6 +110,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_spillovercount" {
   alarm_actions       = [aws_sns_topic.alarm_notification.arn]
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
   treat_missing_data  = "notBreaching"
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.nextcloud_lb_name
@@ -124,6 +130,7 @@ resource "aws_cloudwatch_metric_alarm" "samba_lb_unhealthy_hosts_alert" {
   alarm_description   = "The NEXTCLOUD Samba loadbalancer ${local.samba_lb_name} has 1 Unhealthy host. BO - Nextcloud Syncs may be degraded. Please contact the MIS AWS Support contact"
   alarm_actions       = [aws_sns_topic.alarm_notification.arn]
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.samba_lb_name
@@ -142,6 +149,7 @@ resource "aws_cloudwatch_metric_alarm" "samba_lb_unhealthy_hosts_critical" {
   alarm_description   = "The NEXTCLOUD Samba loadbalancer ${local.samba_lb_name} has 2 Unhealthy hosts. BO - Nextcloud Syncs not functioning!. Please contact the MIS AWS Support contact"
   alarm_actions       = [aws_sns_topic.alarm_notification.arn]
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.samba_lb_name
@@ -164,6 +172,7 @@ resource "aws_cloudwatch_metric_alarm" "ses_auth_fail" {
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
   treat_missing_data  = "notBreaching"
   datapoints_to_alarm = "1"
+  tags                = local.tags
 }
 
 resource "aws_cloudwatch_log_metric_filter" "SesAuthenticationFail" {
@@ -177,4 +186,3 @@ resource "aws_cloudwatch_log_metric_filter" "SesAuthenticationFail" {
     value     = "1"
   }
 }
-

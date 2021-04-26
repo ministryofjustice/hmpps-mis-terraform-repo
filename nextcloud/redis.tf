@@ -22,7 +22,7 @@ resource "aws_elasticache_replication_group" "nextcloud_cache" {
   security_group_ids         = [local.sg_https_out]
   port                       = 6379
   at_rest_encryption_enabled = true
-  tags                       = var.tags
+  tags                       = local.tags
 }
 
 resource "aws_route53_record" "nextcloud_cache_dns" {

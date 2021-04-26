@@ -118,6 +118,7 @@ locals {
   nart_prefix            = substr(local.nart_role, 0, length(local.nart_role) - 1)
   started_message        = "has been started"
   name_prefix            = var.short_environment_name
+  tags                   = data.terraform_remote_state.common.outputs.common_tags
 }
 
 #dashboard
@@ -144,7 +145,7 @@ resource "aws_cloudwatch_log_group" "mis_application_log_group" {
   name              = "/mis/application_logs"
   retention_in_days = var.cloudwatch_log_retention
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${local.name_prefix}-offapi-pri-cwl"
     },
@@ -196,4 +197,3 @@ resource "aws_lambda_permission" "with_sns" {
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.alarm_notification.arn
 }
-

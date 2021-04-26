@@ -32,6 +32,7 @@ module "File_Repository" {
   log_group_name  = local.log_group_name
   metric_name     = "FileRepository"
   pattern_ok      = "${local.include_log_level} ${local.File_Repository} ${local.dis_server_started_msg}"
+  tags            = local.tags
 }
 
 module "Central_Management" {
@@ -46,6 +47,7 @@ module "Central_Management" {
   log_group_name  = local.log_group_name
   metric_name     = "CentralManagement"
   pattern_ok      = "${local.include_log_level} ${local.Central_Management} ${local.dis_server_started_msg}"
+  tags            = local.tags
 }
 
 module "Job_Server" {
@@ -60,6 +62,7 @@ module "Job_Server" {
   log_group_name  = local.log_group_name
   metric_name     = "JobServer"
   pattern_ok      = "${local.include_log_level} ${local.Job_Server} ${local.dis_server_started_msg}"
+  tags            = local.tags
 }
 
 module "AdaptiveProcessingServer" {
@@ -74,6 +77,7 @@ module "AdaptiveProcessingServer" {
   log_group_name  = local.log_group_name
   metric_name     = local.AdaptiveProcessingServer
   pattern_ok      = "${local.include_log_level} NDLDIS101.${local.AdaptiveProcessingServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "EIMAdaptiveProcessingServer" {
@@ -88,6 +92,7 @@ module "EIMAdaptiveProcessingServer" {
   log_group_name  = local.log_group_name
   metric_name     = local.EIMAdaptiveProcessingServer
   pattern_ok      = "${local.include_log_level} NDLDIS101.${local.EIMAdaptiveProcessingServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "DataServices" {
@@ -102,6 +107,7 @@ module "DataServices" {
   log_group_name  = local.log_group_name
   metric_name     = local.DataServices
   pattern_ok      = "${local.include_log_level} In ServiceStart"
+  tags            = local.tags
 }
 
 module "etl" {
@@ -116,5 +122,5 @@ module "etl" {
   log_group_name  = local.log_group_name
   metric_name     = "01CentralManagementServer"
   pattern_ok      = "${local.include_log_level} ${local.ETL} ${local.started_message}"
+  tags            = local.tags
 }
-

@@ -8,7 +8,7 @@ resource "aws_elb" "samba_lb" {
   name                 = "${local.samba_lb_name}-elb"
   internal             = true
   subnets              = flatten(local.private_subnet_ids)
-  tags                 = var.tags
+  tags                 = local.tags
   security_groups      = flatten([local.nextcloud_samba_sg])
   listener {
     instance_port     = "445"

@@ -216,10 +216,6 @@ variable "character_set_name" {
   default     = ""
 }
 
-variable "tags" {
-  type = map(string)
-}
-
 variable "snap_tag" {
   default = "Name"
 }

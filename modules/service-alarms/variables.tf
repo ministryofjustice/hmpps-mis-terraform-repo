@@ -41,3 +41,5 @@ variable "pattern_ok" {
 variable "alarm_threshold" {
   default = "1"
 }
+
+variable "tags" {}

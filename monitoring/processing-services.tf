@@ -43,6 +43,7 @@ module "PROCTIER001_WebIntelligenceProcessingServer" {
   metric_name     = "PROCTIER001WebIntelligenceProcessingServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER001_WebIntelligenceProcessingServer} ${local.started_message}"
   alarm_threshold = "3"
+  tags            = local.tags
 }
 
 module "PROCTIER001_AdaptiveJobServer" {
@@ -57,6 +58,7 @@ module "PROCTIER001_AdaptiveJobServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER001AdaptiveJobServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER001_AdaptiveJobServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER001_APS_Webi" {
@@ -71,6 +73,7 @@ module "PROCTIER001_APS_Webi" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER001APSWebi"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER001_APS_Webi} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER001_ConnectionServer" {
@@ -85,6 +88,7 @@ module "PROCTIER001_ConnectionServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER001ConnectionServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER001_ConnectionServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER001_ConnectionServer32" {
@@ -99,6 +103,7 @@ module "PROCTIER001_ConnectionServer32" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER001ConnectionServer32"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER001_ConnectionServer32} ${local.started_message}"
+  tags            = local.tags
 }
 
 ################################################
@@ -119,6 +124,7 @@ module "PROCTIER002_WebIntelligenceProcessingServer" {
   metric_name     = "PROCTIER002WebIntelligenceProcessingServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER002_WebIntelligenceProcessingServer} ${local.started_message}"
   alarm_threshold = "3"
+  tags            = local.tags
 }
 
 module "PROCTIER002_AdaptiveJobServer" {
@@ -133,6 +139,7 @@ module "PROCTIER002_AdaptiveJobServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER002AdaptiveJobServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER002_AdaptiveJobServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER002_APS_Webi" {
@@ -147,6 +154,7 @@ module "PROCTIER002_APS_Webi" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER002APSWebi"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER002_APS_Webi} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER002_ConnectionServer" {
@@ -161,6 +169,7 @@ module "PROCTIER002_ConnectionServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER002ConnectionServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER002_ConnectionServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER002_ConnectionServer32" {
@@ -175,6 +184,7 @@ module "PROCTIER002_ConnectionServer32" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER002ConnectionServer32"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER002_ConnectionServer32} ${local.started_message}"
+  tags            = local.tags
 }
 
 ################################################
@@ -195,6 +205,7 @@ module "PROCTIER003_WebIntelligenceProcessingServer" {
   metric_name     = "PROCTIER003WebIntelligenceProcessingServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER003_WebIntelligenceProcessingServer} ${local.started_message}"
   alarm_threshold = "3"
+  tags            = local.tags
 }
 
 module "PROCTIER003_AdaptiveJobServer" {
@@ -209,6 +220,7 @@ module "PROCTIER003_AdaptiveJobServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER003AdaptiveJobServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER003_AdaptiveJobServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER003_APS_Webi" {
@@ -223,6 +235,7 @@ module "PROCTIER003_APS_Webi" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER003APSWebi"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER003_APS_Webi} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER003_ConnectionServer" {
@@ -237,6 +250,7 @@ module "PROCTIER003_ConnectionServer" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER003ConnectionServer"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER003_ConnectionServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "PROCTIER003_ConnectionServer32" {
@@ -251,4 +265,5 @@ module "PROCTIER003_ConnectionServer32" {
   log_group_name  = local.log_group_name
   metric_name     = "PROCTIER003ConnectionServer32"
   pattern_ok      = "${local.include_log_level} ${local.PROCTIER003_ConnectionServer32} ${local.started_message}"
+  tags            = local.tags
 }

@@ -18,7 +18,7 @@ resource "aws_ssm_parameter" "nextcloud_db_password" {
   )}${random_string.nextcloud_special.result}"
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${local.environment_identifier}-db-password"
     },
@@ -36,7 +36,7 @@ resource "aws_ssm_parameter" "nextcloud_db_user" {
   type        = "String"
   value       = local.nextcloud_db_user
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${local.environment_identifier}-db-user"
     },
@@ -72,7 +72,7 @@ resource "aws_ssm_parameter" "nextcloud_ssm_password" {
   )}${random_string.special.result}"
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${local.environment_identifier}-admin-password"
     },
@@ -90,7 +90,7 @@ resource "aws_ssm_parameter" "nextcloud_ssm_user" {
   type        = "String"
   value       = local.nextcloud_admin_user
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${local.environment_identifier}-admin-user"
     },
