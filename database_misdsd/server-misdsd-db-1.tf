@@ -1,7 +1,7 @@
 #Overide autostop tag
 locals {
-  tags = merge(
-    local.overide_tags,
+  overide_tags = merge(
+    local.tags,
     {
       "autostop-${var.environment_type}" = "Phase1"
     },
