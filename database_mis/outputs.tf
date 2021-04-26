@@ -26,6 +26,8 @@ locals {
   db2_address             = local.high_availability_count >= 1 ? local.db2_add : local.empty
   db3_address             = local.high_availability_count >= 2 ? local.db3_add : local.empty
   address_list            = "${local.db1_address}${local.db2_address}${local.db3_address}"
+
+  tags                    = data.terraform_remote_state.common.outputs.common_tags
 }
 
 output "jdbc_failover_url" {

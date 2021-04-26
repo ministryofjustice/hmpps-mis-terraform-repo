@@ -15,7 +15,7 @@ module "mis_db_2" {
     data.terraform_remote_state.vpc_security_groups.outputs.sg_mis_out_to_delius_db_id,
   ]
 
-  tags                         = var.tags
+  tags                         = local.tags
   environment_name             = data.terraform_remote_state.vpc.outputs.environment_name
   bastion_inventory            = data.terraform_remote_state.vpc.outputs.bastion_inventory
   project_name                 = var.project_name
@@ -83,4 +83,3 @@ output "mis_db_2" {
     mis_db_2      = "ssh ${module.mis_db_2.public_fqdn}"
   }
 }
-

@@ -111,10 +111,10 @@ resource "aws_launch_configuration" "launch_cfg" {
 }
 
 data "null_data_source" "tags" {
-  count = length(keys(var.tags))
+  count = length(keys(local.tags))
   inputs = {
-    key                 = element(keys(var.tags), count.index)
-    value               = element(values(var.tags), count.index)
+    key                 = element(keys(local.tags), count.index)
+    value               = element(values(local.tags), count.index)
     propagate_at_launch = true
   }
 }
@@ -133,7 +133,7 @@ resource "aws_autoscaling_group" "asg" {
   desired_capacity     = var.nextcloud_instance_count
   health_check_type    = "EC2"
   tags = [
-    for key, value in merge(var.tags, {
+    for key, value in merge(local.tags, {
       "Name" = "${var.environment_type}-${local.app_name}-asg"
     }) : {
       key                 = key
@@ -171,7 +171,7 @@ resource "aws_autoscaling_attachment" "samba_attachment" {
 resource "aws_cloudwatch_log_group" "httpd_access_logs" {
   name              = "/${var.environment_type}/${local.app_name}/access_log"
   retention_in_days = 14
-  tags              = var.tags
+  tags              = local.tags
 }
 
 resource "aws_cloudwatch_log_group" "httpd_error_logs" {

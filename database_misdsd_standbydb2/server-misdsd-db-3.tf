@@ -15,7 +15,7 @@ module "misdsd_db_3" {
     data.terraform_remote_state.vpc_security_groups.outputs.sg_mis_db_in_out_rman_cat_id,
   ]
 
-  tags                         = var.tags
+  tags                         = local.tags
   environment_name             = data.terraform_remote_state.vpc.outputs.environment_name
   bastion_inventory            = data.terraform_remote_state.vpc.outputs.bastion_inventory
   project_name                 = var.project_name
@@ -82,4 +82,3 @@ output "misdsd_db_3" {
     misdsd_db_3   = "ssh ${module.misdsd_db_3.public_fqdn}"
   }
 }
-

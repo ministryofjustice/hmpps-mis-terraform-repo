@@ -73,10 +73,6 @@ variable "access_logs" {
   default     = []
 }
 
-variable "tags" {
-type = map(string)
-}
-
 variable "lifecycle_expiration" {
   description = "Specifies a period in the object's expire"
   default     = 30

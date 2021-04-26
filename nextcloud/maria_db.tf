@@ -25,7 +25,7 @@ resource "aws_iam_role_policy_attachment" "enhanced_monitoring" {
 module "kms_key" {
   source       = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git//modules/kms?ref=terraform-0.12"
   kms_key_name = local.common_name
-  tags         = var.tags
+  tags         = local.tags
 }
 
 ############################################
@@ -37,7 +37,7 @@ module "db_subnet_group" {
   identifier  = local.common_name
   name_prefix = "${local.common_name}-"
   subnet_ids  = local.private_subnet_ids
-  tags        = var.tags
+  tags        = local.tags
 }
 
 ############################################
@@ -50,7 +50,7 @@ module "db_parameter_group" {
   name_prefix = "${local.common_name}-"
   family      = var.family
   parameters  = flatten(var.parameters)
-  tags = var.tags
+  tags = local.tags
 }
 
 ############################################
@@ -65,7 +65,7 @@ module "db_option_group" {
   engine_name              = var.engine
   major_engine_version     = var.major_engine_version
   options                  = [var.options]
-  tags                     = var.tags
+  tags                     = local.tags
 }
 
 ############################################
@@ -119,7 +119,7 @@ module "db_instance" {
   timezone           = var.timezone
   character_set_name = var.character_set_name
 
-  tags = var.tags
+  tags = local.tags
 }
 
 ###############################################

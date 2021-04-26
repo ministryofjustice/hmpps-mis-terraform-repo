@@ -18,6 +18,7 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-alert" {
   alarm_description   = "D: Drive Free Space is less than ${var.alert_threshold}% for ${var.primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions       = [var.sns_topic]
   ok_actions          = [var.sns_topic]
+  tags                = var.tags
 
   dimensions = {
     instance     = "D:"
@@ -44,6 +45,7 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-alert" {
   alarm_description   = "C: Drive Free Space is less than ${var.alert_threshold}% for ${var.primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions       = [var.sns_topic]
   ok_actions          = [var.sns_topic]
+  tags                = var.tags
 
   dimensions = {
     instance     = "C:"
@@ -75,6 +77,7 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-critical" {
   alarm_description   = "D: Drive Free Space is less than ${var.critical_threshold}% for ${var.primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions       = [var.sns_topic]
   ok_actions          = [var.sns_topic]
+  tags                = var.tags
 
   dimensions = {
     instance     = "D:"
@@ -101,6 +104,7 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-critical" {
   alarm_description   = "C: Drive Free Space is less than ${var.critical_threshold}% for ${var.primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions       = [var.sns_topic]
   ok_actions          = [var.sns_topic]
+  tags                = var.tags
 
   dimensions = {
     instance     = "C:"

@@ -46,6 +46,7 @@ module "dis" {
   ami_id             = local.dis_ami_id
   instance_type      = local.dis_instance_type
   sns_topic          = local.sns_topic
+  tags               = local.tags
 }
 
 module "bps" {
@@ -61,6 +62,7 @@ module "bps" {
   ami_id             = local.bps_ami_id
   instance_type      = local.bps_instance_type
   sns_topic          = local.sns_topic
+  tags               = local.tags
 }
 
 module "bcs" {
@@ -76,6 +78,7 @@ module "bcs" {
   ami_id             = local.bcs_ami_id
   instance_type      = local.bcs_instance_type
   sns_topic          = local.sns_topic
+  tags               = local.tags
 }
 
 module "bfs" {
@@ -91,6 +94,7 @@ module "bfs" {
   ami_id             = local.bfs_ami_id
   instance_type      = local.bfs_instance_type
   sns_topic          = local.sns_topic
+  tags               = local.tags
 }
 
 module "bws" {
@@ -106,4 +110,5 @@ module "bws" {
   ami_id             = local.bws_ami_id
   instance_type      = local.bws_instance_type
   sns_topic          = local.sns_topic
+  tags               = local.tags
 }

@@ -11,7 +11,7 @@ resource "aws_datasync_location_s3" "dfi" {
   }
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${var.environment_name}-dfi-s3-location"
     },
@@ -61,7 +61,7 @@ resource "aws_iam_role" "data_sync_s3_acces" {
 EOF
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "${var.environment_name}-data-sync-s3-access"
     },
@@ -81,7 +81,7 @@ resource "aws_cloudwatch_log_group" "s3_to_efs" {
   name              = "/${var.environment_name}/${local.app_name}/aws/datasync"
   retention_in_days = "30"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       "Name" = "/${var.environment_name}/${local.app_name}/aws/datasync"
     },

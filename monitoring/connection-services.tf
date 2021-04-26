@@ -45,6 +45,7 @@ module "CMSTIER001_APS_Core" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER001APSPromotionManager"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER001_APS_Core} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER001_APS_PromotionManager" {
@@ -59,6 +60,7 @@ module "CMSTIER001_APS_PromotionManager" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER001APSCore"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER001_APS_PromotionManager} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER001_CentralManagementServer" {
@@ -73,6 +75,7 @@ module "CMSTIER001_CentralManagementServer" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER001CentralManagementServer"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER001_CentralManagementServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER001_ConnectionServer" {
@@ -87,6 +90,7 @@ module "CMSTIER001_ConnectionServer" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER001ConnectionServer"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER001_ConnectionServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER001_ConnectionServer32" {
@@ -101,6 +105,7 @@ module "CMSTIER001_ConnectionServer32" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER001ConnectionServer32"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER001_ConnectionServer32} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER001_EventServer" {
@@ -115,6 +120,7 @@ module "CMSTIER001_EventServer" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER001EventServer"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER001_EventServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER001_InputFilerepository" {
@@ -129,6 +135,7 @@ module "CMSTIER001_InputFilerepository" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER001InputFilerepository"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER001_InputFilerepository} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER001_OutputFilerepository" {
@@ -143,6 +150,7 @@ module "CMSTIER001_OutputFilerepository" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER001OutputFilerepository"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER001_OutputFilerepository} ${local.started_message}"
+  tags            = local.tags
 }
 
 ################################################
@@ -163,6 +171,7 @@ module "CMSTIER002_CentralManagementServer" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER002CentralManagementServer"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER002_CentralManagementServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER002_ConnectionServer" {
@@ -177,6 +186,7 @@ module "CMSTIER002_ConnectionServer" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER002ConnectionServer"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER002_ConnectionServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER002_ConnectionServer32" {
@@ -191,6 +201,7 @@ module "CMSTIER002_ConnectionServer32" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER002ConnectionServer32"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER002_ConnectionServer32} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER002_APS_Search" {
@@ -205,6 +216,7 @@ module "CMSTIER002_APS_Search" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER002APSSearch"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER002_APS_Search} ${local.started_message}"
+  tags            = local.tags
 }
 
 ################################################
@@ -224,6 +236,7 @@ module "CMSTIER003_APS_Core" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER003APSPromotionManager"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER003_APS_Core} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER003_CentralManagementServer" {
@@ -238,6 +251,7 @@ module "CMSTIER003_CentralManagementServer" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER003CentralManagementServer"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER003_CentralManagementServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER003_ConnectionServer" {
@@ -252,6 +266,7 @@ module "CMSTIER003_ConnectionServer" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER003ConnectionServer"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER003_ConnectionServer} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER003_ConnectionServer32" {
@@ -266,6 +281,7 @@ module "CMSTIER003_ConnectionServer32" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER003ConnectionServer32"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER003_ConnectionServer32} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER003_APS_MonitoringService" {
@@ -280,6 +296,7 @@ module "CMSTIER003_APS_MonitoringService" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER003APSMonitoringService"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER003_APS_MonitoringService} ${local.started_message}"
+  tags            = local.tags
 }
 
 module "CMSTIER003_WebApplicationContainerServer" {
@@ -294,5 +311,5 @@ module "CMSTIER003_WebApplicationContainerServer" {
   log_group_name  = local.log_group_name
   metric_name     = "CMSTIER003WebApplicationContainerServer"
   pattern_ok      = "${local.include_log_level} ${local.CMSTIER003_WebApplicationContainerServer} ${local.started_message}"
+  tags            = local.tags
 }
-

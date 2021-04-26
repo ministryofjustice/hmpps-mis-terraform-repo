@@ -17,6 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "file_permission_denied_alert" {
   ok_actions          = [aws_sns_topic.alarm_notification.arn]
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
+  tags                = local.tags
 }
 
 resource "aws_cloudwatch_log_metric_filter" "file_permission_denied" {

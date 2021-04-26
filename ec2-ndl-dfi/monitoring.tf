@@ -32,6 +32,7 @@ resource "aws_cloudwatch_metric_alarm" "datasync_error_alert" {
   ok_actions          = [local.sns_topic_arn]
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
+  tags                = local.tags
 }
 
 resource "aws_cloudwatch_log_metric_filter" "datasync_error_alert" {
@@ -60,6 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "datasync_creds_error_alert" {
   ok_actions          = [local.sns_topic_arn]
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
+  tags                = local.tags
 }
 
 resource "aws_cloudwatch_log_metric_filter" "datasync_creds_error_alert" {
@@ -88,6 +90,7 @@ resource "aws_cloudwatch_metric_alarm" "datasync_verification_alert" {
   ok_actions          = [local.sns_topic_arn]
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
+  tags                = local.tags
 }
 
 resource "aws_cloudwatch_log_metric_filter" "datasync_verification_alert" {
@@ -122,6 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_cpu_critical" {
   alarm_description   = "CPU utilization is averaging 92% for ${local.dfi_primary_dns_ext[count.index]}. Please note: During the ETL Run it is normal for resource usage to be high, daily between 18:30-00:00 & 01:00-05:30 when this can be ignored. Otherwise contact the MIS Team or AWS Support Contact."
   alarm_actions       = [local.sns_topic_arn]
   ok_actions          = [local.sns_topic_arn]
+  tags                = local.tags
 
   dimensions = {
     InstanceId = local.dfi_instance_ids[count.index]
@@ -144,6 +148,7 @@ module "dfi" {
   ami_id             = local.dfi_ami_id
   instance_type      = local.dfi_instance_type
   sns_topic          = local.sns_topic_arn
+  tags               = local.tags
 }
 
 #--------------------------------------------------------
@@ -164,6 +169,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_instance-health-check" {
   alarm_description   = "EC2 Health status failed for ${local.dfi_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions       = [local.sns_topic_arn]
   ok_actions          = [local.sns_topic_arn]
+  tags                = local.tags
 
   dimensions = {
     InstanceId = local.dfi_instance_ids[count.index]
@@ -190,6 +196,7 @@ count = length(
   alarm_description   = "The DFI loadbalancer ${local.dfi_lb_name} has 1 Unhealthy host. Please contact the MIS Team or the MIS AWS Support contact"
   alarm_actions       = [local.sns_topic_arn]
   ok_actions          = [local.sns_topic_arn]
+  tags                = local.tags
 
   dimensions = {
     LoadBalancerName = local.dfi_lb_name
@@ -214,6 +221,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_instance-memory-critical" {
   alarm_description   = "Memory Utilization  is averaging 92% for ${local.dfi_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
   alarm_actions       = [local.sns_topic_arn]
   ok_actions          = [local.sns_topic_arn]
+  tags                = local.tags
 
   dimensions = {
     InstanceId   = local.dfi_instance_ids[count.index]
@@ -241,6 +249,7 @@ resource "aws_cloudwatch_metric_alarm" "s3_events_error_alert" {
   ok_actions          = [local.sns_topic_arn]
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
+  tags                = local.tags
 }
 
 resource "aws_cloudwatch_log_metric_filter" "s3_events_error_alert" {
@@ -263,5 +272,5 @@ resource "aws_cloudwatch_log_metric_filter" "s3_events_error_alert" {
 module "clamav-notify" {
   source  = "../modules/clamav-notify/"
   name    = var.environment_type
-  tags    = var.tags
+  tags    = local.tags
 }

@@ -4,7 +4,7 @@
 module "efs_share" {
   source                 = "git::https://github.com/ministryofjustice/hmpps-terraform-modules.git//modules/efs?ref=terraform-0.12"
   environment_identifier = local.short_environment_identifier
-  tags                   = var.tags
+  tags                   = local.tags
   encrypted              = true
   performance_mode       = "generalPurpose"
   throughput_mode        = "bursting"

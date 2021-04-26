@@ -12,6 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "mis_service_alarm" {
   alarm_actions       = [var.alarm_actions]
   treat_missing_data  = "notBreaching"
   datapoints_to_alarm = "1"
+  tags                = var.tags
 }
 
 #Alarm Metric Filter
@@ -41,6 +42,7 @@ resource "aws_cloudwatch_metric_alarm" "mis_service_alarm_OK" {
   alarm_actions       = [var.alarm_actions]
   treat_missing_data  = "notBreaching"
   datapoints_to_alarm = "1"
+  tags                = var.tags
 }
 
 #OK Metric Filter

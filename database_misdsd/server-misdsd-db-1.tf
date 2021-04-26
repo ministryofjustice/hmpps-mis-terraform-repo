@@ -1,7 +1,7 @@
 #Overide autostop tag
 locals {
-  tags = merge(
-    var.tags,
+  overide_tags = merge(
+    local.tags,
     {
       "autostop-${var.environment_type}" = "Phase1"
     },
@@ -25,7 +25,7 @@ module "misdsd_db_1" {
     data.terraform_remote_state.vpc_security_groups.outputs.sg_mis_db_in_out_rman_cat_id,
   ]
 
-  tags                         = local.tags
+  tags                         = local.overide_tags
   environment_name             = data.terraform_remote_state.vpc.outputs.environment_name
   bastion_inventory            = data.terraform_remote_state.vpc.outputs.bastion_inventory
   project_name                 = var.project_name
@@ -96,4 +96,3 @@ output "misdsd_db_1" {
     misdsd_db_1   = "ssh ${module.misdsd_db_1.public_fqdn}"
   }
 }
-
