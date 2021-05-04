@@ -170,8 +170,8 @@ locals {
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
 
   dis_disable_api_termination = var.dis_disable_api_termination
-  dis_ebs_optimized           = var.dis_ebs_optimized 
-  dis_hibernation             = var.dis_hibernation  
+  dis_ebs_optimized           = var.dis_ebs_optimized
+  dis_hibernation             = var.dis_hibernation
 }
 
 #-------------------------------------------------------------
@@ -259,7 +259,7 @@ tags = merge(
   }
 
   disable_api_termination = local.dis_disable_api_termination
-  ebs_optimized           = local.dis_ebs_optimized 
+  ebs_optimized           = local.dis_ebs_optimized
   hibernation             = local.dis_hibernation
 
   lifecycle {
@@ -296,4 +296,19 @@ resource "aws_elb_attachment" "environment" {
   count    = var.dis_server_count
   elb      = module.create_app_elb.environment_elb_name
   instance = element(aws_instance.dis_server.*.id, count.index)
+}
+
+#--------------------------------------------------------
+#ETL Cloudwatch Log group
+#--------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "dis_etl_log_group" {
+  name              = "/${local.app_name}/extraction/transformation/loading/log"
+  retention_in_days = "14"
+  tags = merge(
+    local.tags,
+    {
+      "Name" = "/${local.app_name}/extraction/transformation/loading/log"
+    },
+  )
 }

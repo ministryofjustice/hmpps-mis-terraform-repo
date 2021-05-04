@@ -12,6 +12,9 @@ locals {
   dfi_lb_name                = element(concat(aws_elb.dfi.*.id, [""]), 0)
   dfi_lambda_log_group       = "/aws/lambda/dfi-lambda-function"
   dfi_lambda_error_pattern   = "Error processing request"
+  match_all_patterns         = " "  #match all patterns
+  dfi_etl_metric_name        = "DfiEtlErrorsCount"
+  dfi_etl_log_group_name     = "/dfi/extraction/transformation/loading/log"
 }
 
 #--------------------------------------------------------
@@ -273,4 +276,52 @@ module "clamav-notify" {
   source  = "../modules/clamav-notify/"
   name    = var.environment_type
   tags    = local.tags
+}
+
+#--------------------------------------------------------
+#DFI ETL Alarms + Metric filter
+#Log is if there is any data in the error_* file, an error has occured.
+#Any log entry triggers alarm
+#--------------------------------------------------------
+resource "aws_cloudwatch_metric_alarm" "dfi_etl_alarm" {
+  alarm_name          = "${var.environment_name}__DFI_ETL_ERRORS__critical"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = local.dfi_etl_metric_name
+  namespace           = local.name_space
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = 1
+  alarm_description   = "DFI ETL Run Errors detected in error logs. The latest error_* file is more than 0kb in size. Please review the Cloudwatch Log group : ${local.dfi_etl_log_group_name} for more details"
+  alarm_actions       = [local.sns_topic_arn]
+  treat_missing_data  = "notBreaching"
+  datapoints_to_alarm = "1"
+  tags                = local.tags
+}
+
+resource "aws_cloudwatch_log_metric_filter" "dfi_etl_service_metric" {
+  name           = local.dfi_etl_metric_name
+  pattern        = local.match_all_patterns
+  log_group_name = local.dfi_etl_log_group_name
+
+  metric_transformation {
+    name      = local.dfi_etl_metric_name
+    namespace = local.name_space
+    value     = "1"
+  }
+}
+
+#--------------------------------------------------------
+#ETL Cloudwatch Log group
+#--------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "dfi_etl_log_group" {
+  name              = local.dfi_etl_log_group_name
+  retention_in_days = "14"
+  tags = merge(
+    local.tags,
+    {
+      "Name" = local.dfi_etl_log_group_name
+    },
+  )
 }
