@@ -119,6 +119,7 @@ locals {
   started_message        = "has been started"
   name_prefix            = var.short_environment_name
   tags                   = data.terraform_remote_state.common.outputs.common_tags
+  account_id             = data.terraform_remote_state.common.outputs.common_account_id
 }
 
 #dashboard

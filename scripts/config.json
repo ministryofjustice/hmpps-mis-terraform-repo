@@ -1,6 +1,35 @@
 {
         "logs": {
                 "logs_collected": {
+                        "files": {
+                            "collect_list": [
+                                {
+                                    "file_path": "D:\\DSTemp\\log\\DSJobServer101\\devdsd_taf__bodslocal\\error_*.txt",
+                                    "log_group_name": "/mis/extraction/transformation/loading/log",
+                                    "log_stream_name": "{instance_id}"
+                                },
+                                {
+                                    "file_path": "D:\\DSTemp\\log\\DSJobServer800\\datdsd__bodslocal\\error_*.txt",
+                                    "log_group_name": "/mis/extraction/transformation/loading/log",
+                                    "log_stream_name": "{instance_id}"
+                                },
+                                {
+                                    "file_path": "D:\\DSTemp\\log\\DSJobServer411\\stgdsd__bodslocal\\error_*.txt",
+                                    "log_group_name": "/mis/extraction/transformation/loading/log",
+                                    "log_stream_name": "{instance_id}"
+                                },
+                                {
+                                    "file_path": "D:\\DSTemp\\log\\DSJobServer500\\predsd_taf__bodslocal\\error_*.txt",
+                                    "log_group_name": "/mis/extraction/transformation/loading/log",
+                                    "log_stream_name": "{instance_id}"
+                                },
+                                {
+                                    "file_path": "D:\\DSTemp\\log\\DSJobServer001\\prddsd_taf__bodslocal\\error_*.txt",
+                                    "log_group_name": "/mis/extraction/transformation/loading/log",
+                                    "log_stream_name": "{instance_id}"
+                                }
+                            ]
+                        },
                         "windows_events": {
                                 "collect_list": [
                                         {
