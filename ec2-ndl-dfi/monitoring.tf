@@ -309,6 +309,7 @@ resource "aws_cloudwatch_log_metric_filter" "dfi_etl_service_metric" {
     namespace = local.name_space
     value     = "1"
   }
+  depends_on = [aws_cloudwatch_log_group.dfi_etl_log_group]
 }
 
 #--------------------------------------------------------
