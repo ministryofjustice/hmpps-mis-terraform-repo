@@ -17,6 +17,7 @@ resource "aws_security_group_rule" "https_in" {
     local.natgateway_az1,
     local.natgateway_az2,
     local.natgateway_az3,
+    local.bastion_public_ip,
   )
 }
 
