@@ -73,6 +73,20 @@ data "terraform_remote_state" "codebuild" {
   }
 }
 
+#-------------------------------------------------------------
+### Getting the bastion details
+#-------------------------------------------------------------
+data "terraform_remote_state" "bastion" {
+  backend = "s3"
+
+  config = {
+    bucket   = var.bastion_remote_state_bucket_name
+    key      = "service-bastion/terraform.tfstate"
+    region   = var.region
+    role_arn = var.bastion_role_arn
+  }
+}
+
 ####################################################
 # Locals
 ####################################################
@@ -97,6 +111,7 @@ locals {
   natgateway_az1              = ["${data.terraform_remote_state.natgateway.outputs.natgateway_common-nat-public-ip-az1}/32"]
   natgateway_az2              = ["${data.terraform_remote_state.natgateway.outputs.natgateway_common-nat-public-ip-az2}/32"]
   natgateway_az3              = ["${data.terraform_remote_state.natgateway.outputs.natgateway_common-nat-public-ip-az3}/32"]
+  bastion_public_ip           = ["${data.terraform_remote_state.bastion.outputs.bastion_ip}/32"]
 
   sg_map_ids = {
     sg_mis_db_in     = data.terraform_remote_state.security-groups.outputs.sg_mis_db_in

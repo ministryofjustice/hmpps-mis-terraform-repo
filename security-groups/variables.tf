@@ -21,3 +21,10 @@ variable "bws_port" {
   default = "8080"
 }
 
+variable "bastion_remote_state_bucket_name" {
+  description = "Terraform remote state bucket name for Bastion VPC"
+}
+
+variable "bastion_role_arn" {
+  description = "role to access bastion terraform state"
+}
