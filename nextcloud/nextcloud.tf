@@ -43,6 +43,7 @@ data "template_file" "nextcloud_user_data" {
 
   vars = {
     app_name                     = local.app_name
+    mis_app_name                 = local.mis_app_name
     bastion_inventory            = local.bastion_inventory
     private_domain               = local.internal_domain
     private_zone_id              = local.private_zone_id
@@ -68,6 +69,7 @@ data "template_file" "nextcloud_user_data" {
     mis_user                     = data.aws_ssm_parameter.user.value
     mis_user_pass_name           = "${local.environment_identifier}-${local.mis_app_name}-admin-password"
     reports_pass_name            = "${local.environment_identifier}-reports-admin-password"
+    bosso_svc_passname           = "/${local.environment_name}/${local.mis_app_name}-service-accounts/SVC_BOSSO-NDL/SVC_BOSSO-NDL_password"
     cidr_block_a_subnet          = local.cidr_block_a_subnet
     cidr_block_b_subnet          = local.cidr_block_b_subnet
     cidr_block_c_subnet          = local.cidr_block_c_subnet
