@@ -13,6 +13,7 @@ EXTERNAL_DOMAIN="${external_domain}"
 
 cat << EOF >> /etc/environment
 HMPPS_ROLE=${app_name}
+MIS_APP_NAME="${mis_app_name}"
 SMTP_FQDN="smtp.${private_domain}"
 HMPPS_STACKNAME=${env_identifier}
 HMPPS_STACK="${short_env_identifier}"
@@ -46,6 +47,7 @@ STRATEGIC_PWM_URL="${strategic_pwm_url}"
 ENV_TYPE="${environment_type}"
 region="${region}"
 MIS_USER_PASS_NAME="${mis_user_pass_name}"
+BOSSO_SVC_PASSNAME="${bosso_svc_passname}"
 CIDR_BLOCK_A="${cidr_block_a_subnet}"
 CIDR_BLOCK_B="${cidr_block_b_subnet}"
 CIDR_BLOCK_C="${cidr_block_c_subnet}"
@@ -54,6 +56,7 @@ EOF
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
 ## just configured, so lets export them
 export HMPPS_ROLE="${app_name}"
+export MIS_APP_NAME="${mis_app_name}"
 export SMTP_FQDN="smtp.${private_domain}"
 export HMPPS_STACKNAME="${env_identifier}"
 export HMPPS_STACK="${short_env_identifier}"
@@ -87,6 +90,7 @@ export STRATEGIC_PWM_URL="${strategic_pwm_url}"
 export ENV_TYPE="${environment_type}"
 export region="${region}"
 export MIS_USER_PASS_NAME="${mis_user_pass_name}"
+export BOSSO_SVC_PASSNAME="${bosso_svc_passname}"
 export CIDR_BLOCK_A="${cidr_block_a_subnet}"
 export CIDR_BLOCK_B="${cidr_block_b_subnet}"
 export CIDR_BLOCK_C="${cidr_block_c_subnet}"
@@ -110,7 +114,7 @@ cat << EOF > ~/requirements.yml
   src: singleplatform-eng.users
 - name: nextcloud
   src: https://github.com/ministryofjustice/hmpps-nextcloud-installer
-  version: 1.2.0
+  version: 1.3.0
 EOF
 
 wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
@@ -175,6 +179,9 @@ mail_server: $SMTP_FQDN
 from_address: "no-reply.$HMPPS_ROLE"
 region: $region
 mis_user_pass_name: $MIS_USER_PASS_NAME
+bosso_svc_passname: $BOSSO_SVC_PASSNAME
+mis_app_name: $MIS_APP_NAME
+hmpps_environment: $HMPPS_ENVIRONMENT
 globignore: "CRC:nart:National:NPS"
 cidr_block_a: $CIDR_BLOCK_A
 cidr_block_b: $CIDR_BLOCK_B
