@@ -27,6 +27,16 @@
                                     "file_path": "D:\\DSTemp\\log\\DSJobServer001\\prddsd_taf__bodslocal\\error_*.txt",
                                     "log_group_name": "/mis/extraction/transformation/loading/log",
                                     "log_stream_name": "{instance_id}"
+                                },
+                                {
+                                    "file_path": "D:\\DSTemp\\log\\DFIDIS101\\devdsd_taf__dfi_bodslocal\\error_*.txt",
+                                    "log_group_name": "/dfi/extraction/transformation/loading/log",
+                                    "log_stream_name": "{instance_id}"
+                                },
+                                {
+                                    "file_path": "D:\\DSTemp\\log\\DFIDIS411\\stgdsd__dfi_bodslocal\\error_*.txt",
+                                    "log_group_name": "/dfi/extraction/transformation/loading/log",
+                                    "log_stream_name": "{instance_id}"
                                 }
                             ]
                         },
