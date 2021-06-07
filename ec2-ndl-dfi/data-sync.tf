@@ -4,7 +4,7 @@
 #S3 Location
 resource "aws_datasync_location_s3" "dfi" {
   s3_bucket_arn = aws_s3_bucket.dfi.arn
-  subdirectory  = "/dfinterventions"
+  subdirectory  = "/dfinterventions/dfi"
 
   s3_config {
     bucket_access_role_arn = aws_iam_role.data_sync_s3_acces.arn
