@@ -1,26 +1,6 @@
-locals {
-  verification_error_pattern = "Verification failed"
-  error_pattern              = "WARN Failed"
-  creds_error_pattern        = "Volume did not receive creds for location"
-  datasync_log_group         = aws_cloudwatch_log_group.s3_to_efs.name
-  sns_topic_arn              = data.terraform_remote_state.monitoring.outputs.sns_topic_arn
-  name_space                 = "LogMetrics"
-  dfi_instance_ids           = aws_instance.dfi_server.*.id
-  dfi_primary_dns_ext        = aws_route53_record.dfi_dns_ext.*.fqdn
-  dfi_ami_id                 = aws_instance.dfi_server.*.ami
-  dfi_instance_type          = aws_instance.dfi_server.*.instance_type
-  dfi_lb_name                = element(concat(aws_elb.dfi.*.id, [""]), 0)
-  dfi_lambda_log_group       = "/aws/lambda/dfi-lambda-function"
-  dfi_lambda_error_pattern   = "Error processing request"
-  match_all_patterns         = " "  #match all patterns
-  dfi_etl_metric_name        = "DfiEtlErrorsCount"
-  dfi_etl_log_group_name     = "/dfi/extraction/transformation/loading/log"
-}
-
 #--------------------------------------------------------
 #Datasync alerts
 #--------------------------------------------------------
-
 resource "aws_cloudwatch_metric_alarm" "datasync_error_alert" {
   alarm_name          = "${var.environment_name}__datasync_error__alert__DFI_Datasync"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -108,11 +88,9 @@ resource "aws_cloudwatch_log_metric_filter" "datasync_verification_alert" {
   }
 }
 
-
 #--------------------------------------------------------
 # CPU Alert
 #--------------------------------------------------------
-
 resource "aws_cloudwatch_metric_alarm" "dfi_cpu_critical" {
   count = length(
     local.dfi_instance_ids,
@@ -234,7 +212,6 @@ resource "aws_cloudwatch_metric_alarm" "dfi_instance-memory-critical" {
   }
 }
 
-
 #--------------------------------------------------------
 #DFI Lambda Alert
 #--------------------------------------------------------
@@ -292,7 +269,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_etl_alarm" {
   period              = "60"
   statistic           = "Sum"
   threshold           = 1
-  alarm_description   = "DFI ETL Run Errors detected in error logs. The latest error_* file is more than 0kb in size. Please review the Cloudwatch Log group : ${local.dfi_etl_log_group_name} for more details"
+  alarm_description   = "DFI ETL Run Errors detected in error logs on host ${local.host_dfi1}. The latest error_* file is more than 0kb in size. Please review the Cloudwatch Log group : ${local.dfi_etl_log_group_name} for more details"
   alarm_actions       = [local.sns_topic_arn]
   treat_missing_data  = "notBreaching"
   datapoints_to_alarm = "1"
@@ -325,4 +302,112 @@ resource "aws_cloudwatch_log_group" "dfi_etl_log_group" {
       "Name" = local.dfi_etl_log_group_name
     },
   )
+}
+
+#--------------------------------------------------------
+#DFI Service Alerts
+#--------------------------------------------------------
+module "File_Repository" {
+  source          = "../modules/service-alarms/"
+  service_name    = "File_Repository"
+  alarm_name      = "${var.environment_name}__Dfi_File_Repository"
+  name_space      = local.name_space
+  host            = local.host_dfi1
+  mis_team_action = local.mis_team_action
+  alarm_actions   = local.sns_topic_arn
+  pattern         = "${local.include_log_level} ${local.host_dfi1} ${local.File_Repository} ${local.dfi_server_stopped_msg}"
+  log_group_name  = local.log_group_name
+  metric_name     = "DfiFileRepository"
+  pattern_ok      = "${local.include_log_level} ${local.host_dfi1} ${local.File_Repository} ${local.dfi_server_started_msg}"
+  tags            = local.tags
+}
+
+module "Central_Management" {
+  source          = "../modules/service-alarms/"
+  service_name    = "Central_Management"
+  alarm_name      = "${var.environment_name}__Dfi_Central_Management"
+  name_space      = local.name_space
+  host            = local.host_dfi1
+  mis_team_action = local.mis_team_action
+  alarm_actions   = local.sns_topic_arn
+  pattern         = "${local.include_log_level} ${local.host_dfi1} ${local.Central_Management} ${local.dfi_server_stopped_msg}"
+  log_group_name  = local.log_group_name
+  metric_name     = "DfiCentralManagement"
+  pattern_ok      = "${local.include_log_level} ${local.host_dfi1} ${local.Central_Management} ${local.dfi_server_started_msg}"
+  tags            = local.tags
+}
+
+module "Job_Server" {
+  source          = "../modules/service-alarms/"
+  service_name    = "Job_Server"
+  alarm_name      = "${var.environment_name}__Dfi_Job_Server"
+  name_space      = local.name_space
+  host            = local.host_dfi1
+  mis_team_action = local.mis_team_action
+  alarm_actions   = local.sns_topic_arn
+  pattern         = "${local.include_log_level} ${local.host_dfi1} ${local.Job_Server} ${local.dfi_server_stopped_msg}"
+  log_group_name  = local.log_group_name
+  metric_name     = "DfiJobServer"
+  pattern_ok      = "${local.include_log_level} ${local.host_dfi1} ${local.Job_Server} ${local.dfi_server_started_msg}"
+  tags            = local.tags
+}
+
+module "AdaptiveProcessingServer" {
+  source          = "../modules/service-alarms/"
+  service_name    = local.AdaptiveProcessingServer
+  alarm_name      = "${var.environment_name}__Dfi_${local.AdaptiveProcessingServer}"
+  name_space      = local.name_space
+  host            = local.host_dfi1
+  mis_team_action = local.mis_team_action
+  alarm_actions   = local.sns_topic_arn
+  pattern         = "${local.include_log_level} ${local.pattern_host_name}.${local.AdaptiveProcessingServer} ${local.stopped_with_exit_code}"
+  log_group_name  = local.log_group_name
+  metric_name     = "Dfi${local.AdaptiveProcessingServer}"
+  pattern_ok      = "${local.include_log_level} ${local.pattern_host_name}.${local.AdaptiveProcessingServer} ${local.started_message}"
+  tags            = local.tags
+}
+
+module "EIMAdaptiveProcessingServer" {
+  source          = "../modules/service-alarms/"
+  service_name    = local.EIMAdaptiveProcessingServer
+  alarm_name      = "${var.environment_name}__Dfi_${local.EIMAdaptiveProcessingServer}"
+  name_space      = local.name_space
+  host            = local.host_dfi1
+  mis_team_action = local.mis_team_action
+  alarm_actions   = local.sns_topic_arn
+  pattern         = "${local.include_log_level} ${local.pattern_host_name}.${local.EIMAdaptiveProcessingServer} ${local.stopped_with_exit_code}"
+  log_group_name  = local.log_group_name
+  metric_name     = "Dfi${local.EIMAdaptiveProcessingServer}"
+  pattern_ok      = "${local.include_log_level} ${local.pattern_host_name}.${local.EIMAdaptiveProcessingServer} ${local.started_message}"
+  tags            = local.tags
+}
+
+module "DataServices" {
+  source          = "../modules/service-alarms/"
+  service_name    = local.DataServices
+  alarm_name      = "${var.environment_name}__Dfi_${local.DataServices}"
+  name_space      = local.name_space
+  host            = local.host_dfi1
+  mis_team_action = local.mis_team_action
+  alarm_actions   = local.sns_topic_arn
+  pattern         = "${local.include_log_level} ${local.data_services_pattern} ${local.host_dfi1} In ServiceStop"
+  log_group_name  = local.log_group_name
+  metric_name     = "Dfi${local.DataServices}"
+  pattern_ok      = "${local.include_log_level} ${local.data_services_pattern} ${local.host_dfi1} In ServiceStart"
+  tags            = local.tags
+}
+
+module "CentralManagementServer" {
+  source          = "../modules/service-alarms/"
+  service_name    = local.Central_Management_Server
+  alarm_name      = "${var.environment_name}__Dfi_${local.Central_Management_Server}"
+  name_space      = local.name_space
+  host            = local.host_dfi1
+  mis_team_action = local.mis_team_action
+  alarm_actions   = local.sns_topic_arn
+  pattern         = "${local.exclude_log_level} ${local.pattern_host_name}.${local.Central_Management_Server} Service stopped unexpectedly."
+  log_group_name  = local.log_group_name
+  metric_name     = "DfiCentralManagementServer"
+  pattern_ok      = "${local.include_log_level} ${local.pattern_host_name}.${local.Central_Management_Server} ${local.started_message}"
+  tags            = local.tags
 }
