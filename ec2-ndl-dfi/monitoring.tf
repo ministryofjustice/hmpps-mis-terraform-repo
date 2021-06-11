@@ -411,3 +411,35 @@ module "CentralManagementServer" {
   pattern_ok      = "${local.include_log_level} ${local.pattern_host_name}.${local.Central_Management_Server} ${local.started_message}"
   tags            = local.tags
 }
+
+#--------------------------------------------------------
+#DFI Pipeline Failure Alert
+#--------------------------------------------------------
+resource "aws_cloudwatch_metric_alarm" "dfi_pipeline_alert" {
+  alarm_name          = "${var.environment_name}__dfi_pipeline_errors__alert"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DfiPipelineErrorCount"
+  namespace           = local.name_space
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "DFI CodePipeline ${var.environment_name}-dfi-s3-fsx completed with errors. Please review log group ${local.dfi_pipeline_log_group_name}"
+  alarm_actions       = [local.sns_topic_arn]
+  ok_actions          = [local.sns_topic_arn]
+  datapoints_to_alarm = "1"
+  treat_missing_data  = "notBreaching"
+  tags                = local.tags
+}
+
+resource "aws_cloudwatch_log_metric_filter" "dfi_pipeline_alert" {
+  name           = "DfiPipelineErrorCount"
+  pattern        = local.dfi_pipeline_failure_pattern
+  log_group_name = local.dfi_pipeline_log_group_name
+
+  metric_transformation {
+    name      = "DfiPipelineErrorCount"
+    namespace = local.name_space
+    value     = "1"
+  }
+}

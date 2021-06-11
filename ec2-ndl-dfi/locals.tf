@@ -78,4 +78,6 @@ locals {
   include_log_level              = "INFORMATION"
   exclude_log_level              = "-INFORMATION -WARNING"
   started_message                = "has been started"
+  dfi_pipeline_failure_pattern   = "Phase BUILD State FAILED"
+  dfi_pipeline_log_group_name    = "/aws/codebuild/${var.environment_name}-dfi-s3-fsx-build"
 }
