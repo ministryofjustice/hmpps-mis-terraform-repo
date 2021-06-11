@@ -37,6 +37,11 @@
                                     "file_path": "D:\\DSTemp\\log\\DFIDIS411\\stgdsd__dfi_bodslocal\\error_*.txt",
                                     "log_group_name": "/dfi/extraction/transformation/loading/log",
                                     "log_stream_name": "{instance_id}"
+                                },
+                                {
+                                    "file_path": "D:\\DSTemp\\log\\DFIDIS001\\prddsd_taf__dfi_bodslocal\\error_*.txt",
+                                    "log_group_name": "/dfi/extraction/transformation/loading/log",
+                                    "log_stream_name": "{instance_id}"
                                 }
                             ]
                         },

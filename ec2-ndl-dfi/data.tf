@@ -130,3 +130,22 @@ data "aws_ami" "amazon_ami" {
 
   owners = ["895523100917"]
 }
+
+#-------------------------------------------------------------
+## Getting the admin username and password
+#-------------------------------------------------------------
+data "aws_ssm_parameter" "user" {
+  name = "${local.environment_identifier}-${local.app_name}-admin-user"
+}
+
+data "aws_ssm_parameter" "password" {
+  name = "${local.environment_identifier}-${local.app_name}-admin-password"
+}
+
+data "aws_ssm_parameter" "bosso_user" {
+  name = "${local.environment_identifier}-reports-admin-user"
+}
+
+data "aws_ssm_parameter" "bosso_password" {
+  name = "${local.environment_identifier}-reports-admin-password"
+}
