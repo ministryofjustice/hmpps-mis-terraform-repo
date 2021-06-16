@@ -34,7 +34,6 @@ resource "aws_lb_cookie_stickiness_policy" "nextcloud" {
   name                     = "nextcloud-policy"
   load_balancer            = module.nextcloud_lb.environment_elb_name
   lb_port                  = 443
-  cookie_expiration_period = 300
 }
 
 resource "aws_proxy_protocol_policy" "nextcloud" {
