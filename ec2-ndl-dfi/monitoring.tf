@@ -2,7 +2,7 @@
 #Datasync alerts
 #--------------------------------------------------------
 resource "aws_cloudwatch_metric_alarm" "datasync_error_alert" {
-  alarm_name          = "${var.environment_name}__datasync_error__alert__DFI_Datasync"
+  alarm_name          = "${var.environment_type}__datasync_error__alert__DFI_Datasync"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "DataSyncErrorCount"
@@ -31,7 +31,7 @@ resource "aws_cloudwatch_log_metric_filter" "datasync_error_alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "datasync_creds_error_alert" {
-  alarm_name          = "${var.environment_name}__datasync_creds_error__alert__DFI_Datasync"
+  alarm_name          = "${var.environment_type}__datasync_creds_error__alert__DFI_Datasync"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "DataSyncCredsErrorCount"
@@ -60,7 +60,7 @@ resource "aws_cloudwatch_log_metric_filter" "datasync_creds_error_alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "datasync_verification_alert" {
-  alarm_name          = "${var.environment_name}__datasync_verification_error__alert__DFI_Datasync"
+  alarm_name          = "${var.environment_type}__datasync_verification_error__alert__DFI_Datasync"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "DataSyncVerificationErrorCount"
@@ -95,7 +95,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_cpu_critical" {
   count = length(
     local.dfi_instance_ids,
   )
-  alarm_name          = "${var.environment_name}__CPU-Utilization__critical__DFI__${local.dfi_instance_ids[count.index]}"
+  alarm_name          = "${var.environment_type}__CPU-Utilization__critical__DFI__${local.dfi_instance_ids[count.index]}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
@@ -123,7 +123,7 @@ module "dfi" {
   alert_threshold    = "25"
   critical_threshold = "5"
   period             = "60"
-  environment_name   = var.environment_name
+  environment_name   = var.environment_type
   instance_ids       = local.dfi_instance_ids
   primary_dns_ext    = local.dfi_primary_dns_ext
   ami_id             = local.dfi_ami_id
@@ -139,7 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_instance-health-check" {
   count = length(
     local.dfi_instance_ids,
   )
-  alarm_name          = "${var.environment_name}__StatusCheckFailed__critical__DIS__${local.dfi_instance_ids[count.index]}"
+  alarm_name          = "${var.environment_type}__StatusCheckFailed__critical__DIS__${local.dfi_instance_ids[count.index]}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "StatusCheckFailed"
@@ -166,7 +166,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_lb_unhealthy_hosts_critical" {
 count = length(
   local.dfi_instance_ids,
 )
-  alarm_name          = "${var.environment_name}__UnHealthyHostCount__critical__DFI__${local.dfi_lb_name}-lb"
+  alarm_name          = "${var.environment_type}__UnHealthyHostCount__critical__DFI__${local.dfi_lb_name}-lb"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
@@ -191,7 +191,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_instance-memory-critical" {
   count = length(
     local.dfi_instance_ids,
   )
-  alarm_name          = "${var.environment_name}__Memory-Utilization__critical__DFI__${local.dfi_instance_ids[count.index]}"
+  alarm_name          = "${var.environment_type}__Memory-Utilization__critical__DFI__${local.dfi_instance_ids[count.index]}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "MemoryUtilization"
@@ -216,7 +216,7 @@ resource "aws_cloudwatch_metric_alarm" "dfi_instance-memory-critical" {
 #DFI Lambda Alert
 #--------------------------------------------------------
 resource "aws_cloudwatch_metric_alarm" "s3_events_error_alert" {
-  alarm_name          = "${var.environment_name}__dfi_s3_events__alert__DFI_S3Events"
+  alarm_name          = "${var.environment_type}__dfi_s3_events__alert__DFI_S3Events"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "DfiS3EventsErrorCount"
@@ -261,7 +261,7 @@ module "clamav-notify" {
 #Any log entry triggers alarm
 #--------------------------------------------------------
 resource "aws_cloudwatch_metric_alarm" "dfi_etl_alarm" {
-  alarm_name          = "${var.environment_name}__DFI_ETL_ERRORS__critical"
+  alarm_name          = "${var.environment_type}__DFI_ETL_ERRORS__critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = local.dfi_etl_metric_name
@@ -310,7 +310,7 @@ resource "aws_cloudwatch_log_group" "dfi_etl_log_group" {
 module "File_Repository" {
   source          = "../modules/service-alarms/"
   service_name    = "File_Repository"
-  alarm_name      = "${var.environment_name}__Dfi_File_Repository"
+  alarm_name      = "${var.environment_type}__Dfi_File_Repository"
   name_space      = local.name_space
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
@@ -325,7 +325,7 @@ module "File_Repository" {
 module "Central_Management" {
   source          = "../modules/service-alarms/"
   service_name    = "Central_Management"
-  alarm_name      = "${var.environment_name}__Dfi_Central_Management"
+  alarm_name      = "${var.environment_type}__Dfi_Central_Management"
   name_space      = local.name_space
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
@@ -340,7 +340,7 @@ module "Central_Management" {
 module "Job_Server" {
   source          = "../modules/service-alarms/"
   service_name    = "Job_Server"
-  alarm_name      = "${var.environment_name}__Dfi_Job_Server"
+  alarm_name      = "${var.environment_type}__Dfi_Job_Server"
   name_space      = local.name_space
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
@@ -355,7 +355,7 @@ module "Job_Server" {
 module "AdaptiveProcessingServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.AdaptiveProcessingServer
-  alarm_name      = "${var.environment_name}__Dfi_${local.AdaptiveProcessingServer}"
+  alarm_name      = "${var.environment_type}__Dfi_${local.AdaptiveProcessingServer}"
   name_space      = local.name_space
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
@@ -370,7 +370,7 @@ module "AdaptiveProcessingServer" {
 module "EIMAdaptiveProcessingServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.EIMAdaptiveProcessingServer
-  alarm_name      = "${var.environment_name}__Dfi_${local.EIMAdaptiveProcessingServer}"
+  alarm_name      = "${var.environment_type}__Dfi_${local.EIMAdaptiveProcessingServer}"
   name_space      = local.name_space
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
@@ -385,7 +385,7 @@ module "EIMAdaptiveProcessingServer" {
 module "DataServices" {
   source          = "../modules/service-alarms/"
   service_name    = local.DataServices
-  alarm_name      = "${var.environment_name}__Dfi_${local.DataServices}"
+  alarm_name      = "${var.environment_type}__Dfi_${local.DataServices}"
   name_space      = local.name_space
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
@@ -400,7 +400,7 @@ module "DataServices" {
 module "CentralManagementServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.Central_Management_Server
-  alarm_name      = "${var.environment_name}__Dfi_${local.Central_Management_Server}"
+  alarm_name      = "${var.environment_type}__Dfi_${local.Central_Management_Server}"
   name_space      = local.name_space
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
@@ -416,7 +416,7 @@ module "CentralManagementServer" {
 #DFI Pipeline Failure Alert
 #--------------------------------------------------------
 resource "aws_cloudwatch_metric_alarm" "dfi_pipeline_alert" {
-  alarm_name          = "${var.environment_name}__dfi_pipeline_errors__alert"
+  alarm_name          = "${var.environment_type}__dfi_pipeline_errors__alert"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "DfiPipelineErrorCount"
