@@ -36,7 +36,7 @@ locals {
 module "CMSTIER001_APS_Core" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER001_APS_Core
-  alarm_name      = "${local.environment_name}__${local.CMSTIER001_APS_Core}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER001_APS_Core}"
   name_space      = local.name_space
   host            = local.host_bcs1
   mis_team_action = local.mis_team_action
@@ -51,7 +51,7 @@ module "CMSTIER001_APS_Core" {
 module "CMSTIER001_APS_PromotionManager" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER001_APS_PromotionManager
-  alarm_name      = "${local.environment_name}__${local.CMSTIER001_APS_PromotionManager}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER001_APS_PromotionManager}"
   name_space      = local.name_space
   host            = local.host_bcs1
   mis_team_action = local.mis_team_action
@@ -66,7 +66,7 @@ module "CMSTIER001_APS_PromotionManager" {
 module "CMSTIER001_CentralManagementServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER001_CentralManagementServer
-  alarm_name      = "${local.environment_name}__${local.CMSTIER001_CentralManagementServer}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER001_CentralManagementServer}"
   name_space      = local.name_space
   host            = local.host_bcs1
   mis_team_action = local.mis_team_action
@@ -81,7 +81,7 @@ module "CMSTIER001_CentralManagementServer" {
 module "CMSTIER001_ConnectionServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER001_ConnectionServer
-  alarm_name      = "${local.environment_name}__${local.CMSTIER001_ConnectionServer}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER001_ConnectionServer}"
   name_space      = local.name_space
   host            = local.host_bcs1
   mis_team_action = local.mis_team_action
@@ -96,7 +96,7 @@ module "CMSTIER001_ConnectionServer" {
 module "CMSTIER001_ConnectionServer32" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER001_ConnectionServer32
-  alarm_name      = "${local.environment_name}__${local.CMSTIER001_ConnectionServer32}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER001_ConnectionServer32}"
   name_space      = local.name_space
   host            = local.host_bcs1
   mis_team_action = local.mis_team_action
@@ -111,7 +111,7 @@ module "CMSTIER001_ConnectionServer32" {
 module "CMSTIER001_EventServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER001_EventServer
-  alarm_name      = "${local.environment_name}__${local.CMSTIER001_EventServer}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER001_EventServer}"
   name_space      = local.name_space
   host            = local.host_bcs1
   mis_team_action = local.mis_team_action
@@ -126,7 +126,7 @@ module "CMSTIER001_EventServer" {
 module "CMSTIER001_InputFilerepository" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER001_InputFilerepository
-  alarm_name      = "${local.environment_name}__${local.CMSTIER001_InputFilerepository}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER001_InputFilerepository}"
   name_space      = local.name_space
   host            = local.host_bcs1
   mis_team_action = local.mis_team_action
@@ -141,7 +141,7 @@ module "CMSTIER001_InputFilerepository" {
 module "CMSTIER001_OutputFilerepository" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER001_OutputFilerepository
-  alarm_name      = "${local.environment_name}__${local.CMSTIER001_OutputFilerepository}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER001_OutputFilerepository}"
   name_space      = local.name_space
   host            = local.host_bcs1
   mis_team_action = local.mis_team_action
@@ -162,7 +162,7 @@ module "CMSTIER001_OutputFilerepository" {
 module "CMSTIER002_CentralManagementServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER002_CentralManagementServer
-  alarm_name      = "${local.environment_name}__${local.CMSTIER002_CentralManagementServer}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER002_CentralManagementServer}"
   name_space      = local.name_space
   host            = local.host_bcs2
   mis_team_action = local.mis_team_action
@@ -177,7 +177,7 @@ module "CMSTIER002_CentralManagementServer" {
 module "CMSTIER002_ConnectionServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER002_ConnectionServer
-  alarm_name      = "${local.environment_name}__${local.CMSTIER002_ConnectionServer}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER002_ConnectionServer}"
   name_space      = local.name_space
   host            = local.host_bcs2
   mis_team_action = local.mis_team_action
@@ -192,7 +192,7 @@ module "CMSTIER002_ConnectionServer" {
 module "CMSTIER002_ConnectionServer32" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER002_ConnectionServer32
-  alarm_name      = "${local.environment_name}__${local.CMSTIER002_ConnectionServer32}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER002_ConnectionServer32}"
   name_space      = local.name_space
   host            = local.host_bcs2
   mis_team_action = local.mis_team_action
@@ -207,7 +207,7 @@ module "CMSTIER002_ConnectionServer32" {
 module "CMSTIER002_APS_Search" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER002_APS_Search
-  alarm_name      = "${local.environment_name}__${local.CMSTIER002_APS_Search}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER002_APS_Search}"
   name_space      = local.name_space
   host            = local.host_bcs2
   mis_team_action = local.mis_team_action
@@ -227,7 +227,7 @@ module "CMSTIER002_APS_Search" {
 module "CMSTIER003_APS_Core" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER003_APS_Core
-  alarm_name      = "${local.environment_name}__${local.CMSTIER003_APS_Core}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER003_APS_Core}"
   name_space      = local.name_space
   host            = local.host_bcs3
   mis_team_action = local.mis_team_action
@@ -242,7 +242,7 @@ module "CMSTIER003_APS_Core" {
 module "CMSTIER003_CentralManagementServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER003_CentralManagementServer
-  alarm_name      = "${local.environment_name}__${local.CMSTIER003_CentralManagementServer}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER003_CentralManagementServer}"
   name_space      = local.name_space
   host            = local.host_bcs3
   mis_team_action = local.mis_team_action
@@ -257,7 +257,7 @@ module "CMSTIER003_CentralManagementServer" {
 module "CMSTIER003_ConnectionServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER003_ConnectionServer
-  alarm_name      = "${local.environment_name}__${local.CMSTIER003_ConnectionServer}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER003_ConnectionServer}"
   name_space      = local.name_space
   host            = local.host_bcs3
   mis_team_action = local.mis_team_action
@@ -272,7 +272,7 @@ module "CMSTIER003_ConnectionServer" {
 module "CMSTIER003_ConnectionServer32" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER003_ConnectionServer32
-  alarm_name      = "${local.environment_name}__${local.CMSTIER003_ConnectionServer32}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER003_ConnectionServer32}"
   name_space      = local.name_space
   host            = local.host_bcs3
   mis_team_action = local.mis_team_action
@@ -287,7 +287,7 @@ module "CMSTIER003_ConnectionServer32" {
 module "CMSTIER003_APS_MonitoringService" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER003_APS_MonitoringService
-  alarm_name      = "${local.environment_name}__${local.CMSTIER003_APS_MonitoringService}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER003_APS_MonitoringService}"
   name_space      = local.name_space
   host            = local.host_bcs3
   mis_team_action = local.mis_team_action
@@ -302,7 +302,7 @@ module "CMSTIER003_APS_MonitoringService" {
 module "CMSTIER003_WebApplicationContainerServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.CMSTIER003_WebApplicationContainerServer
-  alarm_name      = "${local.environment_name}__${local.CMSTIER003_WebApplicationContainerServer}"
+  alarm_name      = "${var.environment_type}__${local.CMSTIER003_WebApplicationContainerServer}"
   name_space      = local.name_space
   host            = local.host_bcs3
   mis_team_action = local.mis_team_action

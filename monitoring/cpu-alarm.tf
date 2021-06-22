@@ -5,7 +5,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_cpu_critical" {
   count = length(
     data.terraform_remote_state.ec2-ndl-bws.outputs.bws_instance_ids,
   )
-  alarm_name          = "${local.environment_name}__CPU-Utilization__critical__BWS__${data.terraform_remote_state.ec2-ndl-bws.outputs.bws_instance_ids[count.index]}"
+  alarm_name          = "${var.environment_type}__CPU-Utilization__critical__BWS__${data.terraform_remote_state.ec2-ndl-bws.outputs.bws_instance_ids[count.index]}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "dis_cpu_critical" {
   count = length(
     data.terraform_remote_state.ec2-ndl-dis.outputs.dis_instance_ids,
   )
-  alarm_name          = "${local.environment_name}__CPU-Utilization__critical__DIS__${data.terraform_remote_state.ec2-ndl-dis.outputs.dis_instance_ids[count.index]}"
+  alarm_name          = "${var.environment_type}__CPU-Utilization__critical__DIS__${data.terraform_remote_state.ec2-ndl-dis.outputs.dis_instance_ids[count.index]}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
@@ -51,7 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "bps_cpu_critical" {
   count = length(
     data.terraform_remote_state.ec2-ndl-bps.outputs.bps_instance_ids,
   )
-  alarm_name          = "${local.environment_name}__CPU-Utilization__critical__BPS__${data.terraform_remote_state.ec2-ndl-bps.outputs.bps_instance_ids[count.index]}"
+  alarm_name          = "${var.environment_type}__CPU-Utilization__critical__BPS__${data.terraform_remote_state.ec2-ndl-bps.outputs.bps_instance_ids[count.index]}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "bcs_cpu_critical" {
   count = length(
     data.terraform_remote_state.ec2-ndl-bcs.outputs.bcs_instance_ids,
   )
-  alarm_name          = "${local.environment_name}__CPU-Utilization__critical__BCS__${data.terraform_remote_state.ec2-ndl-bcs.outputs.bcs_instance_ids[count.index]}"
+  alarm_name          = "${var.environment_type}__CPU-Utilization__critical__BCS__${data.terraform_remote_state.ec2-ndl-bcs.outputs.bcs_instance_ids[count.index]}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
@@ -97,7 +97,7 @@ resource "aws_cloudwatch_metric_alarm" "bfs_cpu_critical" {
   count = length(
     data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids,
   )
-  alarm_name          = "${local.environment_name}__CPU-Utilization__critical__BFS__${data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids[count.index]}"
+  alarm_name          = "${var.environment_type}__CPU-Utilization__critical__BFS__${data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids[count.index]}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"

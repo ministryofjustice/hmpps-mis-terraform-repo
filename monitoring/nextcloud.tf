@@ -4,7 +4,7 @@ locals {
 
 #Alert permission denied on file
 resource "aws_cloudwatch_metric_alarm" "file_permission_denied_alert" {
-  alarm_name          = "${local.environment_name}__FilePermissionDeniedErrorCount__alert__Nextcloud"
+  alarm_name          = "${var.environment_type}__FilePermissionDeniedErrorCount__alert__Nextcloud"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "FilePermissionDeniedErrorCount"
