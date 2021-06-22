@@ -1,6 +1,6 @@
 #BWS LB
 resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_alert" {
-  alarm_name          = "${local.environment_name}__UnHealthyHostCount__alert__BWS__${local.bws_lb_name}-lb"
+  alarm_name          = "${var.environment_type}__UnHealthyHostCount__alert__BWS__${local.bws_lb_name}-lb"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_critical" {
-  alarm_name          = "${local.environment_name}__UnHealthyHostCount__critical__BWS__${local.bws_lb_name}-lb"
+  alarm_name          = "${var.environment_type}__UnHealthyHostCount__critical__BWS__${local.bws_lb_name}-lb"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
@@ -38,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_critical" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
-  alarm_name          = "${local.environment_name}__SpilloverCount__severe__BWS__${local.bws_lb_name}-lb"
+  alarm_name          = "${var.environment_type}__SpilloverCount__severe__BWS__${local.bws_lb_name}-lb"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "SpilloverCount"
@@ -60,7 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
 #Nextcloud LB
 
 resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts_alert" {
-  alarm_name          = "${local.environment_name}__UnHealthyHostCount__alert__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
+  alarm_name          = "${var.environment_type}__UnHealthyHostCount__alert__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
@@ -79,7 +79,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts_alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts_critical" {
-  alarm_name          = "${local.environment_name}__UnHealthyHostCount__critical__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
+  alarm_name          = "${var.environment_type}__UnHealthyHostCount__critical__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_unhealthy_hosts_critical" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_spillovercount" {
-  alarm_name          = "${local.environment_name}__SpilloverCount__severe__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
+  alarm_name          = "${var.environment_type}__SpilloverCount__severe__NEXTCLOUD__${local.nextcloud_lb_name}-lb"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "SpilloverCount"
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "nextcloud_lb_spillovercount" {
 
 #Samba lb
 resource "aws_cloudwatch_metric_alarm" "samba_lb_unhealthy_hosts_alert" {
-  alarm_name          = "${local.environment_name}__UnHealthyHostCount__alert__SAMBA__${local.samba_lb_name}"
+  alarm_name          = "${var.environment_type}__UnHealthyHostCount__alert__SAMBA__${local.samba_lb_name}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
@@ -138,7 +138,7 @@ resource "aws_cloudwatch_metric_alarm" "samba_lb_unhealthy_hosts_alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "samba_lb_unhealthy_hosts_critical" {
-  alarm_name          = "${local.environment_name}__UnHealthyHostCount__critical__SAMBA__${local.samba_lb_name}"
+  alarm_name          = "${var.environment_type}__UnHealthyHostCount__critical__SAMBA__${local.samba_lb_name}"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
@@ -159,7 +159,7 @@ resource "aws_cloudwatch_metric_alarm" "samba_lb_unhealthy_hosts_critical" {
 #SMTP
 
 resource "aws_cloudwatch_metric_alarm" "ses_auth_fail" {
-  alarm_name          = "${local.environment_name}__SesAuthenticationFail__critical__SMTP"
+  alarm_name          = "${var.environment_type}__SesAuthenticationFail__critical__SMTP"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "SesAuthenticationFail"

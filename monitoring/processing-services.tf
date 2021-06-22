@@ -33,7 +33,7 @@ locals {
 module "PROCTIER001_WebIntelligenceProcessingServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.PROCTIER001_WebIntelligenceProcessingServer
-  alarm_name      = "${local.environment_name}__${local.PROCTIER001_WebIntelligenceProcessingServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER001_WebIntelligenceProcessingServer}"
   name_space      = local.name_space
   host            = local.host_bps1
   mis_team_action = local.mis_team_action
@@ -49,7 +49,7 @@ module "PROCTIER001_WebIntelligenceProcessingServer" {
 module "PROCTIER001_AdaptiveJobServer" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER001_AdaptiveJobServer"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER001_AdaptiveJobServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER001_AdaptiveJobServer}"
   name_space      = local.name_space
   host            = local.host_bps1
   mis_team_action = local.mis_team_action
@@ -64,7 +64,7 @@ module "PROCTIER001_AdaptiveJobServer" {
 module "PROCTIER001_APS_Webi" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER001_APS_Webi"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER001_APS_Webi}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER001_APS_Webi}"
   name_space      = local.name_space
   host            = local.host_bps1
   mis_team_action = local.mis_team_action
@@ -79,7 +79,7 @@ module "PROCTIER001_APS_Webi" {
 module "PROCTIER001_ConnectionServer" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER001_ConnectionServer"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER001_ConnectionServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER001_ConnectionServer}"
   name_space      = local.name_space
   host            = local.host_bps1
   mis_team_action = local.mis_team_action
@@ -94,7 +94,7 @@ module "PROCTIER001_ConnectionServer" {
 module "PROCTIER001_ConnectionServer32" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER001_ConnectionServer32"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER001_ConnectionServer32}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER001_ConnectionServer32}"
   name_space      = local.name_space
   host            = local.host_bps1
   mis_team_action = local.mis_team_action
@@ -114,7 +114,7 @@ module "PROCTIER001_ConnectionServer32" {
 module "PROCTIER002_WebIntelligenceProcessingServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.PROCTIER002_WebIntelligenceProcessingServer
-  alarm_name      = "${local.environment_name}__${local.PROCTIER002_WebIntelligenceProcessingServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER002_WebIntelligenceProcessingServer}"
   name_space      = local.name_space
   host            = local.host_bps2
   mis_team_action = local.mis_team_action
@@ -130,7 +130,7 @@ module "PROCTIER002_WebIntelligenceProcessingServer" {
 module "PROCTIER002_AdaptiveJobServer" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER002_AdaptiveJobServer"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER002_AdaptiveJobServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER002_AdaptiveJobServer}"
   name_space      = local.name_space
   host            = local.host_bps2
   mis_team_action = local.mis_team_action
@@ -145,7 +145,7 @@ module "PROCTIER002_AdaptiveJobServer" {
 module "PROCTIER002_APS_Webi" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER002_APS_Webi"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER002_APS_Webi}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER002_APS_Webi}"
   name_space      = local.name_space
   host            = local.host_bps2
   mis_team_action = local.mis_team_action
@@ -160,7 +160,7 @@ module "PROCTIER002_APS_Webi" {
 module "PROCTIER002_ConnectionServer" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER002_ConnectionServer"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER002_ConnectionServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER002_ConnectionServer}"
   name_space      = local.name_space
   host            = local.host_bps2
   mis_team_action = local.mis_team_action
@@ -175,7 +175,7 @@ module "PROCTIER002_ConnectionServer" {
 module "PROCTIER002_ConnectionServer32" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER002_ConnectionServer32"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER002_ConnectionServer32}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER002_ConnectionServer32}"
   name_space      = local.name_space
   host            = local.host_bps2
   mis_team_action = local.mis_team_action
@@ -195,7 +195,7 @@ module "PROCTIER002_ConnectionServer32" {
 module "PROCTIER003_WebIntelligenceProcessingServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.PROCTIER003_WebIntelligenceProcessingServer
-  alarm_name      = "${local.environment_name}__${local.PROCTIER003_WebIntelligenceProcessingServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER003_WebIntelligenceProcessingServer}"
   name_space      = local.name_space
   host            = local.host_bps3
   mis_team_action = local.mis_team_action
@@ -211,7 +211,7 @@ module "PROCTIER003_WebIntelligenceProcessingServer" {
 module "PROCTIER003_AdaptiveJobServer" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER003_AdaptiveJobServer"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER003_AdaptiveJobServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER003_AdaptiveJobServer}"
   name_space      = local.name_space
   host            = local.host_bps3
   mis_team_action = local.mis_team_action
@@ -226,7 +226,7 @@ module "PROCTIER003_AdaptiveJobServer" {
 module "PROCTIER003_APS_Webi" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER003_APS_Webi"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER003_APS_Webi}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER003_APS_Webi}"
   name_space      = local.name_space
   host            = local.host_bps3
   mis_team_action = local.mis_team_action
@@ -241,7 +241,7 @@ module "PROCTIER003_APS_Webi" {
 module "PROCTIER003_ConnectionServer" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER003_ConnectionServer"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER003_ConnectionServer}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER003_ConnectionServer}"
   name_space      = local.name_space
   host            = local.host_bps3
   mis_team_action = local.mis_team_action
@@ -256,7 +256,7 @@ module "PROCTIER003_ConnectionServer" {
 module "PROCTIER003_ConnectionServer32" {
   source          = "../modules/service-alarms/"
   service_name    = "PROCTIER003_ConnectionServer32"
-  alarm_name      = "${local.environment_name}__${local.PROCTIER003_ConnectionServer32}"
+  alarm_name      = "${var.environment_type}__${local.PROCTIER003_ConnectionServer32}"
   name_space      = local.name_space
   host            = local.host_bps3
   mis_team_action = local.mis_team_action

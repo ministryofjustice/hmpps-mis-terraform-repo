@@ -25,7 +25,7 @@ locals {
 module "File_Repository" {
   source          = "../modules/service-alarms/"
   service_name    = "File_Repository"
-  alarm_name      = "${local.environment_name}__Dis_File_Repository"
+  alarm_name      = "${var.environment_type}__Dis_File_Repository"
   name_space      = local.name_space
   host            = local.host_dis1
   mis_team_action = local.mis_team_action
@@ -40,7 +40,7 @@ module "File_Repository" {
 module "Central_Management" {
   source          = "../modules/service-alarms/"
   service_name    = "Central_Management"
-  alarm_name      = "${local.environment_name}__Dis_Central_Management"
+  alarm_name      = "${var.environment_type}__Dis_Central_Management"
   name_space      = local.name_space
   host            = local.host_dis1
   mis_team_action = local.mis_team_action
@@ -55,7 +55,7 @@ module "Central_Management" {
 module "Job_Server" {
   source          = "../modules/service-alarms/"
   service_name    = "Job_Server"
-  alarm_name      = "${local.environment_name}__Dis_Job_Server"
+  alarm_name      = "${var.environment_type}__Dis_Job_Server"
   name_space      = local.name_space
   host            = local.host_dis1
   mis_team_action = local.mis_team_action
@@ -70,7 +70,7 @@ module "Job_Server" {
 module "AdaptiveProcessingServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.AdaptiveProcessingServer
-  alarm_name      = "${local.environment_name}__Dis_${local.AdaptiveProcessingServer}"
+  alarm_name      = "${var.environment_type}__Dis_${local.AdaptiveProcessingServer}"
   name_space      = local.name_space
   host            = local.host_dis1
   mis_team_action = local.mis_team_action
@@ -85,7 +85,7 @@ module "AdaptiveProcessingServer" {
 module "EIMAdaptiveProcessingServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.EIMAdaptiveProcessingServer
-  alarm_name      = "${local.environment_name}__Dis_${local.EIMAdaptiveProcessingServer}"
+  alarm_name      = "${var.environment_type}__Dis_${local.EIMAdaptiveProcessingServer}"
   name_space      = local.name_space
   host            = local.host_dis1
   mis_team_action = local.mis_team_action
@@ -100,7 +100,7 @@ module "EIMAdaptiveProcessingServer" {
 module "DataServices" {
   source          = "../modules/service-alarms/"
   service_name    = local.DataServices
-  alarm_name      = "${local.environment_name}__Dis_${local.DataServices}"
+  alarm_name      = "${var.environment_type}__Dis_${local.DataServices}"
   name_space      = local.name_space
   host            = local.host_dis1
   mis_team_action = local.mis_team_action
@@ -115,7 +115,7 @@ module "DataServices" {
 module "CentralManagementServer" {
   source          = "../modules/service-alarms/"
   service_name    = local.Central_Management_Server
-  alarm_name      = "${local.environment_name}__Dis_${local.Central_Management_Server}"
+  alarm_name      = "${var.environment_type}__Dis_${local.Central_Management_Server}"
   name_space      = local.name_space
   host            = local.host_dis1
   mis_team_action = local.mis_team_action
@@ -134,7 +134,7 @@ module "CentralManagementServer" {
 #Any log entry triggers alarm
 #--------------------------------------------------------
 resource "aws_cloudwatch_metric_alarm" "mis_etl_alarm" {
-  alarm_name          = "${local.environment_name}__Dis_ETL_ERRORS__critical"
+  alarm_name          = "${var.environment_type}__Dis_ETL_ERRORS__critical"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = local.mis_etl_metric_name

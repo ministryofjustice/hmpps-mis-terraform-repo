@@ -40,7 +40,7 @@ module "dis" {
   alert_threshold    = "25"
   critical_threshold = "5"
   period             = "60"
-  environment_name   = local.environment_name
+  environment_name   = var.environment_type
   instance_ids       = local.dis_instance_ids
   primary_dns_ext    = local.dis_primary_dns_ext
   ami_id             = local.dis_ami_id
@@ -56,7 +56,7 @@ module "bps" {
   alert_threshold    = "25"
   critical_threshold = "5"
   period             = "60"
-  environment_name   = local.environment_name
+  environment_name   = var.environment_type
   instance_ids       = local.bps_instance_ids
   primary_dns_ext    = local.bps_primary_dns_ext
   ami_id             = local.bps_ami_id
@@ -72,7 +72,7 @@ module "bcs" {
   alert_threshold    = "25"
   critical_threshold = "5"
   period             = "60"
-  environment_name   = local.environment_name
+  environment_name   = var.environment_type
   instance_ids       = local.bcs_instance_ids
   primary_dns_ext    = local.bcs_primary_dns_ext
   ami_id             = local.bcs_ami_id
@@ -88,7 +88,7 @@ module "bfs" {
   alert_threshold    = "25"
   critical_threshold = "5"
   period             = "60"
-  environment_name   = local.environment_name
+  environment_name   = var.environment_type
   instance_ids       = local.bfs_instance_ids
   primary_dns_ext    = local.bfs_primary_dns_ext
   ami_id             = local.bfs_ami_id
@@ -104,7 +104,7 @@ module "bws" {
   alert_threshold    = "25"
   critical_threshold = "5"
   period             = "60"
-  environment_name   = local.environment_name
+  environment_name   = var.environment_type
   instance_ids       = local.bws_instance_ids
   primary_dns_ext    = local.bws_primary_dns_ext
   ami_id             = local.bws_ami_id

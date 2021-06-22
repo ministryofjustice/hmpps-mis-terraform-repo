@@ -103,7 +103,6 @@ data "terraform_remote_state" "nextcloud" {
 }
 
 locals {
-  environment_name       = var.environment_type
   environment_identifier = data.terraform_remote_state.common.outputs.short_environment_identifier
   mis_app_name           = data.terraform_remote_state.common.outputs.mis_app_name
   bws_lb_name            = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_elb_name
@@ -125,7 +124,7 @@ locals {
 #dashboard
 
 resource "aws_cloudwatch_dashboard" "mis" {
-  dashboard_name = "mis-${local.environment_name}-monitoring"
+  dashboard_name = "mis-${var.environment_type}-monitoring"
   dashboard_body = data.template_file.dashboard-body.rendered
 }
 
@@ -133,7 +132,7 @@ data "template_file" "dashboard-body" {
   template = file("dashboard.json")
   vars = {
     region            = var.region
-    environment_name  = local.environment_name
+    environment_name  = var.environment_type
     bws_lb_name       = local.bws_lb_name
     region            = var.region
     slow_latency      = 1
