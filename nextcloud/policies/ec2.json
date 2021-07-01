@@ -26,6 +26,18 @@
            ]
         },
         {
+           "Sid": "wmtPushtos3",
+           "Effect": "Allow",
+           "Action": [
+               "s3:PutObject",
+               "s3:PutObjectAcl"
+           ],
+           "Resource": [
+                "arn:aws:s3:::${wmt_s3_bucket}",
+                "arn:aws:s3:::${wmt_s3_bucket}/*"
+           ]
+        },
+        {
             "Sid": "GetParameters",
             "Effect": "Allow",
             "Action": [

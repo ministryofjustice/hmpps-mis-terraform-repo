@@ -211,4 +211,5 @@ locals {
   lb_name                      = "${local.short_environment_identifier}-${local.app_name}"
   internal_lb_security_groups  = flatten([data.terraform_remote_state.security-groups.outputs.sg_mis_nextcloud_lb])
   tags                         = data.terraform_remote_state.common.outputs.common_tags
+  wmt_s3_bucket                = "cloud-platform-eda854a7e667bf785c29552fb5ae0a55"
 }

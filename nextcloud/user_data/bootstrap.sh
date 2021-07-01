@@ -114,7 +114,7 @@ cat << EOF > ~/requirements.yml
   src: singleplatform-eng.users
 - name: nextcloud
   src: https://github.com/ministryofjustice/hmpps-nextcloud-installer
-  version: als-3876
+  version: 1.5.0
 EOF
 
 wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
