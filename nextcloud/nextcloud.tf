@@ -22,6 +22,7 @@ data "template_file" "iam_policy_app" {
   template = file("${path.module}/${local.ec2_role_policy_file}")
   vars = {
     nextcloud_s3_bucket_arn = local.nextcloud_s3_bucket_arn
+    wmt_s3_bucket           = local.wmt_s3_bucket
   }
 }
 
@@ -188,5 +189,10 @@ resource "aws_cloudwatch_log_group" "nextcloud_logs" {
 
 resource "aws_cloudwatch_log_group" "samba_logs" {
   name              = "/${var.environment_type}/${local.app_name}/log.smbd"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "wmt_logs" {
+  name              = "/${var.environment_type}/${local.app_name}/wmt_log"
   retention_in_days = 14
 }
