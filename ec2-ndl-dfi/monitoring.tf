@@ -315,10 +315,10 @@ module "File_Repository" {
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
   alarm_actions   = local.sns_topic_arn
-  pattern         = "[${local.include_log_level}] [${local.domain_host_name}] ${local.File_Repository} ${local.dfi_server_stopped_msg}"
+  pattern         = "${local.include_log_level} ${local.host_dfi1} ${local.File_Repository} ${local.dfi_server_stopped_msg}"
   log_group_name  = local.log_group_name
   metric_name     = "DfiFileRepository"
-  pattern_ok      = "[${local.include_log_level}] [${local.domain_host_name}] ${local.File_Repository} ${local.dfi_server_started_msg}"
+  pattern_ok      = "${local.include_log_level} ${local.host_dfi1} ${local.File_Repository} ${local.dfi_server_started_msg}"
   tags            = local.tags
 }
 
@@ -330,10 +330,10 @@ module "Central_Management" {
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
   alarm_actions   = local.sns_topic_arn
-  pattern         = "[${local.include_log_level}] [${local.domain_host_name}] ${local.Central_Management} ${local.dfi_server_stopped_msg}"
+  pattern         = "${local.include_log_level} ${local.host_dfi1} ${local.Central_Management} ${local.dfi_server_stopped_msg}"
   log_group_name  = local.log_group_name
   metric_name     = "DfiCentralManagement"
-  pattern_ok      = "[${local.include_log_level}] [${local.domain_host_name}] ${local.Central_Management} ${local.dfi_server_started_msg}"
+  pattern_ok      = "${local.include_log_level} ${local.host_dfi1} ${local.Central_Management} ${local.dfi_server_started_msg}"
   tags            = local.tags
 }
 
@@ -345,10 +345,10 @@ module "Job_Server" {
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
   alarm_actions   = local.sns_topic_arn
-  pattern         = "[${local.include_log_level}] [${local.domain_host_name}] Quit ${local.Job_Server} Service"
+  pattern         = "${local.include_log_level} ${local.host_dfi1} ${local.Job_Server} ${local.dfi_server_stopped_msg}"
   log_group_name  = local.log_group_name
   metric_name     = "DfiJobServer"
-  pattern_ok      = "[${local.include_log_level}] [${local.domain_host_name}] ${local.Job_Server} ${local.dfi_server_started_msg}"
+  pattern_ok      = "${local.include_log_level} ${local.host_dfi1} ${local.Job_Server} ${local.dfi_server_started_msg}"
   tags            = local.tags
 }
 
@@ -360,10 +360,10 @@ module "AdaptiveProcessingServer" {
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
   alarm_actions   = local.sns_topic_arn
-  pattern         = "[${local.include_log_level}] ${local.pattern_host_name}.${local.AdaptiveProcessingServer} ${local.stopped_with_exit_code}"
+  pattern         = "${local.include_log_level} ${local.pattern_host_name}.${local.AdaptiveProcessingServer} ${local.stopped_with_exit_code}"
   log_group_name  = local.log_group_name
   metric_name     = "Dfi${local.AdaptiveProcessingServer}"
-  pattern_ok      = "[${local.include_log_level}] ${local.pattern_host_name}.${local.AdaptiveProcessingServer} ${local.started_message}"
+  pattern_ok      = "${local.include_log_level} ${local.pattern_host_name}.${local.AdaptiveProcessingServer} ${local.started_message}"
   tags            = local.tags
 }
 
@@ -375,10 +375,10 @@ module "EIMAdaptiveProcessingServer" {
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
   alarm_actions   = local.sns_topic_arn
-  pattern         = "[${local.include_log_level}] ${local.pattern_host_name}.${local.EIMAdaptiveProcessingServer} ${local.stopped_with_exit_code}"
+  pattern         = "${local.include_log_level} ${local.pattern_host_name}.${local.EIMAdaptiveProcessingServer} ${local.stopped_with_exit_code}"
   log_group_name  = local.log_group_name
   metric_name     = "Dfi${local.EIMAdaptiveProcessingServer}"
-  pattern_ok      = "[${local.include_log_level}] ${local.pattern_host_name}.${local.EIMAdaptiveProcessingServer} ${local.started_message}"
+  pattern_ok      = "${local.include_log_level} ${local.pattern_host_name}.${local.EIMAdaptiveProcessingServer} ${local.started_message}"
   tags            = local.tags
 }
 
@@ -390,10 +390,10 @@ module "DataServices" {
   host            = local.host_dfi1
   mis_team_action = local.mis_team_action
   alarm_actions   = local.sns_topic_arn
-  pattern         = "[${local.include_log_level}] ${local.data_services_pattern} [${local.domain_host_name}] In ServiceStop"
+  pattern         = "${local.include_log_level} ${local.data_services_pattern} ${local.host_dfi1} In ServiceStop"
   log_group_name  = local.log_group_name
   metric_name     = "Dfi${local.DataServices}"
-  pattern_ok      = "[${local.include_log_level}] ${local.data_services_pattern} [${local.domain_host_name}] In ServiceStart"
+  pattern_ok      = "${local.include_log_level} ${local.data_services_pattern} ${local.host_dfi1} In ServiceStart"
   tags            = local.tags
 }
 
@@ -408,7 +408,7 @@ module "CentralManagementServer" {
   pattern         = "${local.exclude_log_level} ${local.pattern_host_name}.${local.Central_Management_Server} Service stopped unexpectedly."
   log_group_name  = local.log_group_name
   metric_name     = "DfiCentralManagementServer"
-  pattern_ok      = "[${local.include_log_level}] ${local.pattern_host_name}.${local.Central_Management_Server} ${local.started_message}"
+  pattern_ok      = "${local.include_log_level} ${local.pattern_host_name}.${local.Central_Management_Server} ${local.started_message}"
   tags            = local.tags
 }
 

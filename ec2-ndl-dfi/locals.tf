@@ -61,7 +61,6 @@ locals {
   dfi_etl_metric_name            = "DfiEtlErrorsCount"
   dfi_etl_log_group_name         = "/dfi/extraction/transformation/loading/log"
   host_dfi1                      = "${local.nart_prefix}1"
-  domain_host_name               = "ndl-dfi-${local.standard_nart_prefix}1.${var.environment_name}.local"
   pattern_host_name              = "NDLDFI${local.standard_nart_prefix}1"
   Central_Management_Server      = "CentralManagementServer"
   File_Repository                = "File Repository"
