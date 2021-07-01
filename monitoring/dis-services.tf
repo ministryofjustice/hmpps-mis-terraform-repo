@@ -60,10 +60,10 @@ module "Job_Server" {
   host            = local.host_dis1
   mis_team_action = local.mis_team_action
   alarm_actions   = aws_sns_topic.alarm_notification.arn
-  pattern         = "${local.include_log_level} ${local.host_dis1} ${local.Job_Server} ${local.dis_server_stopped_msg}"
+  pattern         = "[${local.include_log_level}] [${local.host_dis1}] Quit ${local.Job_Server} Service"
   log_group_name  = local.log_group_name
   metric_name     = "DisJobServer"
-  pattern_ok      = "${local.include_log_level} ${local.host_dis1} ${local.Job_Server} ${local.dis_server_started_msg}"
+  pattern_ok      = "[${local.include_log_level}] [${local.host_dis1}] ${local.Job_Server} ${local.dis_server_started_msg}"
   tags            = local.tags
 }
 

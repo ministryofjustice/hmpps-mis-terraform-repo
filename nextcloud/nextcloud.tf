@@ -190,3 +190,8 @@ resource "aws_cloudwatch_log_group" "samba_logs" {
   name              = "/${var.environment_type}/${local.app_name}/log.smbd"
   retention_in_days = 14
 }
+
+resource "aws_cloudwatch_log_group" "wmt_logs" {
+  name              = "/${var.environment_type}/${local.app_name}/wmt_log"
+  retention_in_days = 14
+}
