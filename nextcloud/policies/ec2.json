@@ -30,7 +30,8 @@
            "Effect": "Allow",
            "Action": [
                "s3:PutObject",
-               "s3:PutObjectAcl"
+               "s3:PutObjectAcl",
+               "s3:ListBucket"
            ],
            "Resource": [
                 "arn:aws:s3:::${wmt_s3_bucket}",
