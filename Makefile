@@ -2,7 +2,7 @@ default: snapshot
 .PHONY: snapshot
 
 snapshot:
-	scripts/restore-snapshots.sh $(ENV_TYPE) $(COMPONENT)
+	scripts/restore-snapshots.sh $(ENV_TYPE) $(COMPONENT) $(HOST_SUFFIX)
 
 backup:
 	scripts/ebs-on-demand-backup.sh $(ENV_TYPE) $(COMPONENT)
