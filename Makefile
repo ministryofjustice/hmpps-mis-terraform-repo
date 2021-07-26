@@ -5,7 +5,7 @@ snapshot:
 	scripts/ebs-restore-snapshots.sh $(ENV_TYPE) $(COMPONENT) $(HOST_SUFFIX)
 
 backup:
-	scripts/ebs-backup-snapshots.sh $(ENV_TYPE) $(COMPONENT)
+	scripts/ebs-backup-snapshots.sh $(ENV_TYPE) $(COMPONENT) $(HOST_SUFFIX)
 
 terraform_plan:
 	./run.sh $(ENVIRONMENT_NAME) plan $(component)   || (exit $$?)
