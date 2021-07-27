@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-REGION=eu-west-2
-ENV_TYPE=$1     #mis-dev    #$1
-HOST_TYPE=$2  #bws     #$2
+ENV_TYPE=$1
+HOST_TYPE=$2
+HOST_SUFFIX=$3
 profile=restore
 
 if [[ -z $ENV_TYPE ]] || [[ -z $HOST_TYPE ]]; then
@@ -59,10 +59,9 @@ EOF
 }
 
 
-get_host_list ()   ##$1 is the host type ie bws
+get_host_list ()
 {
-    HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-*
-   #HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-105
+    HOSTNAME=tf-${REGION}-hmpps-delius-${ENV_TYPE}-mis-ndl-${1}-${2}
 
     INSTANCE_IDS=$(aws ec2 describe-instances --output text --region "${REGION}" --profile $profile \
             --query 'Reservations[*].Instances[*].[InstanceId]' \
@@ -262,9 +261,8 @@ start_instances ()
 ##MAIN
 set_account_id
 authenticate
-get_host_list $HOST_TYPE
+get_host_list $HOST_TYPE $HOST_SUFFIX
 stop_instances
 restore_snapshots
 enable_delete_on_term
 start_instances
-rm ${HOME}/.aws/credentials

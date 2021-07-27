@@ -2,10 +2,10 @@ default: snapshot
 .PHONY: snapshot
 
 snapshot:
-	scripts/restore-snapshots.sh $(ENV_TYPE) $(COMPONENT)
+	scripts/ebs-restore-snapshots.sh $(ENV_TYPE) $(COMPONENT) $(HOST_SUFFIX)
 
 backup:
-	scripts/ebs-on-demand-backup.sh $(ENV_TYPE) $(COMPONENT)
+	scripts/ebs-backup-snapshots.sh $(ENV_TYPE) $(COMPONENT) $(HOST_SUFFIX)
 
 terraform_plan:
 	./run.sh $(ENVIRONMENT_NAME) plan $(component)   || (exit $$?)
