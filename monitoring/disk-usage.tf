@@ -19,12 +19,6 @@ bcs_primary_dns_ext = data.terraform_remote_state.ec2-ndl-bcs.outputs.bcs_primar
 bcs_ami_id          = data.terraform_remote_state.ec2-ndl-bcs.outputs.bcs_ami_id
 bcs_instance_type   = data.terraform_remote_state.ec2-ndl-bcs.outputs.bcs_instance_type
 
-##BFS
-bfs_instance_ids    = data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids
-bfs_primary_dns_ext = data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_primary_dns_ext
-bfs_ami_id          = data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_ami_id
-bfs_instance_type   = data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_type
-
 ##BWS
 bws_instance_ids    = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_instance_ids
 bws_primary_dns_ext = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_primary_dns_ext
@@ -77,22 +71,6 @@ module "bcs" {
   primary_dns_ext    = local.bcs_primary_dns_ext
   ami_id             = local.bcs_ami_id
   instance_type      = local.bcs_instance_type
-  sns_topic          = local.sns_topic
-  tags               = local.tags
-}
-
-module "bfs" {
-  source             = "../modules/disk-usage-alarms/"
-  component          = "BFS"
-  objectname         = "LogicalDisk"
-  alert_threshold    = "25"
-  critical_threshold = "5"
-  period             = "60"
-  environment_name   = var.environment_type
-  instance_ids       = local.bfs_instance_ids
-  primary_dns_ext    = local.bfs_primary_dns_ext
-  ami_id             = local.bfs_ami_id
-  instance_type      = local.bfs_instance_type
   sns_topic          = local.sns_topic
   tags               = local.tags
 }

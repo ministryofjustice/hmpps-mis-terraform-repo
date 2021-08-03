@@ -91,26 +91,3 @@ resource "aws_cloudwatch_metric_alarm" "bcs_cpu_critical" {
     InstanceId = data.terraform_remote_state.ec2-ndl-bcs.outputs.bcs_instance_ids[count.index]
   }
 }
-
-#bfs
-resource "aws_cloudwatch_metric_alarm" "bfs_cpu_critical" {
-  count = length(
-    data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids,
-  )
-  alarm_name          = "${var.environment_type}__CPU-Utilization__critical__BFS__${data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids[count.index]}"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  period              = "120"
-  statistic           = "Average"
-  threshold           = "92"
-  alarm_description   = "CPU utilization is averaging 92% for ${data.terraform_remote_state.ec2-ndl-bps.outputs.bps_primary_dns_ext[count.index]}. Please contact the MIS Team or AWS Support Contact."
-  alarm_actions       = [aws_sns_topic.alarm_notification.arn]
-  ok_actions          = [aws_sns_topic.alarm_notification.arn]
-  tags                = local.tags
-
-  dimensions = {
-    InstanceId = data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids[count.index]
-  }
-}

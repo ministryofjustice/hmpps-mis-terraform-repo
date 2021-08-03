@@ -91,26 +91,3 @@ resource "aws_cloudwatch_metric_alarm" "dis_instance-health-check" {
     InstanceId = data.terraform_remote_state.ec2-ndl-dis.outputs.dis_instance_ids[count.index]
   }
 }
-
-#BFS
-resource "aws_cloudwatch_metric_alarm" "bfs_instance-health-check" {
-  count = length(
-    data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids,
-  )
-  alarm_name          = "${var.environment_type}__StatusCheckFailed__critical__BFS__${data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids[count.index]}"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "1"
-  metric_name         = "StatusCheckFailed"
-  namespace           = "AWS/EC2"
-  period              = "120"
-  statistic           = "Average"
-  threshold           = "1"
-  alarm_description   = "EC2 Health status failed for ${data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_primary_dns_ext[count.index]}. Please contact the MIS AWS Support Contact."
-  alarm_actions       = [aws_sns_topic.alarm_notification.arn]
-  ok_actions          = [aws_sns_topic.alarm_notification.arn]
-  tags                = local.tags
-
-  dimensions = {
-    InstanceId = data.terraform_remote_state.ec2-ndl-bfs.outputs.bfs_instance_ids[count.index]
-  }
-}
