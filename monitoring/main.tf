@@ -64,19 +64,6 @@ data "terraform_remote_state" "ec2-ndl-bps" {
 }
 
 #-------------------------------------------------------------
-### Getting bfs instance details
-#-------------------------------------------------------------
-data "terraform_remote_state" "ec2-ndl-bfs" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/ec2-ndl-bfs/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
 ### Getting bcs instance details
 #-------------------------------------------------------------
 data "terraform_remote_state" "ec2-ndl-bcs" {
