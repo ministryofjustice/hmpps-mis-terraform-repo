@@ -51,3 +51,7 @@ variable "bcs_ebs_optimized" {
 variable "bcs_hibernation" {
   type = bool
 }
+
+variable "mis_overide_autostop_tags" {
+  default = "False"
+}

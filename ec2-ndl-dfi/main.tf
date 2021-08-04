@@ -54,7 +54,7 @@ resource "aws_instance" "dfi_server" {
   )
 
 tags = merge(
-  local.tags,
+  local.overide_tags,
   {
     "Name" = "${local.environment_identifier}-${local.app_name}-${local.nart_prefix}${count.index + 1}"
   },

@@ -40,3 +40,7 @@ variable "dependencies_bucket_arn" {
 variable "environment_name" {
   type = string
 }
+
+variable "mis_overide_autostop_tags" {
+  default = "False"
+}

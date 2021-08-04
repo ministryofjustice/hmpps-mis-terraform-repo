@@ -172,6 +172,14 @@ locals {
   dis_disable_api_termination = var.dis_disable_api_termination
   dis_ebs_optimized           = var.dis_ebs_optimized
   dis_hibernation             = var.dis_hibernation
+
+  #Overide autostop tag
+  overide_tags = merge(
+    local.tags,
+    {
+      "autostop-${var.environment_type}" = var.mis_overide_autostop_tags
+    },
+  )
 }
 
 #-------------------------------------------------------------
@@ -242,7 +250,7 @@ resource "aws_instance" "dis_server" {
   )
 
 tags = merge(
-  local.tags,
+  local.overide_tags,
   {
     "Name" = "${local.environment_identifier}-${local.app_name}-${local.nart_prefix}${count.index + 1}"
   },

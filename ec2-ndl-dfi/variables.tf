@@ -106,3 +106,7 @@ variable "dfi_ebs_optimized" {
 variable "dfi_hibernation" {
   type = bool
 }
+
+variable "mis_overide_autostop_tags" {
+  default = "False"
+}

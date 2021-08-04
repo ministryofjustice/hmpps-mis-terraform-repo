@@ -69,4 +69,12 @@ locals {
   started_message                = "has been started"
   dfi_pipeline_failure_pattern   = "Phase BUILD State FAILED"
   dfi_pipeline_log_group_name    = "/aws/codebuild/${var.environment_name}-dfi-s3-fsx-build"
+
+  #Overide autostop tag
+  overide_tags = merge(
+    local.tags,
+    {
+      "autostop-${var.environment_type}" = var.mis_overide_autostop_tags
+    },
+  )
 }
