@@ -3,7 +3,7 @@ locals {
   overide_tags = merge(
     local.tags,
     {
-      "autostop-${var.environment_type}" = "Phase1"
+      "autostop-${var.environment_type}" = var.delius_overide_autostop_tags
     },
   )
 }

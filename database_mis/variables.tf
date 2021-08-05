@@ -45,3 +45,7 @@ variable "database_high_availability_count" {
   description = "number of standby databases"
   type        = map(number)
 }
+
+variable "delius_overide_autostop_tags" {
+  default = "Phase1"
+}
