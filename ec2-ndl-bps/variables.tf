@@ -51,3 +51,7 @@ variable "bps_ebs_optimized" {
 variable "bps_hibernation" {
   type = bool
 }
+
+variable "mis_overide_autostop_tags" {
+  default = "False"
+}

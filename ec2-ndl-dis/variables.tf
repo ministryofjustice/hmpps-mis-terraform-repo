@@ -88,3 +88,7 @@ variable "dis_ebs_optimized" {
 variable "dis_hibernation" {
   type = bool
 }
+
+variable "mis_overide_autostop_tags" {
+  default = "False"
+}

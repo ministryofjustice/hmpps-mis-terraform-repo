@@ -157,8 +157,16 @@ locals {
   fsx_integration_security_group    = data.terraform_remote_state.fsx-integration.outputs.mis_fsx_integration_security_group
 
   bps_disable_api_termination = var.bps_disable_api_termination
-  bps_ebs_optimized           = var.bps_ebs_optimized 
+  bps_ebs_optimized           = var.bps_ebs_optimized
   bps_hibernation             = var.bps_hibernation
+
+  #Overide autostop tag
+  overide_tags = merge(
+    local.tags,
+    {
+      "autostop-${var.environment_type}" = var.mis_overide_autostop_tags
+    },
+  )
 }
 
 #-------------------------------------------------------------
@@ -229,7 +237,7 @@ resource "aws_instance" "bps_server" {
   )
 
   tags = merge(
-    local.tags,
+    local.overide_tags,
     {
       "Name" = "${local.environment_identifier}-${local.app_name}-${local.nart_prefix}${count.index + 1}"
     },
@@ -246,7 +254,7 @@ resource "aws_instance" "bps_server" {
   }
 
   disable_api_termination = local.bps_disable_api_termination
-  ebs_optimized           = local.bps_ebs_optimized 
+  ebs_optimized           = local.bps_ebs_optimized
   hibernation             = local.bps_hibernation
 
   lifecycle {
