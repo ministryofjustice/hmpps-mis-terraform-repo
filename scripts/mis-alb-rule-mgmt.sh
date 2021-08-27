@@ -24,7 +24,7 @@ cat << EOF > actions-fixed-response.json
     {
         "Type": "fixed-response",
         "FixedResponseConfig": {
-            "MessageBody": "Attention: Ndelius MIS is unavailable between ${STOP_TIME} and ${RESUME_TIME} \n${MAINTENANCE_TASK} is in progress \nPlease try again later",
+            "MessageBody": "Attention: Ndelius MIS is unavailable between ${STOP_TIME} and ${RESUME_TIME} \n${MAINTENANCE_TASK} in progress \nPlease try again later",
             "StatusCode": "200",
             "ContentType": "text/plain"
         }
