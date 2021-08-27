@@ -1,7 +1,5 @@
 locals {
   lb_name     = "${local.short_environment_identifier}-${local.nart_role}"
-  lb_endpoint = "ndl-bws"
-  external_lb_security_groups = flatten([data.terraform_remote_state.security-groups.outputs.security_groups_sg_mis_app_lb])
 }
 
 ############################################

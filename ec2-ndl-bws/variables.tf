@@ -94,3 +94,5 @@ variable "bws_hibernation" {
 variable "mis_overide_autostop_tags" {
   default = "False"
 }
+
+variable "short_environment_name" {}

@@ -1,0 +1,10 @@
+[
+    {
+        "Type": "fixed-response",
+        "FixedResponseConfig": {
+            "MessageBody": "Attention: Ndelius MIS is unavailable between  and  \n is in progress \nPlease try again later",
+            "StatusCode": "200",
+            "ContentType": "text/plain"
+        }
+    }
+]
