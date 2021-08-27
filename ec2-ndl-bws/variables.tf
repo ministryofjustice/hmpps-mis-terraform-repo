@@ -96,3 +96,19 @@ variable "mis_overide_autostop_tags" {
 }
 
 variable "short_environment_name" {}
+
+variable "lb_mgmt_stop_expression" {
+  description = "Schedule to start the Environment mis-lb-rule-mgmt-build Codebuild Project "
+  default = "cron(30 17 * * ? *)"
+}
+
+variable "lb_mgmt_resume_expression" {
+  description = "Schedule to start the Environment mis-lb-rule-mgmt-build Codebuild Project "
+  default = "cron(30 22 * * ? *)"
+}
+
+variable "lb_management_rule_enabled" {
+  description = "Enable or disable mis-lb-management rule. This will block access to app via LB at scheduled times. ie 18:30 to 23:30"
+  type        = string
+  default     = "false"
+}

@@ -109,8 +109,7 @@ resource "aws_lb_listener" "https_listener" {
 #-------------------------------------------
 resource "aws_route53_record" "bws_lb" {
   zone_id = local.public_zone_id
-  #name    = "${local.lb_endpoint}.${local.external_domain}"
-  name    = "${local.lb_endpoint}-new.${local.external_domain}"
+  name    = "${local.lb_endpoint}.${local.external_domain}"
   type    = "A"
 
   alias {

@@ -297,12 +297,3 @@ resource "aws_route53_record" "bws_dns_ext" {
   ttl     = "300"
   records = [element(aws_instance.bws_server.*.private_ip, count.index)]
 }
-
-#-------------------------------------------------------------
-# Create elb attachments
-#-------------------------------------------------------------
-resource "aws_elb_attachment" "environment" {
-  count    = var.bws_server_count
-  elb      = module.create_app_elb.environment_elb_name
-  instance = element(aws_instance.bws_server.*.id, count.index)
-}
