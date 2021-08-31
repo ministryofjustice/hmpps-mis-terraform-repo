@@ -14,6 +14,21 @@ resource "aws_security_group_rule" "lb_https_in" {
   )
 }
 
+resource "aws_security_group_rule" "lb_http_in" {
+  security_group_id = local.sg_mis_app_lb
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  type              = "ingress"
+  description       = "${local.common_name}-lb-http-in"
+
+  cidr_blocks = concat(
+    local.user_access_cidr_blocks,
+    local.env_user_access_cidr_blocks,
+    local.bastion_public_ip,
+  )
+}
+
 resource "aws_security_group_rule" "bws_lb_http_egress" {
   security_group_id        = local.sg_mis_app_lb
   from_port                = local.bws_port

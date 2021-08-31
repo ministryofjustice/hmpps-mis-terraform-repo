@@ -9,16 +9,16 @@
         "properties":{
           "metrics":[
             [
-              "AWS/ELB",
-              "RequestCount",
-              "LoadBalancerName",
-              "${bws_lb_name}"
+              "AWS/ApplicationELB",
+              "ActiveConnectionCount",
+              "LoadBalancer",
+              "${bws_elb_arn_suffix}"
             ]
           ],
           "period":60,
           "stat":"Sum",
           "region":"${region}",
-          "title":"BWS LB Incoming requests / minute",
+          "title":"BWS LB Active Connection Count",
           "view":"timeSeries",
           "stacked":true,
           "yAxis":{
@@ -41,16 +41,16 @@
       "properties":{
         "metrics":[
           [
-            "AWS/ELB",
-            "Latency",
-            "LoadBalancerName",
-            "${bws_lb_name}"
+            "AWS/ApplicationELB",
+            "HTTPCode_ELB_4XX_Count",
+            "LoadBalancer",
+            "${bws_elb_arn_suffix}"
           ]
         ],
         "period":60,
         "stat":"Average",
         "region":"${region}",
-        "title":"BWS LB Response latency (seconds)",
+        "title":"BWS LB 4xx Error Count",
         "view":"timeSeries",
         "stacked":true,
         "yAxis":{
@@ -59,23 +59,12 @@
             "max":5
           }
         },
-        "annotations": {
-          "horizontal": [
-            {
-              "visible":true,
-              "color":"#C00000",
-              "label":"Slow",
-              "value":${slow_latency},
-              "fill":"above",
-              "yAxis":"left"
-            }
-          ]
-        },
         "legend": {
           "position": "hidden"
         }
       }
     },
+
     {
       "type":"metric",
       "x":0,
@@ -85,10 +74,12 @@
       "properties":{
         "metrics":[
           [
-            "AWS/ELB",
+            "AWS/ApplicationELB",
             "HealthyHostCount",
-            "LoadBalancerName",
-            "${bws_lb_name}"
+            "LoadBalancer",
+            "${bws_elb_arn_suffix}",
+            "TargetGroup",
+            "${target_group_arn_suffix}"
           ]
         ],
         "period":60,
@@ -196,6 +187,7 @@
       }
     }
   },
+
   {
     "type":"metric",
     "x":12,
@@ -240,5 +232,5 @@
       }
     }
   }
-]
+ ]
 }
