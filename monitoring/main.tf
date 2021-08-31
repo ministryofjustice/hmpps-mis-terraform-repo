@@ -90,22 +90,24 @@ data "terraform_remote_state" "nextcloud" {
 }
 
 locals {
-  environment_identifier = data.terraform_remote_state.common.outputs.short_environment_identifier
-  mis_app_name           = data.terraform_remote_state.common.outputs.mis_app_name
-  bws_lb_name            = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_elb_name
-  nextcloud_lb_name      = data.terraform_remote_state.nextcloud.outputs.nextcloud_lb_name
-  samba_lb_name          = data.terraform_remote_state.nextcloud.outputs.samba_lb_name
-  log_group_name         = "/mis/application_logs"
-  name_space             = "LogMetrics"
-  exclude_log_level      = "-INFORMATION -WARNING"
-  include_log_level      = "INFORMATION"
-  mis_team_action        = "If no OK alarm is received in a few minutes, please contact the MIS Team"
-  nart_role              = data.terraform_remote_state.common.outputs.legacy_environment_name
-  nart_prefix            = substr(local.nart_role, 0, length(local.nart_role) - 1)
-  started_message        = "has been started"
-  name_prefix            = var.short_environment_name
-  tags                   = data.terraform_remote_state.common.outputs.common_tags
-  account_id             = data.terraform_remote_state.common.outputs.common_account_id
+  environment_identifier  = data.terraform_remote_state.common.outputs.short_environment_identifier
+  mis_app_name            = data.terraform_remote_state.common.outputs.mis_app_name
+  bws_lb_name             = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_elb_name
+  bws_elb_arn_suffix      = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_elb_arn_suffix
+  nextcloud_lb_name       = data.terraform_remote_state.nextcloud.outputs.nextcloud_lb_name
+  samba_lb_name           = data.terraform_remote_state.nextcloud.outputs.samba_lb_name
+  log_group_name          = "/mis/application_logs"
+  name_space              = "LogMetrics"
+  exclude_log_level       = "-INFORMATION -WARNING"
+  include_log_level       = "INFORMATION"
+  mis_team_action         = "If no OK alarm is received in a few minutes, please contact the MIS Team"
+  nart_role               = data.terraform_remote_state.common.outputs.legacy_environment_name
+  nart_prefix             = substr(local.nart_role, 0, length(local.nart_role) - 1)
+  started_message         = "has been started"
+  name_prefix             = var.short_environment_name
+  tags                    = data.terraform_remote_state.common.outputs.common_tags
+  account_id              = data.terraform_remote_state.common.outputs.common_account_id
+  target_group_arn_suffix = data.terraform_remote_state.ec2-ndl-bws.outputs.target_group_arn_suffix
 }
 
 #dashboard
@@ -118,12 +120,14 @@ resource "aws_cloudwatch_dashboard" "mis" {
 data "template_file" "dashboard-body" {
   template = file("dashboard.json")
   vars = {
-    region            = var.region
-    environment_name  = var.environment_type
-    bws_lb_name       = local.bws_lb_name
-    region            = var.region
-    slow_latency      = 1
-    nextcloud_lb_name = local.nextcloud_lb_name
+    region             = var.region
+    environment_name   = var.environment_type
+    bws_lb_name        = local.bws_lb_name
+    region             = var.region
+    slow_latency       = 1
+    nextcloud_lb_name  = local.nextcloud_lb_name
+    bws_elb_arn_suffix = local.bws_elb_arn_suffix
+    target_group_arn_suffix = local.target_group_arn_suffix
   }
 }
 

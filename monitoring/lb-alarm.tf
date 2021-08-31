@@ -4,7 +4,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_alert" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
-  namespace           = "AWS/ELB"
+  namespace           = "AWS/ApplicationELB"
   period              = "300"
   statistic           = "Average"
   threshold           = "1"
@@ -14,7 +14,8 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_alert" {
   tags                = local.tags
 
   dimensions = {
-    LoadBalancerName = local.bws_lb_name
+    LoadBalancer     = local.bws_elb_arn_suffix
+    TargetGroup      = local.target_group_arn_suffix
   }
 }
 
@@ -23,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_critical" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "UnHealthyHostCount"
-  namespace           = "AWS/ELB"
+  namespace           = "AWS/ApplicationELB"
   period              = "300"
   statistic           = "Average"
   threshold           = "2"
@@ -33,27 +34,8 @@ resource "aws_cloudwatch_metric_alarm" "bws_lb_unhealthy_hosts_critical" {
   tags                = local.tags
 
   dimensions = {
-    LoadBalancerName = local.bws_lb_name
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "bws_lb_spillovercount" {
-  alarm_name          = "${var.environment_type}__SpilloverCount__severe__BWS__${local.bws_lb_name}-lb"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "1"
-  metric_name         = "SpilloverCount"
-  namespace           = "AWS/ELB"
-  period              = "300"
-  statistic           = "Sum"
-  threshold           = "1"
-  alarm_description   = "The BWS loadbalancer ${local.bws_lb_name} is averaging a spillover count of 1. Please contact the MIS AWS Support contact."
-  alarm_actions       = [aws_sns_topic.alarm_notification.arn]
-  ok_actions          = [aws_sns_topic.alarm_notification.arn]
-  treat_missing_data  = "notBreaching"
-  tags                = local.tags
-
-  dimensions = {
-    LoadBalancerName = local.bws_lb_name
+    LoadBalancer     = local.bws_elb_arn_suffix
+    TargetGroup      = local.target_group_arn_suffix
   }
 }
 
