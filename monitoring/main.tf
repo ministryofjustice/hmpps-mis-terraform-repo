@@ -90,24 +90,26 @@ data "terraform_remote_state" "nextcloud" {
 }
 
 locals {
-  environment_identifier  = data.terraform_remote_state.common.outputs.short_environment_identifier
-  mis_app_name            = data.terraform_remote_state.common.outputs.mis_app_name
-  bws_lb_name             = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_elb_name
-  bws_elb_arn_suffix      = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_elb_arn_suffix
-  nextcloud_lb_name       = data.terraform_remote_state.nextcloud.outputs.nextcloud_lb_name
-  samba_lb_name           = data.terraform_remote_state.nextcloud.outputs.samba_lb_name
-  log_group_name          = "/mis/application_logs"
-  name_space              = "LogMetrics"
-  exclude_log_level       = "-INFORMATION -WARNING"
-  include_log_level       = "INFORMATION"
-  mis_team_action         = "If no OK alarm is received in a few minutes, please contact the MIS Team"
-  nart_role               = data.terraform_remote_state.common.outputs.legacy_environment_name
-  nart_prefix             = substr(local.nart_role, 0, length(local.nart_role) - 1)
-  started_message         = "has been started"
-  name_prefix             = var.short_environment_name
-  tags                    = data.terraform_remote_state.common.outputs.common_tags
-  account_id              = data.terraform_remote_state.common.outputs.common_account_id
-  target_group_arn_suffix = data.terraform_remote_state.ec2-ndl-bws.outputs.target_group_arn_suffix
+  environment_identifier              = data.terraform_remote_state.common.outputs.short_environment_identifier
+  mis_app_name                        = data.terraform_remote_state.common.outputs.mis_app_name
+  bws_lb_name                         = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_elb_name
+  bws_elb_arn_suffix                  = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_elb_arn_suffix
+  nextcloud_lb_name                   = data.terraform_remote_state.nextcloud.outputs.nextcloud_lb_name
+  samba_lb_name                       = data.terraform_remote_state.nextcloud.outputs.samba_lb_name
+  log_group_name                      = "/mis/application_logs"
+  name_space                          = "LogMetrics"
+  exclude_log_level                   = "-INFORMATION -WARNING"
+  include_log_level                   = "INFORMATION"
+  mis_team_action                     = "If no OK alarm is received in a few minutes, please contact the MIS Team"
+  nart_role                           = data.terraform_remote_state.common.outputs.legacy_environment_name
+  nart_prefix                         = substr(local.nart_role, 0, length(local.nart_role) - 1)
+  started_message                     = "has been started"
+  name_prefix                         = var.short_environment_name
+  tags                                = data.terraform_remote_state.common.outputs.common_tags
+  account_id                          = data.terraform_remote_state.common.outputs.common_account_id
+  target_group_arn_suffix             = data.terraform_remote_state.ec2-ndl-bws.outputs.target_group_arn_suffix
+  bws_lb_mgmt_pipeline_log_group_name = "/aws/codebuild/${var.environment_name}-${local.mis_app_name}-lb-rule-mgmt-build"
+  bws_pipeline_failure_pattern        = "Phase BUILD State FAILED"
 }
 
 #dashboard
@@ -139,6 +141,17 @@ resource "aws_cloudwatch_log_group" "mis_application_log_group" {
     local.tags,
     {
       "Name" = "${local.name_prefix}-offapi-pri-cwl"
+    },
+  )
+}
+
+resource "aws_cloudwatch_log_group" "lb_mgmt" {
+  name              = local.bws_lb_mgmt_pipeline_log_group_name
+  retention_in_days = var.cloudwatch_log_retention
+  tags = merge(
+    local.tags,
+    {
+      "Name" = local.bws_lb_mgmt_pipeline_log_group_name
     },
   )
 }
