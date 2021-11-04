@@ -108,7 +108,7 @@ resource "aws_s3_bucket_notification" "dfi_lambda" {
   bucket = aws_s3_bucket.dfi.id
   lambda_function {
     lambda_function_arn = aws_lambda_function.dfi_lambda.arn
-    events              = ["s3:ObjectCreated:Put"]
+    events              = ["s3:ObjectCreated:*"]
     filter_prefix       = "dfinterventions/dfi"
   }
   depends_on = [aws_lambda_permission.with_s3]
