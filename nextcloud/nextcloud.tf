@@ -21,8 +21,9 @@ module "iam_app_policy" {
 data "template_file" "iam_policy_app" {
   template = file("${path.module}/${local.ec2_role_policy_file}")
   vars = {
-    nextcloud_s3_bucket_arn = local.nextcloud_s3_bucket_arn
-    wmt_s3_bucket           = local.wmt_s3_bucket
+    nextcloud_s3_bucket_arn    = local.nextcloud_s3_bucket_arn
+    wmt_bucket_name_prod       = local.wmt_bucket_name_prod
+    wmt_bucket_name_pre_prod   = local.wmt_bucket_name_pre_prod
   }
 }
 
@@ -78,6 +79,8 @@ data "template_file" "nextcloud_user_data" {
     strategic_pwm_url            = local.strategic_pwm_url
     environment_type             = var.environment_type
     region                       = var.region
+    wmt_bucket_name_prod         = local.wmt_bucket_name_prod
+    wmt_bucket_name_pre_prod     = local.wmt_bucket_name_pre_prod
   }
 }
 
