@@ -51,6 +51,8 @@ BOSSO_SVC_PASSNAME="${bosso_svc_passname}"
 CIDR_BLOCK_A="${cidr_block_a_subnet}"
 CIDR_BLOCK_B="${cidr_block_b_subnet}"
 CIDR_BLOCK_C="${cidr_block_c_subnet}"
+WMT_PROD_BUCKET="${wmt_bucket_name_prod}"
+WMT_PRE_PROD_BUCKET="${wmt_bucket_name_pre_prod}"
 EOF
 
 ## Ansible runs in the same shell that has just set the env vars for future logins so it has no knowledge of the vars we've
@@ -94,6 +96,8 @@ export BOSSO_SVC_PASSNAME="${bosso_svc_passname}"
 export CIDR_BLOCK_A="${cidr_block_a_subnet}"
 export CIDR_BLOCK_B="${cidr_block_b_subnet}"
 export CIDR_BLOCK_C="${cidr_block_c_subnet}"
+export WMT_PROD_BUCKET="${wmt_bucket_name_prod}"
+export WMT_PRE_PROD_BUCKET="${wmt_bucket_name_pre_prod}"
 
 #Mount EFS
 echo "$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone).$EFS_DNS_NAME:/    $DATA_DIR  nfs4    defaults" >> /etc/fstab
@@ -114,7 +118,7 @@ cat << EOF > ~/requirements.yml
   src: singleplatform-eng.users
 - name: nextcloud
   src: https://github.com/ministryofjustice/hmpps-nextcloud-installer
-  version: 1.5.1
+  version: wmt_upload_updates
 EOF
 
 wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
@@ -186,6 +190,8 @@ globignore: "CRC:nart:National:NPS"
 cidr_block_a: $CIDR_BLOCK_A
 cidr_block_b: $CIDR_BLOCK_B
 cidr_block_c: $CIDR_BLOCK_C
+wmt_prod_bucket: $WMT_PROD_BUCKET
+wmt_pre_prod_bucket: $WMT_PRE_PROD_BUCKET
 EOF
 
 cat << EOF > ~/bootstrap.yml

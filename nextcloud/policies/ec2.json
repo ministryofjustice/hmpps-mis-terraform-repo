@@ -34,8 +34,10 @@
                "s3:ListBucket"
            ],
            "Resource": [
-                "arn:aws:s3:::${wmt_s3_bucket}",
-                "arn:aws:s3:::${wmt_s3_bucket}/*"
+                "arn:aws:s3:::${wmt_bucket_name_prod}",
+                "arn:aws:s3:::${wmt_bucket_name_prod}/*",
+                "arn:aws:s3:::${wmt_bucket_name_pre_prod}",
+                "arn:aws:s3:::${wmt_bucket_name_pre_prod}/*"
            ]
         },
         {
