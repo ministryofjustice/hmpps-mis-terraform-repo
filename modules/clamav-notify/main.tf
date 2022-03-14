@@ -59,6 +59,6 @@ resource "aws_cloudwatch_log_group" "clamav-notification" {
     var.tags,
     {
       "Name" = "/aws/lambda/${local.lambda_name}"
-    },
+    }
   )
 }
