@@ -121,8 +121,8 @@ locals {
   target_group_arn_suffix             = data.terraform_remote_state.ec2-ndl-bws.outputs.target_group_arn_suffix
   bws_lb_mgmt_pipeline_log_group_name = "/aws/codebuild/${var.environment_name}-${local.mis_app_name}-lb-rule-mgmt-build"
   bws_pipeline_failure_pattern        = "Phase BUILD State FAILED"
-  slack_nonprod_url                   = data.aws_ssm_parameter.slack_token_nonprod.value    # "/services/T02DYEB3A/BS16X2JGY/r9e1CJYez7BDmwyliIl7WzLf"
-  slack_prod_url                      = data.aws_ssm_parameter.slack_token_prod.value       # "/services/T02DYEB3A/BRU7E5QSC/3Rt4FV9FtrDSll5aMPABgRoB"
+  slack_nonprod_url                   = data.aws_ssm_parameter.slack_token_nonprod.value
+  slack_prod_url                      = data.aws_ssm_parameter.slack_token_prod.value
   slack_nonprod_channel               = "ndmis-non-prod-alerts"
   slack_prod_channel                  = "ndmis-alerts"
 }
@@ -196,10 +196,6 @@ data "archive_file" "notify-ndmis-slack" {
   output_path = "${path.module}/files/${local.lambda_name}zip"
 }
 
-#data "aws_iam_role" "lambda_exec_role" {
-#  name = "lambda_exec_role"
-#}
-
 resource "aws_lambda_function" "notify-ndmis-slack" {
   filename         = data.archive_file.notify-ndmis-slack.output_path
   function_name    = local.lambda_name
@@ -207,6 +203,14 @@ resource "aws_lambda_function" "notify-ndmis-slack" {
   handler          = "${local.lambda_name}.handler"
   source_code_hash = filebase64sha256(data.archive_file.notify-ndmis-slack.output_path)
   runtime          = "nodejs12.x"
+  
+  environment {
+    variables = {
+      environment_type  = var.environment_type
+      slack_url         = var.environment_type == "prod" ? local.slack_prod_url : local.slack_nonprod_url
+      slack_channel     = var.environment_type == "prod" ? local.slack_prod_channel : local.slack_nonprod_channel
+    }
+  }
 }
 
 resource "aws_lambda_permission" "with_sns" {
@@ -217,14 +221,3 @@ resource "aws_lambda_permission" "with_sns" {
   source_arn    = aws_sns_topic.alarm_notification.arn
 }
 
-#-------------------------------------------------------------
-### Getting slack variables for the lambda function
-#-------------------------------------------------------------
-data "template_file" "notify_slack_alarm_lambda_file" {
-  template = file("${path.module}/lambda/mis-notify-ndmis-slack.js")
-  vars     = {
-    environment_type = var.environment_type
-    slack_url        = var.environment_type == "prod" ? local.slack_prod_url : local.slack_nonprod_url
-    slack_channel    = var.environment_type == "prod" ? local.slack_prod_channel : local.slack_nonprod_channel
-  }
-}

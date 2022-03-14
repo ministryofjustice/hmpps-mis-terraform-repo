@@ -46,7 +46,7 @@ resource "aws_lambda_function" "clamav-notification" {
   environment {
     variables = {
       ENVIRONMENT_TYPE = var.name
-      slack_url        = var.name == "prod" ? data.aws_ssm_parameter.slack_token_prod.value : data.aws_ssm_parameter.slack_token_nonprod.value    # "/services/T02DYEB3A/BS16X2JGY/r9e1CJYez7BDmwyliIl7WzLf"
+      slack_url        = var.name == "prod" ? data.aws_ssm_parameter.slack_token_prod.value : data.aws_ssm_parameter.slack_token_nonprod.value
       slack_channel    = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"
     }
   }
