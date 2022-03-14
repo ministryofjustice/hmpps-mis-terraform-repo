@@ -15,6 +15,15 @@ resource "aws_sns_topic_subscription" "clamav-notification" {
   endpoint  = aws_lambda_function.clamav-notification.arn
 }
 
+### Slack token URL details
+data "aws_ssm_parameter" "slack_token_nonprod" {
+  name            = "/mis/nonprod/slack/token"
+}
+
+data "aws_ssm_parameter" "slack_token_prod" {
+  name            = "/mis/prod/slack/token"
+}
+
 ### Lambda
 data "archive_file" "clamav-notification" {
   type        = "zip"
@@ -22,14 +31,14 @@ data "archive_file" "clamav-notification" {
   output_path = "${path.module}/files/${local.clamav_notification}.zip"
 }
 
-data "aws_iam_role" "clamav-notification-role" {
-  name = "lambda_exec_role"
-}
+#data "aws_iam_role" "clamav-notification-role" {
+#  name = "lambda_exec_role"
+#}
 
 resource "aws_lambda_function" "clamav-notification" {
   filename         = data.archive_file.clamav-notification.output_path
   function_name    = local.lambda_name
-  role             = data.aws_iam_role.clamav-notification-role.arn
+  role             = aws_iam_role.lambda_role.arn   # data.aws_iam_role.clamav-notification-role.arn
   handler          = "${local.clamav_notification}.handler"
   source_code_hash = filebase64sha256(data.archive_file.clamav-notification.output_path)
   runtime          = "nodejs12.x"
@@ -37,7 +46,8 @@ resource "aws_lambda_function" "clamav-notification" {
   environment {
     variables = {
       ENVIRONMENT_TYPE = var.name
-    }
+      slack_url        = var.name == "prod" ? data.aws_ssm_parameter.slack_token_prod.value : data.aws_ssm_parameter.slack_token_nonprod.value    # "/services/T02DYEB3A/BS16X2JGY/r9e1CJYez7BDmwyliIl7WzLf"
+      slack_channel    = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"
   }
 }
 
