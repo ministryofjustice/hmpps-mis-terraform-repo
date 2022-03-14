@@ -1,8 +1,8 @@
 resource "aws_iam_role" "lambda_role" {
-  name               = "${var.name}-clamav-notify-slack-role"
+  name               = "${var.environment_name}-notify-slack-role"
   description        = "Role enabling Lambda to access Slack for sending alerts and enabling Lambda ro access SSM Parameter Store slack token value"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy_document.json
-  tags               = merge(var.tags, { Name = "${var.name}-notify-slack-role" })
+  tags               = merge(var.tags, { Name = "${var.environment_name}-notify-slack-role" })
 }
 
 data "aws_caller_identity" "current" {
@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "lambda_policy_document" {
 }
 
 resource "aws_iam_policy" "lambda_policy" {
-  name   = "${var.name}-notify-slack-role"
+  name   = "${var.environment_name}-notify-slack-role"
   policy = data.aws_iam_policy_document.lambda_policy_document.json
 }
 
