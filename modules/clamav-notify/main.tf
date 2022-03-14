@@ -31,14 +31,14 @@ data "archive_file" "clamav-notification" {
   output_path = "${path.module}/files/${local.clamav_notification}.zip"
 }
 
-#data "aws_iam_role" "clamav-notification-role" {
-#  name = "lambda_exec_role"
-#}
+data "aws_iam_role" "clamav-notification-role" {
+  name = "delius-${var.name}-notify-slack-role"
+}
 
 resource "aws_lambda_function" "clamav-notification" {
   filename         = data.archive_file.clamav-notification.output_path
   function_name    = local.lambda_name
-  role             = aws_iam_role.lambda_role.arn   # data.aws_iam_role.clamav-notification-role.arn
+  role             = data.aws_iam_role.clamav-notification-role.arn
   handler          = "${local.clamav_notification}.handler"
   source_code_hash = filebase64sha256(data.archive_file.clamav-notification.output_path)
   runtime          = "nodejs12.x"
@@ -59,6 +59,6 @@ resource "aws_cloudwatch_log_group" "clamav-notification" {
     var.tags,
     {
       "Name" = "/aws/lambda/${local.lambda_name}"
-    }
+    },
   )
 }
