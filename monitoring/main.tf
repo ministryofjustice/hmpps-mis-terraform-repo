@@ -92,13 +92,13 @@ data "terraform_remote_state" "nextcloud" {
 #-------------------------------------------------------------
 ### Getting the slack token URL details
 #-------------------------------------------------------------
-data "aws_ssm_parameter" "slack_token_nonprod" {
-  name            = "/mis/nonprod/slack/token"
-}
+#data "aws_ssm_parameter" "slack_token_nonprod" {
+#  name            = "/mis/nonprod/slack/token"
+#}
 
-data "aws_ssm_parameter" "slack_token_prod" {
-  name            = "/mis/prod/slack/token"
-}
+#data "aws_ssm_parameter" "slack_token_prod" {
+#  name            = "/mis/prod/slack/token"
+#}
 
 locals {
   environment_identifier              = data.terraform_remote_state.common.outputs.short_environment_identifier
@@ -121,8 +121,8 @@ locals {
   target_group_arn_suffix             = data.terraform_remote_state.ec2-ndl-bws.outputs.target_group_arn_suffix
   bws_lb_mgmt_pipeline_log_group_name = "/aws/codebuild/${var.environment_name}-${local.mis_app_name}-lb-rule-mgmt-build"
   bws_pipeline_failure_pattern        = "Phase BUILD State FAILED"
-  slack_nonprod_url                   = data.aws_ssm_parameter.slack_token_nonprod.value
-  slack_prod_url                      = data.aws_ssm_parameter.slack_token_prod.value
+  #slack_nonprod_url                   = data.aws_ssm_parameter.slack_token_nonprod.value
+  #slack_prod_url                      = data.aws_ssm_parameter.slack_token_prod.value
   slack_nonprod_channel               = "ndmis-non-prod-alerts"
   slack_prod_channel                  = "ndmis-alerts"
 }
@@ -184,6 +184,29 @@ resource "aws_sns_topic_subscription" "alarm_subscription" {
   endpoint  = aws_lambda_function.notify-ndmis-slack.arn
 }
 
+### Slack Token SSM ParamStore
+
+resource "random_password" "slack_webhook_url" {
+  length           = 32
+  special          = false
+}
+
+resource "aws_ssm_parameter" "slack_token" {
+  name            = "/${var.environment_type}/slack/token"
+  type            = "SecureString"
+  value           = random_password.slack_webhook_url.result
+  tags            = merge(
+    var.tags, 
+    {
+      "Name" = "/${var.environment_type}/slack/token" 
+    }
+  )
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 ### Lambda
 
 locals {
@@ -206,9 +229,9 @@ resource "aws_lambda_function" "notify-ndmis-slack" {
   
   environment {
     variables = {
-      environment_type  = var.environment_type
-      slack_url         = var.environment_type == "prod" ? local.slack_prod_url : local.slack_nonprod_url
-      slack_channel     = var.environment_type == "prod" ? local.slack_prod_channel : local.slack_nonprod_channel
+      environment_type            = var.environment_type
+      slack_token_paramstore_name = aws_ssm_parameter.slack_token.name    # var.environment_type == "prod" ?  data.aws_ssm_parameter.slack_token_prod.name : data.aws_ssm_parameter.slack_token_nonprod.name    # local.slack_prod_url : local.slack_nonprod_url
+      slack_channel               = var.environment_type == "prod" ? local.slack_prod_channel : local.slack_nonprod_channel
     }
   }
 }
