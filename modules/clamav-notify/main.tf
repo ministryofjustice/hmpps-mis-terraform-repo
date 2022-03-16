@@ -16,12 +16,8 @@ resource "aws_sns_topic_subscription" "clamav-notification" {
 }
 
 ### Slack token URL details
-data "aws_ssm_parameter" "slack_token_nonprod" {
-  name            = "/mis/nonprod/slack/token"
-}
-
-data "aws_ssm_parameter" "slack_token_prod" {
-  name            = "/mis/prod/slack/token"
+data "aws_ssm_parameter" "slack_token" {
+  name            = "/${var.name}/slack/token"
 }
 
 ### Lambda
@@ -45,9 +41,9 @@ resource "aws_lambda_function" "clamav-notification" {
 
   environment {
     variables = {
-      ENVIRONMENT_TYPE = var.name
-      slack_url        = var.name == "prod" ? data.aws_ssm_parameter.slack_token_prod.value : data.aws_ssm_parameter.slack_token_nonprod.value
-      slack_channel    = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"
+      ENVIRONMENT_TYPE            = var.name
+      slack_token_paramstore_name = data.aws_ssm_parameter.slack_token.name    # slack_url        = var.name == "prod" ? data.aws_ssm_parameter.slack_token_prod.value : data.aws_ssm_parameter.slack_token_nonprod.value
+      slack_channel               = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"
     }
   }
 }
