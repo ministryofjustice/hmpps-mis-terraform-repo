@@ -23,8 +23,6 @@ exports.handler = function(event, context) {
         var environment = alarmName.split("__")[0];
         var metric = alarmName.split("__")[1];
         var severity = alarmName.split("__")[2];
-        var channel = "${slack_channel}";
-        var slack_token_ssm = "${slack_token_paramstore_name}"
         var icon_emoji=":twisted_rightwards_arrows:";
         
 
@@ -52,11 +50,11 @@ exports.handler = function(event, context) {
 
  //environment	service	    tier	metric	severity	resolvergroup(s)
 
-            console.log("Slack channel: " + channel);
+            console.log("Slack channel: " + process.env.SLACK_CHANNEL);
 
            if (newStateValue=='ALARM' )
               var postData = {
-                      "channel": "# " + channel,
+                      "channel": "# " + process.env.SLACK_CHANNEL,
                       "username": "AWS SNS via Lambda :: Alarm Notification",
                       "text": "**************************************************************************************************"
                       + "\n\nInfo: " + alarmDescription
@@ -71,7 +69,7 @@ exports.handler = function(event, context) {
 
            if (newStateValue=='OK' )
               var postData = {
-                      "channel": "# " + channel,
+                      "channel": "# " + process.env.SLACK_CHANNEL,
                       "username": "AWS SNS via Lambda :: OK Notification",
                       "text": "**************************************************************************************************"
                       + "\n\nInfo: ALARM State is now OK. No Further Action Required!! The following info is for information purposes only: " + alarmDescription
@@ -83,20 +81,17 @@ exports.handler = function(event, context) {
                       "link_names": "1"
                   };
 
-   ssm.getParameters({Name: slack_token_ssm, WithDecryption: true }, function(err, data) {
-      if (err) {
-         console.log("Unable to get webhook URL token for Slack", slack_token_ssm, err); // an error occurred
+    ssm.getParameters({Name: process.env.SLACK_TOKEN, WithDecryption: true }, function(err, data) {
+       if (err) {
+         console.log("Unable to get webhook URL token for Slack", process.env.SLACK_TOKEN);
          return context.fail("Unable to get webhook URL token for Slack");
-      };
-      else 
-         url_path = console.log(data)
-   });
+      }
 
     var options = {
         method: 'POST',
         hostname: 'hooks.slack.com',
         port: 443,
-        path: url_path
+        path: data.Parameter.Value
     };
 
     var req = https.request(options, function(res) {
@@ -110,6 +105,7 @@ exports.handler = function(event, context) {
       console.log('problem with request: ' + e.message);
     });
 
-    req.write(util.format("%j", postData));
+    req.write(util.format("%j", postData))
+   });
     req.end();
 };

@@ -229,9 +229,10 @@ resource "aws_lambda_function" "notify-ndmis-slack" {
   
   environment {
     variables = {
-      environment_type            = var.environment_type
-      slack_token_paramstore_name = aws_ssm_parameter.slack_token.name    # var.environment_type == "prod" ?  data.aws_ssm_parameter.slack_token_prod.name : data.aws_ssm_parameter.slack_token_nonprod.name    # local.slack_prod_url : local.slack_nonprod_url
-      slack_channel               = var.environment_type == "prod" ? local.slack_prod_channel : local.slack_nonprod_channel
+      REGION                      = var.region
+      ENVIRONMENT_TYPE            = var.environment_type
+      SLACK_TOKEN                 = aws_ssm_parameter.slack_token.name    # var.environment_type == "prod" ?  data.aws_ssm_parameter.slack_token_prod.name : data.aws_ssm_parameter.slack_token_nonprod.name    # local.slack_prod_url : local.slack_nonprod_url
+      SLACK_CHANNEL               = var.environment_type == "prod" ? local.slack_prod_channel : local.slack_nonprod_channel
     }
   }
 }
