@@ -28,7 +28,7 @@ resource "aws_lambda_function" "clamav-notification" {
     variables = {
       REGION            = var.region
       ENVIRONMENT_TYPE  = var.name
-      SLACK_TOKEN       = aws_ssm_parameter.slack_token.name
+      SLACK_TOKEN       = data.aws_ssm_parameter.slack_token.name
       SLACK_CHANNEL     = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"
     }
   }
