@@ -15,22 +15,7 @@ resource "aws_sns_topic_subscription" "clamav-notification" {
   endpoint  = aws_lambda_function.clamav-notification.arn
 }
 
-### Slack token URL details
-data "aws_ssm_parameter" "slack_token" {
-  name            = "/${var.name}/slack/token"
-}
-
 ### Lambda
-data "archive_file" "clamav-notification" {
-  type        = "zip"
-  source_file = "${path.module}/lambda/${local.clamav_notification}.js"
-  output_path = "${path.module}/files/${local.clamav_notification}.zip"
-}
-
-data "aws_iam_role" "clamav-notification-role" {
-  name = "delius-${var.name}-notify-slack-role"
-}
-
 resource "aws_lambda_function" "clamav-notification" {
   filename         = data.archive_file.clamav-notification.output_path
   function_name    = local.lambda_name
@@ -41,9 +26,10 @@ resource "aws_lambda_function" "clamav-notification" {
 
   environment {
     variables = {
-      ENVIRONMENT_TYPE            = var.name
-      slack_token_paramstore_name = data.aws_ssm_parameter.slack_token.name    # slack_url        = var.name == "prod" ? data.aws_ssm_parameter.slack_token_prod.value : data.aws_ssm_parameter.slack_token_nonprod.value
-      slack_channel               = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"
+      REGION            = var.region
+      ENVIRONMENT_TYPE  = var.name
+      SLACK_TOKEN       = aws_ssm_parameter.slack_token.name
+      SLACK_CHANNEL     = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"
     }
   }
 }
