@@ -1,105 +1,3 @@
-terraform {
-  # The configuration for this backend will be filled in by Terragrunt
-  # The configuration for this backend will be filled in by Terragrunt
-  backend "s3" {
-  }
-}
-
-####################################################
-# DATA SOURCE MODULES FROM OTHER TERRAFORM BACKENDS
-####################################################
-#-------------------------------------------------------------
-### Getting the common details
-#-------------------------------------------------------------
-data "terraform_remote_state" "common" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/common/terraform.tfstate"
-    region = var.region
-  }
-}
-
-####################################################
-# DATA SOURCE MODULES FROM OTHER TERRAFORM BACKENDS
-####################################################
-#-------------------------------------------------------------
-### Getting bws instance details
-#-------------------------------------------------------------
-data "terraform_remote_state" "ec2-ndl-bws" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/ec2-ndl-bws/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting dis instance details
-#-------------------------------------------------------------
-data "terraform_remote_state" "ec2-ndl-dis" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/ec2-ndl-dis/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting bps instance details
-#-------------------------------------------------------------
-data "terraform_remote_state" "ec2-ndl-bps" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/ec2-ndl-bps/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting bcs instance details
-#-------------------------------------------------------------
-data "terraform_remote_state" "ec2-ndl-bcs" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/ec2-ndl-bcs/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting nextcloud details
-#-------------------------------------------------------------
-data "terraform_remote_state" "nextcloud" {
-  backend = "s3"
-
-  config = {
-    bucket = var.remote_state_bucket_name
-    key    = "${var.environment_type}/nextcloud/terraform.tfstate"
-    region = var.region
-  }
-}
-
-#-------------------------------------------------------------
-### Getting the slack token URL details
-#-------------------------------------------------------------
-#data "aws_ssm_parameter" "slack_token_nonprod" {
-#  name            = "/mis/nonprod/slack/token"
-#}
-
-#data "aws_ssm_parameter" "slack_token_prod" {
-#  name            = "/mis/prod/slack/token"
-#}
-
 locals {
   environment_identifier              = data.terraform_remote_state.common.outputs.short_environment_identifier
   mis_app_name                        = data.terraform_remote_state.common.outputs.mis_app_name
@@ -121,8 +19,6 @@ locals {
   target_group_arn_suffix             = data.terraform_remote_state.ec2-ndl-bws.outputs.target_group_arn_suffix
   bws_lb_mgmt_pipeline_log_group_name = "/aws/codebuild/${var.environment_name}-${local.mis_app_name}-lb-rule-mgmt-build"
   bws_pipeline_failure_pattern        = "Phase BUILD State FAILED"
-  #slack_nonprod_url                   = data.aws_ssm_parameter.slack_token_nonprod.value
-  #slack_prod_url                      = data.aws_ssm_parameter.slack_token_prod.value
   slack_nonprod_channel               = "ndmis-non-prod-alerts"
   slack_prod_channel                  = "ndmis-alerts"
 }
@@ -132,20 +28,6 @@ locals {
 resource "aws_cloudwatch_dashboard" "mis" {
   dashboard_name = "mis-${var.environment_type}-monitoring"
   dashboard_body = data.template_file.dashboard-body.rendered
-}
-
-data "template_file" "dashboard-body" {
-  template = file("dashboard.json")
-  vars = {
-    region             = var.region
-    environment_name   = var.environment_type
-    bws_lb_name        = local.bws_lb_name
-    region             = var.region
-    slow_latency       = 1
-    nextcloud_lb_name  = local.nextcloud_lb_name
-    bws_elb_arn_suffix = local.bws_elb_arn_suffix
-    target_group_arn_suffix = local.target_group_arn_suffix
-  }
 }
 
 ### Log Group
@@ -184,55 +66,26 @@ resource "aws_sns_topic_subscription" "alarm_subscription" {
   endpoint  = aws_lambda_function.notify-ndmis-slack.arn
 }
 
-### Slack Token SSM ParamStore
-
-resource "random_password" "slack_webhook_url" {
-  length           = 32
-  special          = false
-}
-
-resource "aws_ssm_parameter" "slack_token" {
-  name            = "/${var.environment_type}/slack/token"
-  type            = "SecureString"
-  value           = random_password.slack_webhook_url.result
-  tags            = merge(
-    var.tags, 
-    {
-      "Name" = "/${var.environment_type}/slack/token" 
-    }
-  )
-
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
 ### Lambda
 
 locals {
   lambda_name = "${local.mis_app_name}-notify-ndmis-slack"
 }
 
-data "archive_file" "notify-ndmis-slack" {
-  type        = "zip"
-  source_file = "${path.module}/lambda/${local.lambda_name}.js"
-  output_path = "${path.module}/files/${local.lambda_name}zip"
-}
-
 resource "aws_lambda_function" "notify-ndmis-slack" {
   filename         = data.archive_file.notify-ndmis-slack.output_path
   function_name    = local.lambda_name
-  role             = aws_iam_role.lambda_role.arn #    data.aws_iam_role.lambda_exec_role.arn
+  role             = aws_iam_role.lambda_role.arn
   handler          = "${local.lambda_name}.handler"
   source_code_hash = filebase64sha256(data.archive_file.notify-ndmis-slack.output_path)
   runtime          = "nodejs12.x"
   
   environment {
     variables = {
-      REGION                      = var.region
-      ENVIRONMENT_TYPE            = var.environment_type
-      SLACK_TOKEN                 = aws_ssm_parameter.slack_token.name    # var.environment_type == "prod" ?  data.aws_ssm_parameter.slack_token_prod.name : data.aws_ssm_parameter.slack_token_nonprod.name    # local.slack_prod_url : local.slack_nonprod_url
-      SLACK_CHANNEL               = var.environment_type == "prod" ? local.slack_prod_channel : local.slack_nonprod_channel
+      REGION            = var.region
+      ENVIRONMENT_TYPE  = var.environment_type
+      SLACK_TOKEN       = aws_ssm_parameter.slack_token.name    
+      SLACK_CHANNEL     = var.environment_type == "prod" ? local.slack_prod_channel : local.slack_nonprod_channel
     }
   }
 }
