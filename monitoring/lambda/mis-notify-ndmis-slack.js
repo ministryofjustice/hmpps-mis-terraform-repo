@@ -1,5 +1,5 @@
-var https = require('https');
-var util = require('util');
+let https = require('https');
+let util = require('util');
 let AWS = require('aws-sdk');
 let ssm = new AWS.SSM({ region: process.env.REGION });
 
@@ -81,31 +81,32 @@ exports.handler = function(event, context) {
                       "link_names": "1"
                   };
 
-    ssm.getParameters({Name: process.env.SLACK_TOKEN, WithDecryption: true }, function(err, data) {
-       if (err) {
-         console.log("Unable to get webhook URL token for Slack", process.env.SLACK_TOKEN);
+   ssm.getParameter({ Name: process.env.SLACK_TOKEN, WithDecryption: true }, function(err, data) {
+      if (err) {
+         console.log("Unable to get webhook URL token for Slack", process.env.SLACK_TOKEN, err);
          return context.fail("Unable to get webhook URL token for Slack");
       }
 
-    var options = {
-        method: 'POST',
-        hostname: 'hooks.slack.com',
-        port: 443,
-        path: data.Parameter.Value
-    };
-
-    var req = https.request(options, function(res) {
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        context.done(null);
+      const req = https.request({
+         method: 'POST',
+         hostname: 'hooks.slack.com',
+         port: 443,
+         path: data.Parameter.Value,
+         headers: {
+             "Content-Type": "application/json"
+         }
+      }, function(res) {
+         res.setEncoding('utf8');
+         res.on('data', function (chunk) {
+            console.log("Response received", chunk)
+            return context.done(null)
+         });
       });
-    });
-
-    req.on('error', function(e) {
-      console.log('problem with request: ' + e.message);
-    });
-
-    req.write(util.format("%j", postData))
+      req.on("error", function (e) {
+         console.log("problem with request: ", e);
+         return context.fail("Unable to post message to Slack");
+      });
+      req.write(util.format("%j", postData));
+      req.end();
    });
-    req.end();
 };
