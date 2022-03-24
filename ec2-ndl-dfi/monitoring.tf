@@ -252,7 +252,6 @@ resource "aws_cloudwatch_log_metric_filter" "s3_events_error_alert" {
 module "clamav-notify" {
   source  = "../modules/clamav-notify/"
   name    = var.environment_type
-  region  = var.region
   tags    = local.tags
 }
 

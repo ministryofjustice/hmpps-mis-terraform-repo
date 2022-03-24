@@ -19,14 +19,14 @@ resource "aws_sns_topic_subscription" "clamav-notification" {
 resource "aws_lambda_function" "clamav-notification" {
   filename         = data.archive_file.clamav-notification.output_path
   function_name    = local.lambda_name
-  role             = data.aws_iam_role.clamav-notification-role.arn
+  role             = aws_iam_role.lambda_role.arn
   handler          = "${local.clamav_notification}.handler"
   source_code_hash = filebase64sha256(data.archive_file.clamav-notification.output_path)
   runtime          = "nodejs12.x"
 
   environment {
     variables = {
-      REGION            = var.region
+      REGION            = data.aws_region.current.name
       ENVIRONMENT_TYPE  = var.name
       SLACK_TOKEN       = data.aws_ssm_parameter.slack_token.name
       SLACK_CHANNEL     = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"

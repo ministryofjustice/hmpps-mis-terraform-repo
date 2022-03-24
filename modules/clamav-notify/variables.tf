@@ -1,7 +1,3 @@
-variable "region" {
-  description = "The AWS region."
-}
-
 variable "name" {
   description = "Lambda function name"
 }
