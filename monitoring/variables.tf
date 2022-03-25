@@ -35,3 +35,8 @@ variable "environment_type" {
 variable "project_name" {
   description = "Project name to be used when looking up SSM parameters - eg. delius-core"
 }
+
+variable "tags" {
+  description = "Tags to be applied to resources"
+  type        = map(string)
+}

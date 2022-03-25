@@ -1,5 +1,7 @@
-var https = require('https');
-var util = require('util');
+let https = require('https');
+let util = require('util');
+let AWS = require('aws-sdk');
+let ssm = new AWS.SSM({ region: process.env.REGION });
 
 function sleep(milliseconds) {
   const date = Date.now();
@@ -21,15 +23,8 @@ exports.handler = function(event, context) {
         var environment = alarmName.split("__")[0];
         var metric = alarmName.split("__")[1];
         var severity = alarmName.split("__")[2];
-        var channel="ndmis-non-prod-alerts";
-        var url_path = "/services/T02DYEB3A/BS16X2JGY/r9e1CJYez7BDmwyliIl7WzLf";
         var icon_emoji=":twisted_rightwards_arrows:";
-
-            if (environment=='prod' )
-               channel="ndmis-alerts";
-
-            if (environment=='prod' )
-                url_path = "/services/T02DYEB3A/BRU7E5QSC/3Rt4FV9FtrDSll5aMPABgRoB";
+        
 
             if (severity=='alert' )
                 icon_emoji = ":warning:";
@@ -55,11 +50,11 @@ exports.handler = function(event, context) {
 
  //environment	service	    tier	metric	severity	resolvergroup(s)
 
-            console.log("Slack channel: " + channel);
+            console.log("Slack channel: " + process.env.SLACK_CHANNEL);
 
            if (newStateValue=='ALARM' )
               var postData = {
-                      "channel": "# " + channel,
+                      "channel": "# " + process.env.SLACK_CHANNEL,
                       "username": "AWS SNS via Lambda :: Alarm Notification",
                       "text": "**************************************************************************************************"
                       + "\n\nInfo: " + alarmDescription
@@ -74,7 +69,7 @@ exports.handler = function(event, context) {
 
            if (newStateValue=='OK' )
               var postData = {
-                      "channel": "# " + channel,
+                      "channel": "# " + process.env.SLACK_CHANNEL,
                       "username": "AWS SNS via Lambda :: OK Notification",
                       "text": "**************************************************************************************************"
                       + "\n\nInfo: ALARM State is now OK. No Further Action Required!! The following info is for information purposes only: " + alarmDescription
@@ -86,24 +81,32 @@ exports.handler = function(event, context) {
                       "link_names": "1"
                   };
 
-    var options = {
-        method: 'POST',
-        hostname: 'hooks.slack.com',
-        port: 443,
-        path: url_path
-    };
+   ssm.getParameter({ Name: process.env.SLACK_TOKEN, WithDecryption: true }, function(err, data) {
+      if (err) {
+         console.log("Unable to get webhook URL token for Slack", process.env.SLACK_TOKEN, err);
+         return context.fail("Unable to get webhook URL token for Slack");
+      }
 
-    var req = https.request(options, function(res) {
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        context.done(null);
+      const req = https.request({
+         method: 'POST',
+         hostname: 'hooks.slack.com',
+         port: 443,
+         path: data.Parameter.Value,
+         headers: {
+             "Content-Type": "application/json"
+         }
+      }, function(res) {
+         res.setEncoding('utf8');
+         res.on('data', function (chunk) {
+            console.log("Response received", chunk)
+            return context.done(null)
+         });
       });
-    });
-
-    req.on('error', function(e) {
-      console.log('problem with request: ' + e.message);
-    });
-
-    req.write(util.format("%j", postData));
-    req.end();
+      req.on("error", function (e) {
+         console.log("problem with request: ", e);
+         return context.fail("Unable to post message to Slack");
+      });
+      req.write(util.format("%j", postData));
+      req.end();
+   });
 };

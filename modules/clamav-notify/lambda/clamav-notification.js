@@ -1,5 +1,7 @@
-var https = require('https');
-var util = require('util');
+let https = require('https');
+let util = require('util');
+let AWS = require('aws-sdk');
+let ssm = new AWS.SSM({ region: process.env.REGION });
 
 exports.handler = function(event, context) {
     console.log(JSON.stringify(event, null, 2));
@@ -7,17 +9,11 @@ exports.handler = function(event, context) {
         const environment = process.env.ENVIRONMENT_TYPE;
         var heading = "ClamAV Notification";
         var bodytext = "ClamAV found some files to be infected. Please review infected folder in DFI bucket for the environment";
-        var channel = "ndmis-non-prod-alerts";
-        var url_path = "/services/T02DYEB3A/BS16X2JGY/r9e1CJYez7BDmwyliIl7WzLf";
         var icon_emoji = ":sign-warning:";
-
-            if (environment=='prod' )
-               channel = "ndmis-alerts";
-
-            console.log("Slack channel: " + channel);
+            console.log("Slack channel: " + process.env.SLACK_CHANNEL);
 
                var postData = {
-                       "channel": "# " + channel,
+                       "channel": "# " + process.env.SLACK_CHANNEL,
                        "username": "AWS SNS via Lambda :: ClamAV Notification",
                        "text": "**************************************************************************************************"
                        + "\nInfo: "  + heading
@@ -29,24 +25,32 @@ exports.handler = function(event, context) {
                        "link_names": "1"
                    };
 
-    var options = {
+  ssm.getParameter({ Name: process.env.SLACK_TOKEN, WithDecryption: true }, function(err, data) {
+    if (err) {
+      console.log("Unable to get webhook URL token for Slack", process.env.SLACK_TOKEN, err);
+      return context.fail("Unable to get webhook URL token for Slack");
+    }
+
+    const req = https.request({
         method: 'POST',
         hostname: 'hooks.slack.com',
         port: 443,
-        path: url_path
-    };
-
-    var req = https.request(options, function(res) {
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        context.done(null);
+        path: data.Parameter.Value,
+        headers: {
+            "Content-Type": "application/json"
+        }
+      }, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+          console.log("Response received", chunk)
+          return context.done(null)
       });
     });
-
     req.on('error', function(e) {
-      console.log('problem with request: ' + e.message);
+      console.log('problem with request: ', e);
+      return context.fail("Unable to post message to Slack");
     });
-
     req.write(util.format("%j", postData));
     req.end();
+  });
 };

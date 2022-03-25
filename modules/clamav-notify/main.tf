@@ -16,27 +16,20 @@ resource "aws_sns_topic_subscription" "clamav-notification" {
 }
 
 ### Lambda
-data "archive_file" "clamav-notification" {
-  type        = "zip"
-  source_file = "${path.module}/lambda/${local.clamav_notification}.js"
-  output_path = "${path.module}/files/${local.clamav_notification}.zip"
-}
-
-data "aws_iam_role" "clamav-notification-role" {
-  name = "lambda_exec_role"
-}
-
 resource "aws_lambda_function" "clamav-notification" {
   filename         = data.archive_file.clamav-notification.output_path
   function_name    = local.lambda_name
-  role             = data.aws_iam_role.clamav-notification-role.arn
+  role             = aws_iam_role.lambda_role.arn
   handler          = "${local.clamav_notification}.handler"
   source_code_hash = filebase64sha256(data.archive_file.clamav-notification.output_path)
   runtime          = "nodejs12.x"
 
   environment {
     variables = {
-      ENVIRONMENT_TYPE = var.name
+      REGION            = data.aws_region.current.name
+      ENVIRONMENT_TYPE  = var.name
+      SLACK_TOKEN       = data.aws_ssm_parameter.slack_token.name
+      SLACK_CHANNEL     = var.name == "prod" ? "ndmis-alerts" : "ndmis-non-prod-alerts"
     }
   }
 }
