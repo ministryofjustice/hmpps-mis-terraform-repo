@@ -6,13 +6,13 @@ resource "random_password" "slack_webhook_url" {
 }
 
 resource "aws_ssm_parameter" "slack_token" {
-  name            = "/${var.environment_type}/slack/token"
+  name            = "/${local.mis_app_name}/${var.environment_type}/slack/token"
   type            = "SecureString"
   value           = random_password.slack_webhook_url.result
   tags            = merge(
     var.tags, 
     {
-      "Name" = "/${var.environment_type}/slack/token" 
+      "Name" = "/${local.mis_app_name}/${var.environment_type}/slack/token" 
     }
   )
 

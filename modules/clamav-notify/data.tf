@@ -4,7 +4,7 @@ data "aws_region" "current" {
 
 ### Slack token URL details
 data "aws_ssm_parameter" "slack_token" {
-  name            = "/${var.name}/slack/token"
+  name            = "/mis/${var.name}/slack/token"
 }
 
 ### Lambda
