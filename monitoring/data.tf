@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "lambda_policy_document" {
     statement {
         sid       = "Parameters"
         effect    = "Allow"
-        resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/${var.environment_type}/slack/token"]
+        resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter${aws_ssm_parameter.slack_token.name}"]
         actions   = ["ssm:GetParameter"]
     }
     statement {
