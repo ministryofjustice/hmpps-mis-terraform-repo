@@ -99,12 +99,12 @@ variable "short_environment_name" {}
 
 variable "lb_mgmt_stop_expression" {
   description = "Schedule to start the Environment mis-lb-rule-mgmt-build Codebuild Project "
-  default = "cron(30 18 * * ? *)"
+  default = "cron(30 17 * * ? *)"
 }
 
 variable "lb_mgmt_resume_expression" {
   description = "Schedule to start the Environment mis-lb-rule-mgmt-build Codebuild Project "
-  default = "cron(30 23 * * ? *)"
+  default = "cron(30 22 * * ? *)"
 }
 
 variable "lb_management_rule_enabled" {
