@@ -56,7 +56,8 @@ exports.handler = function(event, context) {
               var postData = {
                       "channel": "# " + process.env.SLACK_CHANNEL,
                       "username": "AWS SNS via Lambda :: Alarm Notification",
-                      "text": "**************************************************************************************************"
+                      "text": icon_emoji + " AWS SNS via Lambda :: *\Alarm Notification\* "
+                      + "\n**************************************************************************************************"
                       + "\n\nInfo: " + alarmDescription
                       + "\nAlarmState: " + newStateValue
                       +"\nMetric: " + metric
@@ -71,7 +72,8 @@ exports.handler = function(event, context) {
               var postData = {
                       "channel": "# " + process.env.SLACK_CHANNEL,
                       "username": "AWS SNS via Lambda :: OK Notification",
-                      "text": "**************************************************************************************************"
+                      "text": icon_emoji + " AWS SNS via Lambda :: *\OK Notification\* "
+                      + "\n**************************************************************************************************"
                       + "\n\nInfo: ALARM State is now OK. No Further Action Required!! The following info is for information purposes only: " + alarmDescription
                       + "\nAlarmState: " + newStateValue
                       +"\nMetric: " + metric

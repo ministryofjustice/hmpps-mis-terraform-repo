@@ -15,7 +15,8 @@ exports.handler = function(event, context) {
                var postData = {
                        "channel": "# " + process.env.SLACK_CHANNEL,
                        "username": "AWS SNS via Lambda :: ClamAV Notification",
-                       "text": "**************************************************************************************************"
+                       "text": icon_emoji + " AWS SNS via Lambda :: *\OK Notification\* "
+                       + "\n**************************************************************************************************"
                        + "\nInfo: "  + heading
                        + "\nDetails: "  + bodytext
                        + "\nEnvironment: "  + environment
