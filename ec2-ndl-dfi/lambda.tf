@@ -97,6 +97,7 @@ resource "aws_lambda_permission" "with_s3" {
   statement_id  = "AllowExecutionFromS3"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.dfi_lambda.arn
+  source_account = local.account_id
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.dfi.arn
 }
