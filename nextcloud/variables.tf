@@ -67,7 +67,7 @@ variable "create_db_option_group" {
 # DB parameter group
 variable "family" {
   description = "The family of the DB parameter group"
-  default     = "mariadb10.2"
+  default     = "mariadb10.3"
 }
 
 variable "parameters" {
@@ -89,7 +89,7 @@ variable "engine" {
 
 variable "engine_version" {
   description = "The engine version to use"
-  default     = "10.2"
+  default     = "10.3"
 }
 
 # DB option group
@@ -164,7 +164,7 @@ variable "publicly_accessible" {
 
 variable "allow_major_version_upgrade" {
   description = "Indicates that major version upgrades are allowed. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible"
-  default     = false
+  default     = true
 }
 
 variable "auto_minor_version_upgrade" {
@@ -174,7 +174,7 @@ variable "auto_minor_version_upgrade" {
 
 variable "apply_immediately" {
   description = "Specifies whether any database modifications are applied immediately, or during the next maintenance window"
-  default     = false
+  default     = true
 }
 
 variable "maintenance_window" {
