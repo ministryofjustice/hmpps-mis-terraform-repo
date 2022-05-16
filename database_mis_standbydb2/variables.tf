@@ -28,7 +28,7 @@ variable "ansible_vars_mis_db" {
   type        = map(string)
 }
 
-variable "db_size_mis" {
+variable "db_size_mis_standby" {
   description = "Details of the database resources size"
   type        = map(string)
 }
