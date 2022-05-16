@@ -31,7 +31,7 @@ module "mis_db_2" {
   private_zone_id = data.terraform_remote_state.vpc.outputs.private_zone_id
   private_domain  = data.terraform_remote_state.vpc.outputs.private_zone_name
   vpc_account_id  = data.terraform_remote_state.vpc.outputs.vpc_account_id
-  db_size         = var.db_size_mis
+  db_size         = var.db_size_mis_standby
 
   ansible_vars = {
     service_user_name             = var.ansible_vars_mis_db["service_user_name"]
