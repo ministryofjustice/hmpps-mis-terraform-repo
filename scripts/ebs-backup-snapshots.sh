@@ -8,7 +8,7 @@ profile=backup_profile
 if [[ -z $ENV_TYPE ]] || [[ -z $HOST_TYPE ]]; then
   echo '--------------------------------------------------------------------------------------------------------'
   echo "Usage $0 ENV_TYPE   HOST_TYPE"
-  echo "ENV_TYPE: mis-dev | auto-test | stage| pre-prod | prod"
+  echo "ENV_TYPE: mis-dev | stage| pre-prod | prod"
   echo "HOST_TYPE: bws | bcs | bps| bws | dis"
   echo "Creates on demand backup of MIS Windows host EBS volumes"
   echo '--------------------------------------------------------------------------------------------------------'
@@ -20,8 +20,6 @@ set_account_id () {
 
 case "${ENV_TYPE}" in
     mis-dev)   ACCOUNT_ID="479759138745"
-               ;;
-    auto-test) ACCOUNT_ID="431912413968"
                ;;
     stage)     ACCOUNT_ID="205048117103"
     ;;
@@ -80,7 +78,7 @@ stop_instances ()
 IFS=$'\n';for instance in $INSTANCE_IDS; do
   instance_id=$(echo "$instance" | awk '{ print $1 }')
 
-  if [[ "$ENV_TYPE" == "mis-dev" ]] || [[ "$ENV_TYPE" == "auto-test" ]]; then
+  if [[ "$ENV_TYPE" == "mis-dev" ]]; then
       echo '--------------------------------------------------------------------------------------------------------'
       echo "Disabling auto-stop on $instance_id"
       echo '--------------------------------------------------------------------------------------------------------'
@@ -182,7 +180,7 @@ start_instances ()
     sleep 10
     aws ec2 start-instances --instance-ids $instance_id --profile $profile --region ${REGION} || exit $?
 
-    if [[ "$ENV_TYPE" == "mis-dev" ]] || [[ "$ENV_TYPE" == "auto-test" ]]; then
+    if [[ "$ENV_TYPE" == "mis-dev" ]]; then
         echo '--------------------------------------------------------------------------------------------------------'
         echo "Re-enabling auto-stop on $instance_id"
         echo '--------------------------------------------------------------------------------------------------------'
