@@ -9,7 +9,7 @@ locals {
 }
 
 module "misboe_db_1" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.5.0"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.6.0"
   server_name = "misboe-db-1"
 
   ami_id               = data.aws_ami.centos_oracle_db.id
