@@ -1,5 +1,5 @@
 module "mis_db_2" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.5.0"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.6.0"
   server_name = "mis-db-2"
 
   ami_id               = data.aws_ami.centos_oracle_db.id
