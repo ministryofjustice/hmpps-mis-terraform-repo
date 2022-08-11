@@ -119,7 +119,11 @@ module "db_instance" {
   timezone           = var.timezone
   character_set_name = var.character_set_name
 
-  tags = local.tags
+  tags = merge(local.tags,
+    {
+      "autostop-${var.environment_type}" = "Phase1"
+    }
+  )
 }
 
 ###############################################
