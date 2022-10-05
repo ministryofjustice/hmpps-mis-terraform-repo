@@ -22,7 +22,7 @@ resource "aws_lambda_function" "clamav-notification" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "${local.clamav_notification}.handler"
   source_code_hash = filebase64sha256(data.archive_file.clamav-notification.output_path)
-  runtime          = "nodejs12.x"
+  runtime          = "nodejs16.x"
 
   environment {
     variables = {

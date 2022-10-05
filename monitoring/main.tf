@@ -78,7 +78,7 @@ resource "aws_lambda_function" "notify-ndmis-slack" {
   role             = aws_iam_role.lambda_role.arn
   handler          = "${local.lambda_name}.handler"
   source_code_hash = filebase64sha256(data.archive_file.notify-ndmis-slack.output_path)
-  runtime          = "nodejs12.x"
+  runtime          = "nodejs16.x"
   
   environment {
     variables = {
