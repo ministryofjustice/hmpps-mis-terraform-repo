@@ -5,19 +5,8 @@ variable "remote_state_bucket_name" {
   description = "Terraform remote state bucket name"
 }
 
-variable "mis_alarms_enabled" {
-  type = string
-}
-
-variable "cloudwatch_log_retention" {
-}
-
 variable "environment_name" {
   description = "Environment name to be used as a unique identifier for resources - eg. delius-core-dev"
-}
-
-variable "short_environment_name" {
-  description = "Shortened environment name to be used as a unique identifier for resources with a limit on resource name length - eg. dlc-dev"
 }
 
 variable "environment_identifier" {
@@ -32,36 +21,34 @@ variable "environment_type" {
   description = "The environment type - e.g. dev"
 }
 
-variable "project_name" {
-  description = "Project name to be used when looking up SSM parameters - eg. delius-core"
-}
-
 variable "resizing_schedule_am_expression" {
-  description = "Schedule to stop the Lambda function script for ETL server resizing"
-  default = "cron(00 06 * * ? *)"
+  description = "Schedule to run ETL resizing schedule in the morning after ETL jobs run times"
+  default = "cron(05 06 * * ? *)"
 }
 
 variable "resizing_schedule_pm_expression" {
-  description = "Schedule to start the Lambda function script for ETL server resizing"
+  description = "Schedule to run ETL resizing schedule in the evening before ETL jobs run times"
   default = "cron(00 18 * * ? *)"
 }
 
-variable "scheduler_rule_enabled" {
-  description = "Enable or disable ETL server resizing at scheduled times. ie 18:00 to 06:00"
-  default     = "true"
-}
-
 variable "mis_overide_resizing_schedule_tags" {
-  description = "Enable or disable ETL server resizing at scheduled times. ie 18:00 to 06:00"
-}
-
-variable "dis_instance_type_lower" {
-  description = "Project name to be used when looking up SSM parameters - eg. delius-core"
+  description = "Tag attached to DIS instances for MIS. Tag defines whether server resizing is enabled/disabled at the scheduled times. This value is set in hmpps-env-configs repo"
 }
 
 variable "dis_instance_type" {
-  description = "Project name to be used when looking up SSM parameters - eg. delius-core"
+  description = "DIS instance type. This value is set in hmpps-env-configs repo"
 }
+
+variable "dis_instance_type_lower" {
+  description = "DIS instance type required when not running ETL jobs. This is a lower value than dis_instance_type. This value is set in hmpps-env-configs repo"
+}
+
+#variable "delius_alarms_config" {
+#  type = object({
+#    enabled     = bool
+#    quiet_hours = tuple([number, number])
+#  })
+#}
 
 variable "tags" {
   description = "Tags to be applied to resources"

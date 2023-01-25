@@ -67,8 +67,8 @@ resource "aws_iam_role_policy_attachment" "lambda_scheduler" {
 
 data "archive_file" "lambda_scheduler" {
   type               = "zip"
-  source_file        = "${path.module}/lambda/modify-ec2-instance-type.py"
-  output_path        = "${path.module}/files/modify-ec2-instance-type.zip"
+  source_file        = "${path.module}/lambda/mis-modify-ec2-instance-type.py"
+  output_path        = "${path.module}/files/mis-modify-ec2-instance-type.zip"
 }
 
 resource "aws_lambda_function" "modify-ec2-instance-type" {
@@ -81,8 +81,11 @@ resource "aws_lambda_function" "modify-ec2-instance-type" {
   
   environment {
     variables = {
+      #ENABLED                 = tostring(var.delius_alarms_config.enabled)
       REGION                   = var.region
       ENVIRONMENT_TYPE         = var.environment_type
+      #QUIET_PERIOD_START_HOUR = tostring(var.delius_alarms_config.quiet_hours[0])
+      #QUIET_PERIOD_END_HOUR   = tostring(var.delius_alarms_config.quiet_hours[1])
       ENABLE_RESIZE_SCHEDULE   = local.enable_resizing_schedule
     }
   }
