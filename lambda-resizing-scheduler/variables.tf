@@ -43,6 +43,15 @@ variable "dis_instance_type_lower" {
   description = "DIS instance type required when not running ETL jobs. This is a lower value than dis_instance_type. This value is set in hmpps-env-configs repo"
 }
 
+variable "cloudwatch_log_retention" {
+  description =  "Number of days to retain cloudwatch logs"
+  default = "14"
+}
+
+variable "mis_alarms_enabled" {
+  type = string
+}
+
 #variable "delius_alarms_config" {
 #  type = object({
 #    enabled     = bool
