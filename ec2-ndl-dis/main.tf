@@ -277,6 +277,7 @@ tags = merge(
     ignore_changes = [
       ami,
       user_data,
+      instance_type,
     ]
   }
 }

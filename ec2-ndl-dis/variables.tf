@@ -94,5 +94,5 @@ variable "mis_overide_autostop_tags" {
 }
 
 variable "mis_overide_resizing_schedule_tags" {
-  default = "False"
+  default = "false"
 }
