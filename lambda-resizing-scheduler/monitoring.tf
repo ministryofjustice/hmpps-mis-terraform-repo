@@ -36,15 +36,13 @@ resource "aws_cloudwatch_metric_alarm" "lambda_invocations_alert" {
 resource "aws_cloudwatch_log_metric_filter" "lambda_invocations_alert" {
   name           = "ETLSchedulerInvocations"
   pattern        = local.resizing_scheduler_error_pattern
-  log_group_name = local.resizing_scheduler_log_group
+  log_group_name = aws_cloudwatch_log_group.scheduler.name
 
   metric_transformation {
-    name      = "ETLSchedulerInvocations"
+    name      = "Invocations"
     namespace = "Lambda"
     value     = "1"
   }
-  depends_on = [aws_cloudwatch_log_group.scheduler]
-
 }
 
 resource "aws_cloudwatch_metric_alarm" "lambda_errors_alert" {
@@ -67,13 +65,11 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors_alert" {
 resource "aws_cloudwatch_log_metric_filter" "lambda_errors_alert" {
   name           = "ETLSchedulerErrors"
   pattern        = local.resizing_scheduler_error_pattern
-  log_group_name = local.resizing_scheduler_log_group
+  log_group_name = aws_cloudwatch_log_group.scheduler.name
 
   metric_transformation {
-    name      = "ETLSchedulerErrors"
+    name      = "Errors"
     namespace = "Lambda"
     value     = "1"
   }
-  depends_on = [aws_cloudwatch_log_group.scheduler]
-
 }
