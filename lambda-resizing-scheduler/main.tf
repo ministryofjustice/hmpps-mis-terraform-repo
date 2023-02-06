@@ -23,7 +23,6 @@ resource "aws_lambda_function" "modify-ec2-instance-type" {
     variables = {
       REGION                   = var.region
       ENVIRONMENT_TYPE         = var.environment_type
-      ENABLE_RESIZE_SCHEDULE   = local.enable_resizing_schedule
     }
   }
 }
