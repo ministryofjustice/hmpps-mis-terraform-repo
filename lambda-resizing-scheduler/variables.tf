@@ -52,13 +52,6 @@ variable "mis_alarms_enabled" {
   type = string
 }
 
-#variable "delius_alarms_config" {
-#  type = object({
-#    enabled     = bool
-#    quiet_hours = tuple([number, number])
-#  })
-#}
-
 variable "tags" {
   description = "Tags to be applied to resources"
   type        = map(string)

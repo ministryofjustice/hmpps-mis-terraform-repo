@@ -17,7 +17,7 @@ def stop_ec2(instance):
 # Change the instance type
 def modify_ec2_type(instance, ec2_type):
     client.modify_instance_attribute(InstanceId=instance, Attribute='instanceType', Value=ec2_type)
-    print(instance, " resized down to ", ec2_type)
+    print(instance, " resized to ", ec2_type)
     
 # Start the instance
 def start_ec2(instance):

@@ -21,11 +21,8 @@ resource "aws_lambda_function" "modify-ec2-instance-type" {
   
   environment {
     variables = {
-      #ENABLED                 = tostring(var.delius_alarms_config.enabled)
       REGION                   = var.region
       ENVIRONMENT_TYPE         = var.environment_type
-      #QUIET_PERIOD_START_HOUR = tostring(var.delius_alarms_config.quiet_hours[0])
-      #QUIET_PERIOD_END_HOUR   = tostring(var.delius_alarms_config.quiet_hours[1])
       ENABLE_RESIZE_SCHEDULE   = local.enable_resizing_schedule
     }
   }
@@ -94,17 +91,3 @@ resource "aws_lambda_permission" "allow_cloudwatch_scheduler_pm" {
   source_arn    = "${aws_cloudwatch_event_rule.resizing_schedule_pm.arn}"
 }
 
-#------------------------------------------------------------------------------------------------------------------
-# CloudWatch Log
-#------------------------------------------------------------------------------------------------------------------
-
-resource "aws_cloudwatch_log_group" "scheduler" {
-  name              = local.resizing_scheduler_log_group 
-  retention_in_days = var.cloudwatch_log_retention
-  tags = merge(
-    local.tags,
-    {
-      "Name" = local.resizing_scheduler_log_group
-    },
-  )
-}
