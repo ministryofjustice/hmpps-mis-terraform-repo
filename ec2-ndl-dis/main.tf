@@ -179,6 +179,9 @@ locals {
     {
       "autostop-${var.environment_type}" = var.mis_overide_autostop_tags
     },
+    {
+      "enable-ec2-resizing-schedule" = var.mis_overide_resizing_schedule_tags
+    },
   )
 }
 
@@ -274,6 +277,7 @@ tags = merge(
     ignore_changes = [
       ami,
       user_data,
+      instance_type,
     ]
   }
 }

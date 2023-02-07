@@ -92,3 +92,7 @@ variable "dis_hibernation" {
 variable "mis_overide_autostop_tags" {
   default = "False"
 }
+
+variable "mis_overide_resizing_schedule_tags" {
+  default = "false"
+}
