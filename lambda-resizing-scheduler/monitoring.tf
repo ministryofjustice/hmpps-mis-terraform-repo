@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors_alert" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "Errors"
-  namespace           = "Lambda"
+  namespace           = "AWS/Lambda"
   period              = "60"
   statistic           = "Sum"
   threshold           = "1"
@@ -32,11 +32,15 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors_alert" {
   datapoints_to_alarm = "1"
   treat_missing_data  = "notBreaching"
   tags                = local.tags
+  dimensions = {
+    FunctionName = "${aws_lambda_function.modify-ec2-instance-type.function_name}"
+    Resource     = "${aws_lambda_function.modify-ec2-instance-type.function_name}"
+  }
 }
 
 resource "aws_cloudwatch_log_metric_filter" "lambda_errors_alert" {
   name           = "ETLSchedulerErrors"
-  pattern        = ""
+  pattern        = "ERROR"
   log_group_name = aws_cloudwatch_log_group.scheduler.name
 
   metric_transformation {
