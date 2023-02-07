@@ -37,15 +37,3 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors_alert" {
     Resource     = "${aws_lambda_function.modify-ec2-instance-type.function_name}"
   }
 }
-
-resource "aws_cloudwatch_log_metric_filter" "lambda_errors_alert" {
-  name           = "ETLSchedulerErrors"
-  pattern        = "ERROR"
-  log_group_name = aws_cloudwatch_log_group.scheduler.name
-
-  metric_transformation {
-    name      = "Errors"
-    namespace = "Lambda"
-    value     = "1"
-  }
-}
