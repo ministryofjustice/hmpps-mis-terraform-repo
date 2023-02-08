@@ -23,9 +23,7 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-alert" {
   dimensions = {
     instance     = "D:"
     InstanceId   = var.instance_ids[count.index]
-    ImageId      = var.ami_id[count.index]
     objectname   = var.objectname
-    InstanceType = var.instance_type[count.index]
   }
 }
 
@@ -50,9 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-alert" {
   dimensions = {
     instance     = "C:"
     InstanceId   = var.instance_ids[count.index]
-    ImageId      = var.ami_id[count.index]
     objectname   = var.objectname
-    InstanceType = var.instance_type[count.index]
   }
 }
 
@@ -82,9 +78,7 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-critical" {
   dimensions = {
     instance     = "D:"
     InstanceId   = var.instance_ids[count.index]
-    ImageId      = var.ami_id[count.index]
     objectname   = var.objectname
-    InstanceType = var.instance_type[count.index]
   }
 }
 
@@ -109,8 +103,6 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-critical" {
   dimensions = {
     instance     = "C:"
     InstanceId   = var.instance_ids[count.index]
-    ImageId      = var.ami_id[count.index]
     objectname   = var.objectname
-    InstanceType = var.instance_type[count.index]
   }
 }

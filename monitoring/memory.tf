@@ -99,8 +99,6 @@ resource "aws_cloudwatch_metric_alarm" "dis_instance-memory-critical" {
 
   dimensions = {
     InstanceId   = data.terraform_remote_state.ec2-ndl-dis.outputs.dis_instance_ids[count.index]
-    ImageId      = data.terraform_remote_state.ec2-ndl-dis.outputs.dis_ami_id[count.index]
-    InstanceType = data.terraform_remote_state.ec2-ndl-dis.outputs.dis_instance_type[count.index]
     objectname   = "Memory"
   }
 }
