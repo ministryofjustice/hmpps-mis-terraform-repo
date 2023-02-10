@@ -28,7 +28,7 @@ bws_instance_type   = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_instan
 
 
 module "dis" {
-  source             = "../modules/disk-usage-alarms-2/"
+  source             = "../modules/disk-usage-alarms-1/"
   component          = "DIS"
   objectname         = "LogicalDisk"
   alert_threshold    = "25"
