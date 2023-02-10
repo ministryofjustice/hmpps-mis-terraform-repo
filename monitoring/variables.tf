@@ -9,6 +9,14 @@ variable "mis_alarms_enabled" {
   type = string
 }
 
+variable "dis_instance_type" {
+  description = "DIS instance type"
+}
+
+variable "dis_instance_type_lower" {
+  description = "Second DIS instance type considered when applying the ETL resizing scheduler"
+}
+
 variable "cloudwatch_log_retention" {
 }
 

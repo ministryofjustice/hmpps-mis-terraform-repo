@@ -4,10 +4,8 @@
 
 
 resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-alert" {
-  count = length(
-    var.instance_ids,
-  )
-  alarm_name          = "${var.environment_name}__Free-Space-D-Drive__alert__${var.component}__${var.instance_ids[count.index]}"
+  count = (var.environment_name == "mis-dev" || var.environment_name == "prod") ? length(var.instance_ids) : 0
+  alarm_name          = "${var.environment_name}__Free-Space-D-Drive__2__alert__${var.component}__${var.instance_ids[count.index]}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "LogicalDisk % Free Space"
@@ -25,16 +23,13 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-alert" {
     InstanceId   = var.instance_ids[count.index]
     ImageId      = var.ami_id[count.index]
     objectname   = var.objectname
-    InstanceType = var.instance_type[count.index]
+    InstanceType = var.instance_type
   }
 }
 
-
 resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-alert" {
-  count = length(
-    var.instance_ids,
-  )
-  alarm_name          = "${var.environment_name}__Free-Space-C-Drive__alert__${var.component}__${var.instance_ids[count.index]}"
+  count = (var.environment_name == "mis-dev" || var.environment_name == "prod") ? length(var.instance_ids) : 0
+  alarm_name          = "${var.environment_name}__Free-Space-C-Drive__2__alert__${var.component}__${var.instance_ids[count.index]}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "LogicalDisk % Free Space"
@@ -52,10 +47,9 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-alert" {
     InstanceId   = var.instance_ids[count.index]
     ImageId      = var.ami_id[count.index]
     objectname   = var.objectname
-    InstanceType = var.instance_type[count.index]
+    InstanceType = var.instance_type
   }
 }
-
 
 
 #---------------------------------------------------------------------
@@ -63,10 +57,8 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-alert" {
 #---------------------------------------------------------------------
 
 resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-critical" {
-  count = length(
-    var.instance_ids,
-  )
-  alarm_name          = "${var.environment_name}__Free-Space-D-Drive__critical__${var.component}__${var.instance_ids[count.index]}"
+  count = (var.environment_name == "mis-dev" || var.environment_name == "prod") ? length(var.instance_ids) : 0
+  alarm_name          = "${var.environment_name}__Free-Space-D-Drive__2__critical__${var.component}__${var.instance_ids[count.index]}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "LogicalDisk % Free Space"
@@ -84,16 +76,13 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-critical" {
     InstanceId   = var.instance_ids[count.index]
     ImageId      = var.ami_id[count.index]
     objectname   = var.objectname
-    InstanceType = var.instance_type[count.index]
+    InstanceType = var.instance_type
   }
 }
 
-
 resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-critical" {
-  count = length(
-    var.instance_ids,
-  )
-  alarm_name          = "${var.environment_name}__Free-Space-C-Drive__critical__${var.component}__${var.instance_ids[count.index]}"
+  count = (var.environment_name == "mis-dev" || var.environment_name == "prod") ? length(var.instance_ids) : 0
+  alarm_name          = "${var.environment_name}__Free-Space-C-Drive__2__critical__${var.component}__${var.instance_ids[count.index]}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "LogicalDisk % Free Space"
@@ -111,6 +100,6 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-critical" {
     InstanceId   = var.instance_ids[count.index]
     ImageId      = var.ami_id[count.index]
     objectname   = var.objectname
-    InstanceType = var.instance_type[count.index]
+    InstanceType = var.instance_type
   }
 }

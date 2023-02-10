@@ -28,7 +28,7 @@ bws_instance_type   = data.terraform_remote_state.ec2-ndl-bws.outputs.bws_instan
 
 
 module "dis" {
-  source             = "../modules/disk-usage-alarms/"
+  source             = "../modules/disk-usage-alarms-2/"
   component          = "DIS"
   objectname         = "LogicalDisk"
   alert_threshold    = "25"
@@ -38,7 +38,24 @@ module "dis" {
   instance_ids       = local.dis_instance_ids
   primary_dns_ext    = local.dis_primary_dns_ext
   ami_id             = local.dis_ami_id
-  instance_type      = local.dis_instance_type
+  instance_type      = var.dis_instance_type
+  sns_topic          = local.sns_topic
+  tags               = local.tags
+}
+
+# Create a second alarm for DIS Disk Usage in order to consider the daily changes in ec2 type due to the resizing ETL scheduler. Alarm created in  mis-dev and prod only as scheduler applied in these two envs.
+module "dis-2" {
+  source             = "../modules/disk-usage-alarms-2/"
+  component          = "DIS"
+  objectname         = "LogicalDisk"
+  alert_threshold    = "25"
+  critical_threshold = "5"
+  period             = "60"
+  environment_name   = var.environment_type
+  instance_ids       = local.dis_instance_ids
+  primary_dns_ext    = local.dis_primary_dns_ext
+  ami_id             = local.dis_ami_id
+  instance_type      = var.dis_instance_type_lower
   sns_topic          = local.sns_topic
   tags               = local.tags
 }
