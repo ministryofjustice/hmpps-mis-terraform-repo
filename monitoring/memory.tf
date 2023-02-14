@@ -99,7 +99,7 @@ resource "aws_cloudwatch_metric_alarm" "dis_instance-memory-critical" {
 
   dimensions = {
     InstanceId   = data.terraform_remote_state.ec2-ndl-dis.outputs.dis_instance_ids[count.index]
-    ImageId      = data.terraform_remote_state.ec2-ndl-bps.outputs.bps_ami_id[count.index]
+    ImageId      = data.terraform_remote_state.ec2-ndl-dis.outputs.dis_ami_id[count.index]
     InstanceType = var.dis_instance_type
     objectname   = "Memory"
   }
@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "dis_instance-memory-critical-2" {
 
   dimensions = {
     InstanceId   = data.terraform_remote_state.ec2-ndl-dis.outputs.dis_instance_ids[count.index]
-    ImageId      = data.terraform_remote_state.ec2-ndl-bps.outputs.bps_ami_id[count.index]
+    ImageId      = data.terraform_remote_state.ec2-ndl-dis.outputs.dis_ami_id[count.index]
     InstanceType = var.dis_instance_type_lower
     objectname   = "Memory"
   }
