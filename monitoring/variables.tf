@@ -15,6 +15,7 @@ variable "dis_instance_type" {
 
 variable "dis_instance_type_lower" {
   description = "Second DIS instance type considered when applying the ETL resizing scheduler"
+  default = ""
 }
 
 variable "cloudwatch_log_retention" {

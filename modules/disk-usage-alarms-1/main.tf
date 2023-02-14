@@ -4,7 +4,9 @@
 
 
 resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-alert" {
-  count = (var.environment_name == "mis-dev" || var.environment_name == "prod") ? length(var.instance_ids) : 0
+  count = length(
+    var.instance_ids,
+  )
   alarm_name          = "${var.environment_name}__Free-Space-D-Drive__alert__${var.component}__${var.instance_ids[count.index]}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -28,7 +30,9 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-alert" {
-  count = (var.environment_name == "mis-dev" || var.environment_name == "prod") ? length(var.instance_ids) : 0
+  count = length(
+    var.instance_ids,
+  )
   alarm_name          = "${var.environment_name}__Free-Space-C-Drive__alert__${var.component}__${var.instance_ids[count.index]}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -57,7 +61,9 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-alert" {
 #---------------------------------------------------------------------
 
 resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-critical" {
-  count = (var.environment_name == "mis-dev" || var.environment_name == "prod") ? length(var.instance_ids) : 0
+  count = length(
+    var.instance_ids,
+  )
   alarm_name          = "${var.environment_name}__Free-Space-D-Drive__critical__${var.component}__${var.instance_ids[count.index]}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -81,7 +87,9 @@ resource "aws_cloudwatch_metric_alarm" "free-disk-space-D-critical" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "free-disk-space-C-critical" {
-  count = (var.environment_name == "mis-dev" || var.environment_name == "prod") ? length(var.instance_ids) : 0
+  count = length(
+    var.instance_ids,
+  )
   alarm_name          = "${var.environment_name}__Free-Space-C-Drive__critical__${var.component}__${var.instance_ids[count.index]}"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
