@@ -23,12 +23,12 @@ variable "environment_type" {
 
 variable "resizing_schedule_am_expression" {
   description = "Schedule to run ETL resizing schedule in the morning after ETL jobs run times"
-  default = "cron(05 06 * * ? *)"
+  default = "cron(05 05 * * ? *)"
 }
 
 variable "resizing_schedule_pm_expression" {
   description = "Schedule to run ETL resizing schedule in the evening before ETL jobs run times"
-  default = "cron(00 18 * * ? *)"
+  default = "cron(00 17 * * ? *)"
 }
 
 variable "mis_overide_resizing_schedule_tags" {
