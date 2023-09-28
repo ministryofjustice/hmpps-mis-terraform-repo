@@ -76,7 +76,7 @@ module "db_instance" {
   source                              = "../modules/db_instance"
   identifier                          = local.common_name
   engine                              = var.engine
-  engine_version                      = try(local.db_versions[var.environment_type], var.engine_version)
+  engine_version                      = var.engine_version
   instance_class                      = var.rds_instance_class
   allocated_storage                   = var.rds_allocated_storage
   storage_type                        = var.storage_type
