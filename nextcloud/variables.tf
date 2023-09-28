@@ -67,7 +67,7 @@ variable "create_db_option_group" {
 # DB parameter group
 variable "family" {
   description = "The family of the DB parameter group"
-  default     = "mariadb10.3"
+  default     = "mariadb10.5"
 }
 
 variable "parameters" {
@@ -89,7 +89,7 @@ variable "engine" {
 
 variable "engine_version" {
   description = "The engine version to use"
-  default     = "10.3"
+  default     = "10.5"
 }
 
 # DB option group

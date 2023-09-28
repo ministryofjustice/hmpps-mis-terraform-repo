@@ -40,15 +40,6 @@ module "db_subnet_group" {
   tags        = local.tags
 }
 
-locals {
-  db_versions = {
-    "mis-dev": "10.5"
-  }
-
-  db_version = try(local.db_versions[var.environment_type], var.engine_version)
-  family = "mariadb${local.db_version}"
-}
-
 ############################################
 # CREATE PARAMETER GROUP
 ############################################
@@ -57,7 +48,7 @@ module "db_parameter_group" {
   create      = var.create_db_parameter_group
   identifier  = local.common_name
   name_prefix = "${local.common_name}-"
-  family      = local.family
+  family      = var.family
   parameters  = flatten(var.parameters)
   tags = local.tags
 }
