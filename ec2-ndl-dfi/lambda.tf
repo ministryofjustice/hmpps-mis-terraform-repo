@@ -84,7 +84,7 @@ resource "aws_lambda_function" "dfi_lambda" {
   role             = aws_iam_role.dfi_lambda.arn
   handler          = "${local.lambda_name}.lambda_handler"
   source_code_hash = filebase64sha256(data.archive_file.dfi_lambda.output_path)
-  runtime          = "python3.7"
+  runtime          = "python3.9"
 
   environment {
     variables = {
