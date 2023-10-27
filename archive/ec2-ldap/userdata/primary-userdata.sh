@@ -33,7 +33,7 @@ cat << EOF > ~/requirements.yml
 - name: elasticbeats
   src: https://github.com/ministryofjustice/hmpps-beats-monitoring
 - name: users
-  src: singleplatform-eng.users
+  src: https://github.com/singleplatform-eng/ansible-users
 EOF
 
 wget https://raw.githubusercontent.com/ministryofjustice/hmpps-delius-ansible/master/group_vars/${bastion_inventory}.yml -O users.yml
@@ -139,7 +139,7 @@ rm -rf /tmp/awslogs-install
 
 # IPA Server
 
-yum install ipa-server -y 
+yum install ipa-server -y
 
 # certs
 mkdir -p /root/ipa-certs
@@ -162,7 +162,7 @@ ipa-server-install --unattended \
     --realm $realm \
     --no-host-dns \
     --ip-address=$(hostname -i | cut -d ' ' -f2) \
-    --log-file /root/bootstrap-ipa-install.log 
+    --log-file /root/bootstrap-ipa-install.log
 
 #The next step is to get /root/ipa.csr signed by your CA and re-run /sbin/ipa-server-install as:
 #/sbin/ipa-server-install --external-cert-file=/path/to/signed_certificate --external-cert-file=/path/to/external_ca_certificate
@@ -260,7 +260,7 @@ keyUsage = critical, digitalSignature, cRLSign, keyCertSign' > openssl.cnf
 # sign ca file
 openssl ca -config openssl.cnf -extensions v3_intermediate_ca -days 3650 -notext -md sha256 -in /root/ipa.csr -out /root/ipa.crt -batch
 
-cp newcerts/*.pem /root/ipa.crt 
+cp newcerts/*.pem /root/ipa.crt
 cd /root
 
 # load cert
@@ -268,7 +268,7 @@ cd /root
     --unattended -p $ds_password -a $admin_password -r $realm --log-file /root/postca-ipa-install.log
 
 # backup node and upload to s3 bucket
-ipa-backup 
+ipa-backup
 
 mkdir /tmp/backups/
 

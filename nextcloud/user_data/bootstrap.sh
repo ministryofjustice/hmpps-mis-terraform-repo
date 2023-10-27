@@ -115,7 +115,7 @@ cat << EOF > ~/requirements.yml
 - name: elasticbeats
   src: https://github.com/ministryofjustice/hmpps-beats-monitoring
 - name: users
-  src: singleplatform-eng.users
+  src: https://github.com/singleplatform-eng/ansible-users
 - name: nextcloud
   src: https://github.com/ministryofjustice/hmpps-nextcloud-installer
   version: 1.6.0
