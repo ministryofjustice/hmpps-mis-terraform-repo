@@ -80,8 +80,27 @@ resource "aws_s3_bucket_policy" "migration_datasync" {
     Version = "2012-10-17",
     Statement = [
       {
+        Effect = "Allow",
+        Principal = {
+          # migration accounts
+          AWS = [
+            "arn:aws:iam::891377175249:role/*",
+            "arn:aws:iam::381492116631:role/*",
+            "arn:aws:iam::471112751565:role/*",
+            "arn:aws:iam::590183722357:role/*"
+          ]
+        },
+        Action = "s3:*",
+        Resources = [
+          "${aws_s3_bucket.migration_datasync.arn}",
+          "${aws_s3_bucket.migration_datasync.arn}/*",
+        ],
+      },
+    ],
+    Statement = [
+      {
         Effect    = "Allow",
-        Principal = "*",
+        Principal = "data-sync.amazonaws.com",
         Action    = "s3:*",
         Resources = [
           "${aws_s3_bucket.migration_datasync.arn}",
