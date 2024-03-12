@@ -38,7 +38,7 @@
             "Resource": "*"
         },
         {
-            "Sid": "Allow access for Key Administrators",
+            "Sid": "Allow access for Migration Accounts",
             "Effect": "Allow",
             "Principal": {
                 "AWS": [
