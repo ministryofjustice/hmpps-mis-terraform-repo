@@ -48,3 +48,65 @@ resource "aws_s3_bucket" "backups" {
   )
 }
 
+#-------------------------------------------
+### S3 bucket for migration to datasync
+#--------------------------------------------
+
+resource "aws_s3_bucket" "migration_datasync" {
+  bucket = "nextcloud-migration"
+  acl    = "private"
+
+  versioning {
+    enabled = false
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "migration_datasync" {
+  bucket = aws_s3_bucket.migration_datasync.bucket
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          # migration accounts
+          AWS = [
+            "arn:aws:iam::891377175249:role/*",
+            "arn:aws:iam::381492116631:role/*",
+            "arn:aws:iam::471112751565:role/*",
+            "arn:aws:iam::590183722357:role/*"
+          ]
+        },
+        Action = "s3:*",
+        Resources = [
+          "${aws_s3_bucket.migration_datasync.arn}",
+          "${aws_s3_bucket.migration_datasync.arn}/*",
+        ],
+      },
+    ],
+    Statement = [
+      {
+        Effect    = "Allow",
+        Principal = "data-sync.amazonaws.com",
+        Action    = "s3:*",
+        Resources = [
+          "${aws_s3_bucket.migration_datasync.arn}",
+          "${aws_s3_bucket.migration_datasync.arn}/*",
+        ],
+      },
+    ],
+  })
+}
