@@ -97,9 +97,11 @@ resource "aws_s3_bucket_policy" "migration_datasync" {
         ],
       },
       {
-        Effect    = "Allow",
-        Principal = "data-sync.amazonaws.com",
-        Action    = "s3:*",
+        Effect = "Allow",
+        Principal = {
+          Service = "data-sync.amazonaws.com"
+        },
+        Action = "s3:*",
         Resource = [
           "${aws_s3_bucket.migration_datasync.arn}",
           "${aws_s3_bucket.migration_datasync.arn}/*",
