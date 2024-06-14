@@ -91,7 +91,7 @@ resource "aws_s3_bucket_policy" "migration_datasync" {
           ]
         },
         Action = "s3:*",
-        Resources = [
+        Resource = [
           "${aws_s3_bucket.migration_datasync.arn}",
           "${aws_s3_bucket.migration_datasync.arn}/*",
         ],
@@ -102,7 +102,7 @@ resource "aws_s3_bucket_policy" "migration_datasync" {
         Effect    = "Allow",
         Principal = "data-sync.amazonaws.com",
         Action    = "s3:*",
-        Resources = [
+        Resource = [
           "${aws_s3_bucket.migration_datasync.arn}",
           "${aws_s3_bucket.migration_datasync.arn}/*",
         ],
