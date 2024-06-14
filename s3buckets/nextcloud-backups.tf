@@ -96,8 +96,6 @@ resource "aws_s3_bucket_policy" "migration_datasync" {
           "${aws_s3_bucket.migration_datasync.arn}/*",
         ],
       },
-    ],
-    Statement = [
       {
         Effect    = "Allow",
         Principal = "data-sync.amazonaws.com",
@@ -106,7 +104,7 @@ resource "aws_s3_bucket_policy" "migration_datasync" {
           "${aws_s3_bucket.migration_datasync.arn}",
           "${aws_s3_bucket.migration_datasync.arn}/*",
         ],
-      },
-    ],
+      }
+    ]
   })
 }
