@@ -73,48 +73,48 @@ resource "aws_s3_bucket" "migration_datasync" {
   }
 }
 
-data "aws_iam_policy_document" "migration_datasync" {
-  statement {
-    effect = "Allow"
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::891377175249:role/*",
-        "arn:aws:iam::381492116631:role/*",
-        "arn:aws:iam::471112751565:role/*",
-        "arn:aws:iam::590183722357:role/*"
-      ]
-    }
+# data "aws_iam_policy_document" "migration_datasync" {
+#   statement {
+#     effect = "Allow"
+#     principals {
+#       type = "AWS"
+#       identifiers = [
+#         "arn:aws:iam::891377175249:role/*",
+#         "arn:aws:iam::381492116631:role/*",
+#         "arn:aws:iam::471112751565:role/*",
+#         "arn:aws:iam::590183722357:role/*"
+#       ]
+#     }
 
-    actions = ["s3:*"]
+#     actions = ["s3:*"]
 
-    resources = [
-      aws_s3_bucket.migration_datasync.arn,
-      "${aws_s3_bucket.migration_datasync.arn}/*"
-    ]
-  }
+#     resources = [
+#       aws_s3_bucket.migration_datasync.arn,
+#       "${aws_s3_bucket.migration_datasync.arn}/*"
+#     ]
+#   }
 
-  statement {
-    effect = "Allow"
+#   statement {
+#     effect = "Allow"
 
-    principals {
-      type        = "Service"
-      identifiers = ["datasync.amazonaws.com"]
-    }
+#     principals {
+#       type        = "Service"
+#       identifiers = ["datasync.amazonaws.com"]
+#     }
 
-    actions = ["s3:*"]
+#     actions = ["s3:*"]
 
-    resources = [
-      aws_s3_bucket.migration_datasync.arn,
-      "${aws_s3_bucket.migration_datasync.arn}/*"
-    ]
-  }
-}
+#     resources = [
+#       aws_s3_bucket.migration_datasync.arn,
+#       "${aws_s3_bucket.migration_datasync.arn}/*"
+#     ]
+#   }
+# }
 
-resource "aws_s3_bucket_policy" "migration_datasync" {
-  bucket = aws_s3_bucket.migration_datasync.id
-  policy = data.aws_iam_policy_document.migration_datasync.json
-}
+# resource "aws_s3_bucket_policy" "migration_datasync" {
+#   bucket = aws_s3_bucket.migration_datasync.id
+#   policy = data.aws_iam_policy_document.migration_datasync.json
+# }
 
 
 # resource "aws_s3_bucket_policy" "migration_datasync" {
