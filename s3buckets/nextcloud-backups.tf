@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "migration_datasync" {
 }
 
 resource "aws_s3_bucket_policy" "migration_datasync" {
-  bucket = aws_s3_bucket.migration_datasync.bucket
+  bucket = aws_s3_bucket.migration_datasync.id
   policy = data.aws_iam_policy_document.migration_datasync.json
 }
 
