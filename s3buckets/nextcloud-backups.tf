@@ -52,26 +52,26 @@ resource "aws_s3_bucket" "backups" {
 ### S3 bucket for migration to datasync
 #--------------------------------------------
 
-resource "aws_s3_bucket" "migration_datasync" {
-  bucket = "nextcloud-migration"
-  acl    = "private"
+# resource "aws_s3_bucket" "migration_datasync" {
+#   bucket = "nextcloud-migration"
+#   acl    = "private"
 
-  versioning {
-    enabled = false
-  }
+#   versioning {
+#     enabled = false
+#   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+#   lifecycle {
+#     prevent_destroy = true
+#   }
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-}
+#   server_side_encryption_configuration {
+#     rule {
+#       apply_server_side_encryption_by_default {
+#         sse_algorithm = "AES256"
+#       }
+#     }
+#   }
+# }
 
 # data "aws_iam_policy_document" "migration_datasync" {
 #   statement {
