@@ -36,25 +36,6 @@
                 "kms:CancelKeyDeletion"
             ],
             "Resource": "*"
-        },
-        {
-            "Sid": "Allow access for Migration Accounts",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": [
-                    "arn:aws:iam::891377175249:role/*",
-                    "arn:aws:iam::381492116631:role/*",
-                    "arn:aws:iam::471112751565:role/*",
-                    "arn:aws:iam::590183722357:role/*"
-                ]
-            },
-            "Action": [
-                "kms:CreateGrant",
-                "kms:Describe*",
-                "kms:List*",
-                "kms:Get*"
-            ],
-            "Resource": "*"
         }
     ]
 }
