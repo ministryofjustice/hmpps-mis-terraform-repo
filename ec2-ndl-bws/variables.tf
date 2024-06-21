@@ -104,11 +104,11 @@ variable "lb_mgmt_stop_expression" {
 
 variable "lb_mgmt_resume_expression" {
   description = "Schedule to start the Environment mis-lb-rule-mgmt-build Codebuild Project "
-  default     = "cron(30 23 * * ? *)"
+  default     = "cron(00 23 * * ? *)"
 }
 
 variable "lb_management_rule_enabled" {
-  description = "Enable or disable mis-lb-management rule. This will block access to app via LB at scheduled times. ie 17:00 to 23:30"
+  description = "Enable or disable mis-lb-management rule. This will block access to app via LB at scheduled times. ie 17:00 UTC to 23:00 UTC"
   type        = string
   default     = "false"
 }
