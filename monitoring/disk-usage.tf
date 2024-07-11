@@ -31,7 +31,7 @@ module "dis" {
   source             = "../modules/disk-usage-alarms-1/"
   component          = "DIS"
   objectname         = "LogicalDisk"
-  alert_threshold    = "25"
+  alert_threshold    = "10"
   critical_threshold = "5"
   period             = "60"
   environment_name   = var.environment_type
@@ -48,7 +48,7 @@ module "dis-2" {
   source             = "../modules/disk-usage-alarms-2/"
   component          = "DIS"
   objectname         = "LogicalDisk"
-  alert_threshold    = "25"
+  alert_threshold    = "10"
   critical_threshold = "5"
   period             = "60"
   environment_name   = var.environment_type
@@ -64,7 +64,7 @@ module "bps" {
   source             = "../modules/disk-usage-alarms/"
   component          = "BPS"
   objectname         = "LogicalDisk"
-  alert_threshold    = "25"
+  alert_threshold    = "10"
   critical_threshold = "5"
   period             = "60"
   environment_name   = var.environment_type
@@ -80,7 +80,7 @@ module "bcs" {
   source             = "../modules/disk-usage-alarms/"
   component          = "BCS"
   objectname         = "LogicalDisk"
-  alert_threshold    = "25"
+  alert_threshold    = "10"
   critical_threshold = "5"
   period             = "60"
   environment_name   = var.environment_type
@@ -96,7 +96,7 @@ module "bws" {
   source             = "../modules/disk-usage-alarms/"
   component          = "BWS"
   objectname         = "LogicalDisk"
-  alert_threshold    = "25"
+  alert_threshold    = "10"
   critical_threshold = "5"
   period             = "60"
   environment_name   = var.environment_type
