@@ -110,24 +110,69 @@ resource "aws_security_group_rule" "jenkins_db_in" {
 ####################################################
 
 resource "aws_security_group_rule" "ldap_in" {
-  security_group_id        = data.terraform_remote_state.delius_core_security_groups.outputs.sg_apacheds_ldap_private_elb_id
-  from_port                = 389
-  to_port                  = 389
-  protocol                 = "tcp"
-  type                     = "ingress"
-  description              = "nextcloud in to ldap lb"
-  source_security_group_id = data.terraform_remote_state.security-groups.outputs.sg_https_out
+  security_group_id = data.terraform_remote_state.security-groups.outputs.sg_https_out
+  from_port         = 389
+  to_port           = 389
+  protocol          = "tcp"
+  type              = "ingress"
+  description       = "nextcloud in to MP ldap range"
+  # source_security_group_id = data.terraform_remote_state.security-groups.outputs.sg_https_out
+  cidr_blocks = [
+    "10.26.24.0/21",
+    "10.26.8.0/21",
+    "10.27.0.0/21",
+    "10.27.8.0/21"
+  ]
 }
 
 resource "aws_security_group_rule" "ldap_out" {
-  security_group_id        = data.terraform_remote_state.security-groups.outputs.sg_https_out
-  from_port                = 389
-  to_port                  = 389
-  protocol                 = "tcp"
-  type                     = "egress"
-  description              = "nextcloud out to ldap lb"
-  source_security_group_id = data.terraform_remote_state.delius_core_security_groups.outputs.sg_apacheds_ldap_private_elb_id
+  security_group_id = data.terraform_remote_state.security-groups.outputs.sg_https_out
+  from_port         = 389
+  to_port           = 389
+  protocol          = "tcp"
+  type              = "egress"
+  description       = "nextcloud in to MP ldap range"
+  # source_security_group_id = data.terraform_remote_state.delius_core_security_groups.outputs.sg_apacheds_ldap_private_elb_id
+  cidr_blocks = [
+    "10.26.24.0/21",
+    "10.26.8.0/21",
+    "10.27.0.0/21",
+    "10.27.8.0/21"
+  ]
 }
+
+resource "aws_security_group_rule" "ldap_in_secure" {
+  security_group_id = data.terraform_remote_state.delius_core_security_groups.outputs.sg_apacheds_ldap_private_elb_id
+  from_port         = 636
+  to_port           = 636
+  protocol          = "tcp"
+  type              = "ingress"
+  description       = "nextcloud in to MP ldap range"
+  # source_security_group_id = data.terraform_remote_state.security-groups.outputs.sg_https_out
+  cidr_blocks = [
+    "10.26.24.0/21",
+    "10.26.8.0/21",
+    "10.27.0.0/21",
+    "10.27.8.0/21"
+  ]
+}
+
+resource "aws_security_group_rule" "ldap_out_secure" {
+  security_group_id = data.terraform_remote_state.security-groups.outputs.sg_https_out
+  from_port         = 636
+  to_port           = 636
+  protocol          = "tcp"
+  type              = "egress"
+  description       = "nextcloud in to MP ldap range"
+  # source_security_group_id = data.terraform_remote_state.delius_core_security_groups.outputs.sg_apacheds_ldap_private_elb_id
+  cidr_blocks = [
+    "10.26.24.0/21",
+    "10.26.8.0/21",
+    "10.27.0.0/21",
+    "10.27.8.0/21"
+  ]
+}
+
 
 ####################################################
 # SG Rules for Redis cache

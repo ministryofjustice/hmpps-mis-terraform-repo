@@ -21,9 +21,9 @@ module "iam_app_policy" {
 data "template_file" "iam_policy_app" {
   template = file("${path.module}/${local.ec2_role_policy_file}")
   vars = {
-    nextcloud_s3_bucket_arn    = local.nextcloud_s3_bucket_arn
-    wmt_bucket_name_prod       = local.wmt_bucket_name_prod
-    wmt_bucket_name_pre_prod   = local.wmt_bucket_name_pre_prod
+    nextcloud_s3_bucket_arn  = local.nextcloud_s3_bucket_arn
+    wmt_bucket_name_prod     = local.wmt_bucket_name_prod
+    wmt_bucket_name_pre_prod = local.wmt_bucket_name_pre_prod
   }
 }
 
@@ -101,7 +101,7 @@ resource "aws_launch_configuration" "launch_cfg" {
     local.efs_security_groups,
     local.nextcloud_db_sg,
     local.nextcloud_samba_sg,
-    local.sg_smtp_ses,
+    local.sg_smtp_ses
   ])
   enable_monitoring           = "true"
   associate_public_ip_address = false
@@ -141,7 +141,7 @@ resource "aws_autoscaling_group" "asg" {
   tags = [
     for key, value in merge(local.tags, {
       "Name" = "${var.environment_type}-${local.app_name}-asg"
-    }) : {
+      }) : {
       key                 = key
       value               = value
       propagate_at_launch = true
@@ -149,7 +149,7 @@ resource "aws_autoscaling_group" "asg" {
   ]
   lifecycle {
     create_before_destroy = true
-    ignore_changes = [load_balancers, target_group_arns]
+    ignore_changes        = [load_balancers, target_group_arns]
   }
 }
 
