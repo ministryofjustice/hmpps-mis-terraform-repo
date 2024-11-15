@@ -38,4 +38,3 @@ output "sg_map_ids" {
 output "bws_port" {
   value = local.bws_port
 }
-
