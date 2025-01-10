@@ -50,7 +50,7 @@ resource "aws_route53_record" "dsd_db1_migration_internal" {
   name    = "misdsd-db-1"
   type    = "CNAME"
   ttl     = "300"
-  records = ["delius-mis-${local.legacy_to_mp_env[var.environment_name]}-boe-db-1.delius-mis.hmpps-${local.legacy_to_mp_vpc[var.environment_name]}.modernisation-platform.service.justice.gov.uk"]
+  records = ["delius-mis-${local.legacy_to_mp_env[var.environment_name]}-dsd-db-1.delius-mis.hmpps-${local.legacy_to_mp_vpc[var.environment_name]}.modernisation-platform.service.justice.gov.uk"]
 }
 
 resource "aws_route53_record" "dsd_db1_migration_public" {
@@ -58,5 +58,5 @@ resource "aws_route53_record" "dsd_db1_migration_public" {
   name    = "misdsd-db-1"
   type    = "CNAME"
   ttl     = "300"
-  records = ["delius-mis-${local.legacy_to_mp_env[var.environment_name]}-boe-db-1.delius-mis.hmpps-${local.legacy_to_mp_vpc[var.environment_name]}.modernisation-platform.service.justice.gov.uk"]
+  records = ["delius-mis-${local.legacy_to_mp_env[var.environment_name]}-dsd-db-1.delius-mis.hmpps-${local.legacy_to_mp_vpc[var.environment_name]}.modernisation-platform.service.justice.gov.uk"]
 }
