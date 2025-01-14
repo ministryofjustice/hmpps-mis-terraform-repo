@@ -249,3 +249,33 @@ resource "aws_security_group_rule" "ldap_lb_https_in" {
   description              = "${local.common_name}-ldap-https-in"
   source_security_group_id = local.sg_ldap_lb
 }
+
+resource "aws_security_group_rule" "ldap_outbound_to_mp" {
+  security_group_id = local.sg_mis_common
+  from_port         = 389
+  to_port           = 389
+  protocol          = "tcp"
+  type              = "egress"
+  description       = "${local.common_name}-ldap-out-to-mp"
+  cidr_blocks       = [
+    "10.26.24.0/21",
+    "10.26.8.0/21",
+    "10.27.0.0/21",
+    "10.27.8.0/21"
+  ]
+}
+
+resource "aws_security_group_rule" "ldaps_outbound_to_mp" {
+  security_group_id = local.sg_mis_common
+  from_port         = 636
+  to_port           = 636
+  protocol          = "tcp"
+  type              = "egress"
+  description       = "${local.common_name}-ldaps-out-to-mp"
+  cidr_blocks       = [
+    "10.26.24.0/21",
+    "10.26.8.0/21",
+    "10.27.0.0/21",
+    "10.27.8.0/21"
+  ]
+}
