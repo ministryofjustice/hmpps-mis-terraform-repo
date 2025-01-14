@@ -1,0 +1,29 @@
+variable "environment_identifier" {
+  description = "resource label or name"
+}
+
+variable "short_environment_identifier" {
+  description = "shortend resource label or name"
+}
+
+###
+variable "region" {
+  description = "The AWS region."
+}
+
+variable "project_name" {
+  description = "The project name - delius-core"
+}
+
+variable "environment_type" {
+  description = "environment"
+}
+
+variable "remote_state_bucket_name" {
+  description = "Terraform remote state bucket name"
+}
+
+variable "environment_name" {
+  type = string
+}
+
