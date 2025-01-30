@@ -125,6 +125,16 @@ resource "aws_security_group_rule" "ldap_in" {
   ]
 }
 
+resource "aws_security_group_rule" "legacy_ldap_in" {
+  security_group_id        = data.terraform_remote_state.delius_core_security_groups.outputs.sg_apacheds_ldap_private_elb_id
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "tcp"
+  type                     = "ingress"
+  description              = "nextcloud in to legacy ldap lb"
+  source_security_group_id = data.terraform_remote_state.security-groups.outputs.sg_https_out
+}
+
 resource "aws_security_group_rule" "ldap_out" {
   security_group_id = data.terraform_remote_state.security-groups.outputs.sg_https_out
   from_port         = 389
@@ -140,6 +150,17 @@ resource "aws_security_group_rule" "ldap_out" {
     "10.27.8.0/21"
   ]
 }
+
+resource "aws_security_group_rule" "legacy_ldap_out" {
+  security_group_id        = data.terraform_remote_state.security-groups.outputs.sg_https_out
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "tcp"
+  type                     = "egress"
+  description              = "nextcloud out to legacy ldap lb"
+  source_security_group_id = data.terraform_remote_state.delius_core_security_groups.outputs.sg_apacheds_ldap_private_elb_id
+}
+
 
 resource "aws_security_group_rule" "ldap_in_secure" {
   security_group_id = data.terraform_remote_state.delius_core_security_groups.outputs.sg_apacheds_ldap_private_elb_id
