@@ -63,7 +63,11 @@
       "Sid": "AllowCrossAccountGet",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::${account_id}:user/${sync_user}"
+        "AWS": [
+          "arn:aws:iam::${account_id_development}:user/${sync_user}",
+          "arn:aws:iam::${account_id_preproduction}:user/${sync_user}",
+          "arn:aws:iam::${account_id_production}:user/${sync_user}"
+        ]
       },
       "Action": [
         "s3:GetObject",
