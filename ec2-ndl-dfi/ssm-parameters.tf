@@ -60,7 +60,7 @@ resource "aws_ssm_parameter" "cross_account_sync_id_production" {
 }
 
 resource "aws_ssm_parameter" "sync_user" {
-  name  = "github-dfi-cross-account-sync-user"
+  name  = "modernisation-platform-oidc-cicd"
   type  = "String"
   value = "PLACEHOLDER" # Update this manually after creation
 
@@ -69,7 +69,7 @@ resource "aws_ssm_parameter" "sync_user" {
   tags = merge(
     local.tags,
     {
-      "Name" = "github-dfi-cross-account-sync-user"
+      "Name" = "modernisation-platform-oidc-cicd"
     }
   )
 
