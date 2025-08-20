@@ -10,7 +10,7 @@ resource "aws_ssm_parameter" "cross_account_sync_id" {
     local.tags,
     {
       "Name"        = "dfi-cross-account-sync"
-      "Environment" = "development"
+      "Environment" = var.environment_name
     }
   )
 
@@ -22,7 +22,7 @@ resource "aws_ssm_parameter" "cross_account_sync_id" {
 resource "aws_ssm_parameter" "sync_user" {
   name  = "modernisation-platform-oidc-cicd"
   type  = "String"
-  value = "PLACEHOLDER" # Update this manually after creation
+  value = "modernisation-platform-oidc-cicd"
 
   description = "Username for DFI cross-account sync operations"
 
