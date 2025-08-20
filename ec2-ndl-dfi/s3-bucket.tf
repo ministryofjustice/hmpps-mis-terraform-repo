@@ -6,13 +6,11 @@ data "template_file" "dfi" {
   template = file("./templates/s3_policy.tpl")
 
   vars = {
-    dfi_account              = var.aws_account_ids["cloud-platform"]
-    region                   = var.region
-    environment_name         = var.environment_name
-    sync_user                = aws_ssm_parameter.sync_user.value
-    account_id_development   = aws_ssm_parameter.cross_account_sync_id_development.value
-    account_id_preproduction = aws_ssm_parameter.cross_account_sync_id_preproduction.value
-    account_id_production    = aws_ssm_parameter.cross_account_sync_id_production.value
+    dfi_account      = var.aws_account_ids["cloud-platform"]
+    region           = var.region
+    environment_name = var.environment_name
+    sync_user        = aws_ssm_parameter.sync_user.value
+    account_id       = aws_ssm_parameter.cross_account_sync_id.value
   }
 }
 
