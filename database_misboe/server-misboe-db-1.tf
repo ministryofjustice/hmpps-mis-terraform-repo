@@ -1,5 +1,7 @@
 #Overide autostop tag
 locals {
+  migrated_envs = ["delius-mis-dev"]
+
   overide_tags = merge(
     local.tags,
     {
@@ -9,7 +11,7 @@ locals {
 }
 
 module "misboe_db_1" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.6.0"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.10.0"
   server_name = "misboe-db-1"
 
   ami_id               = data.aws_ami.centos_oracle_db.id
@@ -93,6 +95,6 @@ output "misboe_db_1" {
     internal_fqdn = module.misboe_db_1.internal_fqdn
     private_ip    = module.misboe_db_1.private_ip
     db_disks      = module.misboe_db_1.db_size_parameters
-    misboe_db_1   = "ssh ${module.misboe_db_1.public_fqdn}"
+    misboe_db_1      = module.misboe_db_1.public_fqdn != null ? "ssh ${module.misboe_db_1.public_fqdn}" : ""
   }
 }

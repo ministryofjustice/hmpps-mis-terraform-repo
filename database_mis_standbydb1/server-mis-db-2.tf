@@ -1,5 +1,9 @@
+locals {
+  migrated_envs = ["delius-mis-dev"]
+}
+
 module "mis_db_2" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.6.0"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.10.0"
   server_name = "mis-db-2"
 
   ami_id               = data.aws_ami.centos_oracle_db.id
@@ -80,6 +84,6 @@ output "mis_db_2" {
     internal_fqdn = module.mis_db_2.internal_fqdn
     private_ip    = module.mis_db_2.private_ip
     db_disks      = module.mis_db_2.db_size_parameters
-    mis_db_2      = "ssh ${module.mis_db_2.public_fqdn}"
+    mis_db_2      = module.mis_db_2.public_fqdn != null ? "ssh ${module.mis_db_2.public_fqdn}" : ""
   }
 }
