@@ -1,5 +1,7 @@
 #Overide autostop tag
 locals {
+  migrated_envs = ["delius-mis-dev"]
+
   overide_tags = merge(
     local.tags,
     {
@@ -9,7 +11,7 @@ locals {
 }
 
 module "mis_db_1" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.6.0"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.10.0"
   server_name = "mis-db-1"
 
   ami_id               = data.aws_ami.centos_oracle_db.id
@@ -34,6 +36,8 @@ module "mis_db_1" {
 
   environment_type = var.environment_type
   region           = var.region
+  
+  create_dns_records = contains(local.migrated_envs, var.environment_name) ? false : true
 
   kms_key_id      = module.kms_key_mis_db.kms_arn
   public_zone_id  = data.terraform_remote_state.vpc.outputs.public_zone_id
@@ -93,6 +97,6 @@ output "mis_db_1" {
     internal_fqdn = module.mis_db_1.internal_fqdn
     private_ip    = module.mis_db_1.private_ip
     db_disks      = module.mis_db_1.db_size_parameters
-    mis_db_1      = "ssh ${module.mis_db_1.public_fqdn}"
+    mis_db_1      = module.mis_db_1.public_fqdn != null ? "ssh ${module.mis_db_1.public_fqdn}" : ""
   }
 }
