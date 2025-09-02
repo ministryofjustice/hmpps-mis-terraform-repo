@@ -44,6 +44,8 @@ module "misdsd_db_1" {
   vpc_account_id  = data.terraform_remote_state.vpc.outputs.vpc_account_id
   db_size         = var.db_size_misdsd
 
+  create_dns_records = contains(local.migrated_envs, var.environment_name) ? false : true
+
   ansible_vars = {
     service_user_name             = var.ansible_vars_misdsd_db["service_user_name"]
     database_global_database_name = var.ansible_vars_misdsd_db["database_global_database_name"]
