@@ -1,5 +1,10 @@
+locals {
+  migrated_envs = ["delius-mis-dev"]
+}
+
+
 module "misboe_db_2" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.6.0"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.10.0"
   server_name = "misboe-db-2"
 
   ami_id               = data.aws_ami.centos_oracle_db.id
@@ -31,6 +36,8 @@ module "misboe_db_2" {
   private_domain  = data.terraform_remote_state.vpc.outputs.private_zone_name
   vpc_account_id  = data.terraform_remote_state.vpc.outputs.vpc_account_id
   db_size         = var.db_size_misboe
+
+  create_dns_records = contains(local.migrated_envs, var.environment_name) ? false : true
 
   ansible_vars = {
     service_user_name             = var.ansible_vars_misboe_db["service_user_name"]
@@ -79,6 +86,6 @@ output "misboe_db_2" {
     internal_fqdn = module.misboe_db_2.internal_fqdn
     private_ip    = module.misboe_db_2.private_ip
     db_disks      = module.misboe_db_2.db_size_parameters
-    misboe_db_2   = "ssh ${module.misboe_db_2.public_fqdn}"
+    misboe_db_2   = module.misboe_db_2.public_fqdn != null ? "ssh ${module.misboe_db_2.public_fqdn}" : ""
   }
 }

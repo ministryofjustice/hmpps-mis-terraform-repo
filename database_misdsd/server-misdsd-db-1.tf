@@ -1,5 +1,7 @@
 #Overide autostop tag
 locals {
+  migrated_envs = ["delius-mis-dev"]
+
   overide_tags = merge(
     local.tags,
     {
@@ -9,7 +11,7 @@ locals {
 }
 
 module "misdsd_db_1" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.6.0"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.10.0"
   server_name = "misdsd-db-1"
 
   ami_id               = data.aws_ami.centos_oracle_db.id
@@ -41,6 +43,8 @@ module "misdsd_db_1" {
   private_domain  = data.terraform_remote_state.vpc.outputs.private_zone_name
   vpc_account_id  = data.terraform_remote_state.vpc.outputs.vpc_account_id
   db_size         = var.db_size_misdsd
+
+  create_dns_records = contains(local.migrated_envs, var.environment_name) ? false : true
 
   ansible_vars = {
     service_user_name             = var.ansible_vars_misdsd_db["service_user_name"]
@@ -93,6 +97,6 @@ output "misdsd_db_1" {
     internal_fqdn = module.misdsd_db_1.internal_fqdn
     private_ip    = module.misdsd_db_1.private_ip
     db_disks      = module.misdsd_db_1.db_size_parameters
-    misdsd_db_1   = "ssh ${module.misdsd_db_1.public_fqdn}"
+    misdsd_db_1   = module.misdsd_db_1.public_fqdn != null ? "ssh ${module.misdsd_db_1.public_fqdn}" : ""
   }
 }

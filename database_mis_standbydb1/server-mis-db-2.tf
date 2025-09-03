@@ -1,5 +1,9 @@
+locals {
+  migrated_envs = ["delius-mis-dev"]
+}
+
 module "mis_db_2" {
-  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.6.0"
+  source      = "git::https://github.com/ministryofjustice/hmpps-oracle-database.git//modules/oracle-database?ref=2.10.0"
   server_name = "mis-db-2"
 
   ami_id               = data.aws_ami.centos_oracle_db.id
@@ -32,6 +36,8 @@ module "mis_db_2" {
   private_domain  = data.terraform_remote_state.vpc.outputs.private_zone_name
   vpc_account_id  = data.terraform_remote_state.vpc.outputs.vpc_account_id
   db_size         = var.db_size_mis_standby
+
+  create_dns_records = contains(local.migrated_envs, var.environment_name) ? false : true
 
   ansible_vars = {
     service_user_name             = var.ansible_vars_mis_db["service_user_name"]
@@ -80,6 +86,6 @@ output "mis_db_2" {
     internal_fqdn = module.mis_db_2.internal_fqdn
     private_ip    = module.mis_db_2.private_ip
     db_disks      = module.mis_db_2.db_size_parameters
-    mis_db_2      = "ssh ${module.mis_db_2.public_fqdn}"
+    mis_db_2      = module.mis_db_2.public_fqdn != null ? "ssh ${module.mis_db_2.public_fqdn}" : ""
   }
 }
