@@ -86,6 +86,6 @@ output "misboe_db_2" {
     internal_fqdn = module.misboe_db_2.internal_fqdn
     private_ip    = module.misboe_db_2.private_ip
     db_disks      = module.misboe_db_2.db_size_parameters
-    misboe_db_2      = module.misboe_db_2.public_fqdn != null ? "ssh ${module.misboe_db_2.public_fqdn}" : ""
+    misboe_db_2   = module.misboe_db_2.public_fqdn != null ? "ssh ${module.misboe_db_2.public_fqdn}" : ""
   }
 }

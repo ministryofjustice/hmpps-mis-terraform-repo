@@ -97,6 +97,6 @@ output "misdsd_db_1" {
     internal_fqdn = module.misdsd_db_1.internal_fqdn
     private_ip    = module.misdsd_db_1.private_ip
     db_disks      = module.misdsd_db_1.db_size_parameters
-    misdsd_db_1      = module.misdsd_db_1.public_fqdn != null ? "ssh ${module.misdsd_db_1.public_fqdn}" : ""
+    misdsd_db_1   = module.misdsd_db_1.public_fqdn != null ? "ssh ${module.misdsd_db_1.public_fqdn}" : ""
   }
 }
