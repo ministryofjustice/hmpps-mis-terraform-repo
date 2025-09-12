@@ -44,7 +44,12 @@
       "Sid": "DataSyncReadPolicy",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::*:role/delius-mis-*-datasync-s3-role"
+        "AWS": [
+          "arn:aws:iam::891377175249:role/delius-mis-dev-datasync-s3-role",
+          "arn:aws:iam::471112751565:role/delius-mis-stage-datasync-s3-role",
+          "arn:aws:iam::471112751565:role/delius-mis-preprod-datasync-s3-role",
+          "arn:aws:iam::590183722357:role/delius-mis-prod-datasync-s3-role"
+        ]
       },
       "Action": [
         "s3:GetBucketLocation",
