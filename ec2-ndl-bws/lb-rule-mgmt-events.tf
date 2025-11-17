@@ -1,6 +1,3 @@
-#-----------------------------------------
-# Event
-#-----------------------------------------
 resource "aws_cloudwatch_event_rule" "stop" {
   name                = "${var.environment_name}-${local.app_name}-lb-management-stop-event-rule"
   description         = "Rule to enable banner on MIS LB during ETL/Maintenance"
@@ -15,9 +12,6 @@ resource "aws_cloudwatch_event_rule" "resume" {
   is_enabled          = var.lb_management_rule_enabled
 }
 
-#-----------------------------------------
-# Event Targets
-#-----------------------------------------
 resource "aws_cloudwatch_event_target" "stop" {
   arn      = "arn:aws:codebuild:${var.region}:${local.account_id}:project/${var.environment_name}-${local.app_name}-lb-rule-mgmt-build"
   rule     = aws_cloudwatch_event_rule.stop.name
@@ -52,9 +46,6 @@ resource "aws_cloudwatch_event_target" "resume" {
   DOC
 }
 
-#-----------------------------------------
-# IAM Role
-#-----------------------------------------
 
 resource "aws_iam_role" "lb_mgmt" {
   name               = "${var.environment_name}-${local.app_name}-lb-management-role"
@@ -74,10 +65,6 @@ resource "aws_iam_role" "lb_mgmt" {
 }
 EOF
 }
-
-#-----------------------------------------
-# IAM Policy
-#-----------------------------------------
 
 resource "aws_iam_policy" "lb_mgmt" {
   name        = "${var.environment_name}-${local.app_name}-lb-management-policy"
@@ -99,9 +86,6 @@ POLICY
 
 }
 
-#-----------------------------------------
-# IAM Policy Attachment
-#-----------------------------------------
 resource "aws_iam_role_policy_attachment" "lb_mgmt" {
   role       = aws_iam_role.lb_mgmt.name
   policy_arn = aws_iam_policy.lb_mgmt.arn
