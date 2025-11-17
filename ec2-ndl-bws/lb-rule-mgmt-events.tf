@@ -1,51 +1,50 @@
-resource "aws_cloudwatch_event_rule" "stop" {
-  name                = "${var.environment_name}-${local.app_name}-lb-management-stop-event-rule"
-  description         = "Rule to enable banner on MIS LB during ETL/Maintenance"
+resource "aws_scheduler_schedule" "stop" {
+  name                = "${var.environment_name}-${local.app_name}-lb-management-stop-schedule"
+  description         = "Schedule to enable banner on MIS LB during ETL/Maintenance"
   schedule_expression = var.lb_mgmt_stop_expression
-  is_enabled          = var.lb_management_rule_enabled
+  state               = var.lb_management_rule_enabled ? "ENABLED" : "DISABLED"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  target {
+    arn      = "arn:aws:codebuild:${var.region}:${local.account_id}:project/${var.environment_name}-${local.app_name}-lb-rule-mgmt-build"
+    role_arn = aws_iam_role.lb_mgmt.arn
+    input = encodejson({
+      environmentVariablesOverride : [
+        {
+          name : "ACTION",
+          value : "stop"
+        }
+      ]
+    })
+  }
 }
 
-resource "aws_cloudwatch_event_rule" "resume" {
-  name                = "${var.environment_name}-${local.app_name}-lb-management-resume-event-rule"
-  description         = "Rule to remove banner on MIS LB after ETL/Maintenance completion"
+resource "aws_scheduler_schedule" "resume" {
+  name                = "${var.environment_name}-${local.app_name}-lb-management-resume-schedule"
+  description         = "Schedule to remove banner on MIS LB during ETL/Maintenance completion"
   schedule_expression = var.lb_mgmt_resume_expression
-  is_enabled          = var.lb_management_rule_enabled
+  state               = var.lb_management_rule_enabled ? "ENABLED" : "DISABLED"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  target {
+    arn      = "arn:aws:codebuild:${var.region}:${local.account_id}:project/${var.environment_name}-${local.app_name}-lb-rule-mgmt-build"
+    role_arn = aws_iam_role.lb_mgmt.arn
+    input = encodejson({
+      environmentVariablesOverride : [
+        {
+          name : "ACTION",
+          value : "resume"
+        }
+      ]
+    })
+  }
 }
-
-resource "aws_cloudwatch_event_target" "stop" {
-  arn      = "arn:aws:codebuild:${var.region}:${local.account_id}:project/${var.environment_name}-${local.app_name}-lb-rule-mgmt-build"
-  rule     = aws_cloudwatch_event_rule.stop.name
-  role_arn = aws_iam_role.lb_mgmt.arn
-
-  input = <<DOC
-  {
-  "environmentVariablesOverride": [
-    {
-      "name": "ACTION",
-      "value": "stop"
-    }
-   ]
-   }
-  DOC
-}
-
-resource "aws_cloudwatch_event_target" "resume" {
-  arn      = "arn:aws:codebuild:${var.region}:${local.account_id}:project/${var.environment_name}-${local.app_name}-lb-rule-mgmt-build"
-  rule     = aws_cloudwatch_event_rule.resume.name
-  role_arn = aws_iam_role.lb_mgmt.arn
-
-  input = <<DOC
-  {
-  "environmentVariablesOverride": [
-    {
-      "name": "ACTION",
-      "value": "resume"
-    }
-   ]
-   }
-  DOC
-}
-
 
 resource "aws_iam_role" "lb_mgmt" {
   name               = "${var.environment_name}-${local.app_name}-lb-management-role"
@@ -70,7 +69,7 @@ resource "aws_iam_policy" "lb_mgmt" {
   name        = "${var.environment_name}-${local.app_name}-lb-management-policy"
   description = "Policy to allow Event rule to invoke Codebuild project ${var.environment_name}-${local.app_name}-lb-rule-mgmt-build"
 
-policy = <<POLICY
+  policy = <<POLICY
 {
 "Version": "2012-10-17",
 "Statement": [
