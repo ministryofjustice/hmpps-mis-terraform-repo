@@ -11,7 +11,7 @@ resource "aws_scheduler_schedule" "stop" {
   target {
     arn      = "arn:aws:codebuild:${var.region}:${local.account_id}:project/${var.environment_name}-${local.app_name}-lb-rule-mgmt-build"
     role_arn = aws_iam_role.lb_mgmt.arn
-    input = encodejson({
+    input = jsonencode({
       environmentVariablesOverride : [
         {
           name : "ACTION",
@@ -35,7 +35,7 @@ resource "aws_scheduler_schedule" "resume" {
   target {
     arn      = "arn:aws:codebuild:${var.region}:${local.account_id}:project/${var.environment_name}-${local.app_name}-lb-rule-mgmt-build"
     role_arn = aws_iam_role.lb_mgmt.arn
-    input = encodejson({
+    input = jsonencode({
       environmentVariablesOverride : [
         {
           name : "ACTION",
