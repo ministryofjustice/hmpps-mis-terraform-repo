@@ -1,8 +1,9 @@
 resource "aws_scheduler_schedule" "stop" {
-  name                = "${var.environment_name}-${local.app_name}-lb-management-stop-schedule"
-  description         = "Schedule to enable banner on MIS LB during ETL/Maintenance"
-  schedule_expression = var.lb_mgmt_stop_expression
-  state               = var.lb_management_rule_enabled ? "ENABLED" : "DISABLED"
+  name                         = "${var.environment_name}-${local.app_name}-lb-management-stop-schedule"
+  description                  = "Schedule to enable banner on MIS LB during ETL/Maintenance"
+  schedule_expression          = var.lb_mgmt_stop_expression
+  state                        = var.lb_management_rule_enabled ? "ENABLED" : "DISABLED"
+  schedule_expression_timezone = "Europe/London"
 
   flexible_time_window {
     mode = "OFF"
