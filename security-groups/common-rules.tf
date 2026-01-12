@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "ssh_in" {
 }
 
 resource "aws_security_group_rule" "common_out_oracle_tcp" {
-  security_group_id = aws_security_group.common_out.id
+  security_group_id = local.sg_mis_common
   type              = "egress"
   protocol          = "tcp"
   from_port         = 1521
