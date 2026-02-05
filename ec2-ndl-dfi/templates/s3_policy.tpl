@@ -40,12 +40,13 @@
         "arn:aws:s3:::${region}-${environment_name}-dfi-extracts"
       ]
     },
+%{ if dfi_mp_datasync_s3_role != null }
     {
       "Sid": "DataSyncReadPolicy",
       "Effect": "Allow",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::891377175249:role/delius-mis-dev-datasync-s3-role"
+          "${dfi_mp_datasync_s3_role}"
         ]
       },
       "Action": [
@@ -66,6 +67,7 @@
         "arn:aws:s3:::${region}-${environment_name}-dfi-extracts/*"
       ]
     },
+${ endif }
     {
       "Sid": "DfiS3GetPolicy",
       "Effect": "Deny",
