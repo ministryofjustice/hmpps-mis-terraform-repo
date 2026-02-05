@@ -67,7 +67,7 @@
         "arn:aws:s3:::${region}-${environment_name}-dfi-extracts/*"
       ]
     },
-${ endif }
+%{ endif }
     {
       "Sid": "DfiS3GetPolicy",
       "Effect": "Deny",
