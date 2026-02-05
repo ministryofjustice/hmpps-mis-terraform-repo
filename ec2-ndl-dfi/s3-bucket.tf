@@ -7,9 +7,10 @@ data "template_file" "dfi" {
   template = "${file("./templates/s3_policy.tpl")}"
 
   vars = {
-    dfi_account      = var.aws_account_ids["cloud-platform"]
-    region           = var.region
-    environment_name = var.environment_name
+    dfi_account             = var.aws_account_ids["cloud-platform"]
+    region                  = var.region
+    environment_name        = var.environment_name
+    dfi_mp_datasync_s3_role = var.dfi_mp_datasync_s3_role
   }
 }
 

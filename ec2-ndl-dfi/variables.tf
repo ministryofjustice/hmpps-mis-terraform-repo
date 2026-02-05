@@ -110,3 +110,8 @@ variable "dfi_hibernation" {
 variable "mis_overide_autostop_tags" {
   default = "False"
 }
+
+variable "dfi_mp_datasync_s3_role" {
+  type    = string
+  default = null
+}
