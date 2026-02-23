@@ -44,8 +44,3 @@ variable "legacy_environment_name" {
   default     = "100"
   description = "legacy environment name"
 }
-
-variable "modernisation_platform_hmpp_dc_cidr" {
-  type    = string
-  default = null
-}
