@@ -60,6 +60,30 @@ resource "aws_security_group_rule" "https" {
   description       = "${local.common_name}-https"
 }
 
+resource "aws_security_group_rule" "modernisation_platform_hmpp_dc_udp" {
+  count = modernisation_platform_hmpp_dc_cidr != null ? 1 : 0
+
+  security_group_id = aws_security_group.vpc-sg-outbound.id
+  type              = "egress"
+  from_port         = "0"
+  to_port           = "65535"
+  protocol          = "udp"
+  cidr_blocks       = [var.modernisation_platform_hmpp_dc_cidr]
+  description       = "${local.common_name}-modernisation-platform-hmpp-dc-udp"
+}
+
+resource "aws_security_group_rule" "modernisation_platform_hmpp_dc_tdp" {
+  count = modernisation_platform_hmpp_dc_cidr != null ? 1 : 0
+
+  security_group_id = aws_security_group.vpc-sg-outbound.id
+  type              = "egress"
+  from_port         = "0"
+  to_port           = "65535"
+  protocol          = "tcp"
+  cidr_blocks       = [var.modernisation_platform_hmpp_dc_cidr]
+  description       = "${local.common_name}-modernisation-platform-hmpp-dc-tdp"
+}
+
 # #-------------------------------------------
 # ### S3 bucket for config
 # #--------------------------------------------
