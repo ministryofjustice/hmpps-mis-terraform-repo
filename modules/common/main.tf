@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "https" {
 }
 
 resource "aws_security_group_rule" "modernisation_platform_hmpp_dc_udp" {
-  count = modernisation_platform_hmpp_dc_cidr != null ? 1 : 0
+  count = var.modernisation_platform_hmpp_dc_cidr != null ? 1 : 0
 
   security_group_id = aws_security_group.vpc-sg-outbound.id
   type              = "egress"
@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "modernisation_platform_hmpp_dc_udp" {
 }
 
 resource "aws_security_group_rule" "modernisation_platform_hmpp_dc_tdp" {
-  count = modernisation_platform_hmpp_dc_cidr != null ? 1 : 0
+  count = var.modernisation_platform_hmpp_dc_cidr != null ? 1 : 0
 
   security_group_id = aws_security_group.vpc-sg-outbound.id
   type              = "egress"
