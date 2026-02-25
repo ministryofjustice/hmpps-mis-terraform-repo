@@ -47,3 +47,17 @@ variable "modernisation_platform_hmpp_dc_cidr" {
   type    = string
   default = null
 }
+
+variable "modernisation_platform_hmpp_dc_ips" {
+  type    = list(string)
+  default = null
+}
+
+variable "modernisation_platform_hmpp_domain_name" {
+  type    = string
+  default = null
+}
+
+variable "private_subnet_map" {
+  type = map(any)
+}
