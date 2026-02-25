@@ -50,7 +50,7 @@ locals {
   s3_lb_policy_file                   = "../policies/s3_alb_policy.json"
   environment                         = var.environment_type
   legacy_environment_name             = var.legacy_environment_name
-  modernisation_platform_hmpp_dc_cidr = contains(["stage", "pre-prod", "prod"], var.environment_identifier) ? "10.27.136.0/21" : "10.20.96.0/19"
+  modernisation_platform_hmpp_dc_cidr = var.modernisation_platform_hmpp_dc_cidr
 
   tags = merge(
     data.terraform_remote_state.vpc.outputs.tags,
