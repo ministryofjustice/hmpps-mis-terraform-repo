@@ -43,3 +43,7 @@ variable "password_length" {
   default = "18"
 }
 
+variable "modernisation_platform_hmpp_dc_cidr" {
+  type    = string
+  default = null
+}
