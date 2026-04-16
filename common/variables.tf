@@ -50,3 +50,13 @@ variable "modernisation_platform_hmpp_dc_cidr" {
   default     = null
   description = "cidr where HMPP DCs and FSX sit for mounting NART file share"
 }
+
+variable "modernisation_platform_hmpp_dc_ips" {
+  type    = list(string)
+  default = null
+}
+
+variable "modernisation_platform_hmpp_domain_name" {
+  type    = string
+  default = null
+}
