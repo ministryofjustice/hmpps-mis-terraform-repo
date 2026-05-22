@@ -43,3 +43,13 @@ resource "aws_security_group_rule" "ssh_in" {
     local.bastion_cidr,
   )
 }
+
+resource "aws_security_group_rule" "common_out_oracle_tcp" {
+  security_group_id = local.sg_mis_common
+  type              = "egress"
+  protocol          = "tcp"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks       = ["10.27.0.0/21", "10.27.8.0/21", "10.26.8.0/21", "10.26.24.0/21"]
+  description       = "Oracle out to MP tcp"
+}
