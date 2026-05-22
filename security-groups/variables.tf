@@ -28,3 +28,9 @@ variable "bastion_remote_state_bucket_name" {
 variable "bastion_role_arn" {
   description = "role to access bastion terraform state"
 }
+
+variable "nextcloud_smb_access_cidrs" {
+  type        = list(string)
+  default     = null
+  description = "List of CIDRs allowed to access nextcloud SMB access"
+}

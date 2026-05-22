@@ -233,6 +233,18 @@ resource "aws_security_group_rule" "samba_in" {
   self              = "true"
 }
 
+resource "aws_security_group_rule" "samba_in_cidrs" {
+  count = var.nextcloud_smb_access_cidrs != null ? 1 : 0
+
+  security_group_id = data.terraform_remote_state.security-groups.outputs.sg_mis_samba
+  from_port         = 445
+  to_port           = 445
+  protocol          = "tcp"
+  type              = "ingress"
+  description       = "Access to SMB from given CIDRs"
+  cidr_blocks       = var.nextcloud_smb_access_cidrs
+}
+
 resource "aws_security_group_rule" "samba_out" {
   security_group_id = data.terraform_remote_state.security-groups.outputs.sg_mis_samba
   from_port         = 445
