@@ -1,5 +1,5 @@
 locals {
-  migrated_envs = ["delius-mis-dev", "delius-stage"]
+  migrated_envs = ["delius-mis-dev", "delius-stage", "delius-pre-prod"]
 }
 
 module "mis_db_2" {
