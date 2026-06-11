@@ -11,9 +11,16 @@ locals {
     "delius-stage"    = "preproduction"
     "delius-pre-prod" = "preproduction"
   }
+  migrated_envs = {
+    "delius-mis-dev"  = ["mis-db-1", "misboe-db-1", "misdsd-db-1"]
+    "delius-test"     = []
+    "delius-stage"    = ["mis-db-1", "misboe-db-1", "misdsd-db-1"]
+    "delius-pre-prod" = ["mis-db-1"]
+  }
 }
 
 resource "aws_route53_record" "mis_db1_migration_internal" {
+  count   = contains(local.migrated_envs[var.environment_name], "mis-db-1") ? 1 : 0
   zone_id = data.terraform_remote_state.vpc.outputs.private_zone_id
   name    = "mis-db-1"
   type    = "CNAME"
@@ -22,6 +29,7 @@ resource "aws_route53_record" "mis_db1_migration_internal" {
 }
 
 resource "aws_route53_record" "mis_db1_migration_public" {
+  count   = contains(local.migrated_envs[var.environment_name], "mis-db-1") ? 1 : 0
   zone_id = data.terraform_remote_state.vpc.outputs.public_zone_id
   name    = "mis-db-1"
   type    = "CNAME"
@@ -30,6 +38,7 @@ resource "aws_route53_record" "mis_db1_migration_public" {
 }
 
 resource "aws_route53_record" "boe_db1_migration_internal" {
+  count   = contains(local.migrated_envs[var.environment_name], "misboe-db-1") ? 1 : 0
   zone_id = data.terraform_remote_state.vpc.outputs.private_zone_id
   name    = "misboe-db-1"
   type    = "CNAME"
@@ -38,6 +47,7 @@ resource "aws_route53_record" "boe_db1_migration_internal" {
 }
 
 resource "aws_route53_record" "boe_db1_migration_public" {
+  count   = contains(local.migrated_envs[var.environment_name], "misboe-db-1") ? 1 : 0
   zone_id = data.terraform_remote_state.vpc.outputs.public_zone_id
   name    = "misboe-db-1"
   type    = "CNAME"
@@ -46,6 +56,7 @@ resource "aws_route53_record" "boe_db1_migration_public" {
 }
 
 resource "aws_route53_record" "dsd_db1_migration_internal" {
+  count   = contains(local.migrated_envs[var.environment_name], "misdsd-db-1") ? 1 : 0
   zone_id = data.terraform_remote_state.vpc.outputs.private_zone_id
   name    = "misdsd-db-1"
   type    = "CNAME"
@@ -54,6 +65,7 @@ resource "aws_route53_record" "dsd_db1_migration_internal" {
 }
 
 resource "aws_route53_record" "dsd_db1_migration_public" {
+  count   = contains(local.migrated_envs[var.environment_name], "misdsd-db-1") ? 1 : 0
   zone_id = data.terraform_remote_state.vpc.outputs.public_zone_id
   name    = "misdsd-db-1"
   type    = "CNAME"
