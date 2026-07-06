@@ -4,18 +4,21 @@ locals {
     "delius-test"     = "test"
     "delius-stage"    = "stage"
     "delius-pre-prod" = "preprod"
+    "delius-prod"     = "prod"
   }
   legacy_to_mp_vpc = {
     "delius-mis-dev"  = "development"
     "delius-test"     = "test"
     "delius-stage"    = "preproduction"
     "delius-pre-prod" = "preproduction"
+    "delius-prod"     = "production"
   }
   migrated_envs = {
     "delius-mis-dev"  = ["mis-db-1", "misboe-db-1", "misdsd-db-1"]
     "delius-test"     = []
     "delius-stage"    = ["mis-db-1", "misboe-db-1", "misdsd-db-1"]
     "delius-pre-prod" = ["mis-db-1", "mis-db-2"]
+    "delius-prod"     = ["mis-db-1", "mis-db-2"]
   }
 }
 
