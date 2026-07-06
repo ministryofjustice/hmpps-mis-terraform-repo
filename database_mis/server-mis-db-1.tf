@@ -1,6 +1,6 @@
 #Overide autostop tag
 locals {
-  migrated_envs = ["delius-mis-dev", "delius-stage", "delius-pre-prod"]
+  migrated_envs = ["delius-mis-dev", "delius-stage", "delius-pre-prod", "delius-prod"]
 
   overide_tags = merge(
     local.tags,
