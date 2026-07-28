@@ -69,6 +69,18 @@ resource "aws_security_group_rule" "nextcloud_efs_out" {
   self              = "true"
 }
 
+resource "aws_security_group_rule" "nextcloud_modernisation_platform_in" {
+  count = var.nextcloud_nfs_access_cidrs != null ? 1 : 0
+
+  security_group_id = data.terraform_remote_state.security-groups.outputs.sg_mis_nextcloud_efs_in
+  from_port         = "2049"
+  to_port           = "2049"
+  protocol          = "tcp"
+  type              = "ingress"
+  description       = "Modernisation-Platform-efs-in"
+  cidr_blocks       = var.nextcloud_nfs_access_cidrs
+}
+
 ####################################################
 # SG Rules for DB
 ####################################################
