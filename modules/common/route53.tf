@@ -81,3 +81,63 @@ resource "aws_route53_resolver_rule_association" "this" {
   resolver_rule_id = aws_route53_resolver_rule.hmpp_route53_resolver_hmpp[0].id
   vpc_id           = local.vpc_id
 }
+
+# So EFS DNS can be resolved from Modernisation Platform
+resource "aws_security_group" "dns_resolver_inbound" {
+  name        = "dns-resolver-inbound-sg"
+  description = "Allow inbound DNS queries"
+  vpc_id      = local.vpc_id
+
+  ingress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  ingress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  tags = merge(local.tags, {
+    Name = "dns-resolver-inbound-sg"
+  })
+}
+
+resource "aws_route53_resolver_endpoint" "dns_resolver_inbound" {
+  name      = "dns-resolver-inbound"
+  direction = "INBOUND"
+
+  security_group_ids = [
+    aws_security_group.dns_resolver_inbound.id
+  ]
+
+  dynamic "ip_address" {
+    for_each = var.private_subnet_map
+
+    content {
+      subnet_id = ip_address.value
+    }
+  }
+
+  tags = merge(local.tags, {
+    Name = "dns-resolver-inbound"
+  })
+}
