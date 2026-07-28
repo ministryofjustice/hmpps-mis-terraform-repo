@@ -29,6 +29,12 @@ variable "bastion_role_arn" {
   description = "role to access bastion terraform state"
 }
 
+variable "nextcloud_nfs_access_cidrs" {
+  type        = list(string)
+  default     = null
+  description = "List of CIDRs allowed to access nextcloud NFS access"
+}
+
 variable "nextcloud_smb_access_cidrs" {
   type        = list(string)
   default     = null
