@@ -19,6 +19,11 @@ variable "nextcloud_instance_count" {
   default = "1"
 }
 
+variable "nextcloud_efs_iam_mount_principals" {
+  description = "Principles allowed to mount EFS with IAM"
+  default = []
+}
+
 # LB
 variable "cross_zone_load_balancing" {
   description = "Enable cross-zone load balancing"
