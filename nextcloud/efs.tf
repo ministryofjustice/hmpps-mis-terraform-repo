@@ -15,8 +15,6 @@ module "efs_share" {
   security_groups        = [local.efs_security_groups]
 }
 
-data "aws_caller_identity" "this" {}
-
 data "aws_iam_policy_document" "efs_share" {
   statement {
     sid    = "SameAccountNFSv4Access"
@@ -24,7 +22,7 @@ data "aws_iam_policy_document" "efs_share" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.this.account_id}:root"]
+      identifiers = ["*"]
     }
 
     actions = [
@@ -34,6 +32,12 @@ data "aws_iam_policy_document" "efs_share" {
     ]
 
     resources = [module.efs_share.efs_arn]
+
+    condition {
+      test     = "Bool"
+      variable = "elasticfilesystem:AccessedViaMountTarget"
+      values   = ["true"]
+    }
   }
   statement {
     sid    = "CrossAccountIAMAccess"
@@ -51,12 +55,6 @@ data "aws_iam_policy_document" "efs_share" {
     ]
 
     resources = [module.efs_share.efs_arn]
-
-    condition {
-      test     = "Bool"
-      variable = "elasticfilesystem:AccessedViaMountTarget"
-      values   = ["true"]
-    }
   }
 }
 
