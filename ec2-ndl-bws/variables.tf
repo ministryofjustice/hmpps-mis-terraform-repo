@@ -113,3 +113,27 @@ variable "lb_management_rule_enabled" {
   type        = string
   default     = "false"
 }
+
+variable "modernisation_platform_mis_cname" {
+  description = "Optionally add an external CNAME record to the modernisation platform reporting URL"
+  type        = string
+  default     = null
+}
+
+variable "modernisation_platform_mis_admin_cname" {
+  description = "Optionally add an external CNAME record to the modernisation platform reporting admin URL"
+  type        = string
+  default     = null
+}
+
+variable "modernisation_platform_mis_cert_validation_name" {
+  description = "Modernisation platform cert External validation name"
+  type        = string
+  default     = null
+}
+
+variable "modernisation_platform_mis_cert_validation_value" {
+  description = "Modernisation platform cert External validation value"
+  type        = string
+  default     = null
+}
