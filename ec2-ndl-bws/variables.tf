@@ -99,8 +99,8 @@ variable "short_environment_name" {}
 
 variable "lb_mgmt_stop_expression" {
   description = "Schedule to start the Environment mis-lb-rule-mgmt-build Codebuild Project "
-  # Set to 17:00 UTC when DST is on (BST), 18:00 UTC when DST is off (GMT)
-  default = "cron(00 18 * * ? *)"
+  # Set to 16:00 UTC when DST is on (BST), 17:00 UTC when DST is off (GMT)
+  default = "cron(00 16 * * ? *)"
 }
 
 variable "lb_mgmt_resume_expression" {
